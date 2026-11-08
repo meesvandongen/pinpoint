@@ -25,7 +25,6 @@ export function Pager<T>({
   columns = 1,
   gap = 10,
   label,
-  bleed = false,
 }: {
   items: T[]
   /** The height every item is given, in pixels. */
@@ -36,8 +35,6 @@ export function Pager<T>({
   gap?: number
   /** Names the list for screen readers. */
   label: string
-  /** Let items draw outside their cell, such as a stamp over the edge of its page. */
-  bleed?: boolean
 }) {
   const { t } = useI18n()
   const root = useRef<HTMLDivElement>(null)
@@ -59,7 +56,7 @@ export function Pager<T>({
   const style = { '--cols': columns, '--gap': `${gap}px` } as CSSProperties
 
   return (
-    <div className={`pager${bleed ? ' bleed' : ''}`} ref={root} style={style}>
+    <div className="pager" ref={root} style={style}>
       <div className="pager-items" role="list" aria-label={label}>
         {items.slice(current * perPage, (current + 1) * perPage).map((item) => (
           <div role="listitem" key={keyOf(item)} className="pager-item" style={{ height: rowHeight }}>

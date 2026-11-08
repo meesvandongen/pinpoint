@@ -101,7 +101,9 @@ for (const [name, viewport] of [
       await expect(page.locator('.slot.lifted')).toHaveCount(1)
       await page.locator('.slot.lifted .hit').click()
       await expect(page.locator('.detail-stamp')).toBeVisible()
-      await expect(page.locator('.extras-list li')).toHaveCount(3) // quiz, photo, together
+      // Quiz, photo and together, plus the dark or sunrise mark when the test runs at such an hour
+      await expect(page.locator('.extras-list li').nth(2)).toBeVisible()
+      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(3)
       await expectNoClipping(page, 'book pin')
 
       // The progress survives a reload
