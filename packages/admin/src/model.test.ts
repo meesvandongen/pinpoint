@@ -33,6 +33,8 @@ describe('the editor model and the game model agree', () => {
     'a pin without clues': (q) => (q.pins[0].clues = []),
     'a text clue without text': (q) => (q.pins[0].clues[0] = { type: 'text' }),
     'an audio clue without a file': (q) => (q.pins[0].clues[0] = { type: 'audio' }),
+    'a photo hosted somewhere else': (q) => (q.pins[0].clues[0] = { type: 'photo', src: 'https://example.org/a.jpg' }),
+    'a photo inside content/ (fine)': (q) => (q.pins[0].clues[0] = { type: 'photo', src: 'media/a.jpg' }),
     'an unknown category': (q) => (q.pins[0].category = 'spaceship'),
     'a latitude out of range': (q) => (q.pins[0].position.lat = 91),
     'a radius that is too small': (q) => (q.pins[0].radius = 5),
@@ -59,7 +61,7 @@ describe('the editor model and the game model agree', () => {
       mutate(q)
       return !QuestFile.safeParse(q).success
     })
-    expect(rejected.length).toBeGreaterThanOrEqual(13)
+    expect(rejected.length).toBeGreaterThanOrEqual(14)
   })
 
   it('agree about locations', () => {

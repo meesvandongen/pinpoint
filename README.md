@@ -61,7 +61,7 @@ The app is a Cloudflare Worker named `pinpoint` ([`packages/app/wrangler.jsonc`]
 | Root directory | `packages/app` |
 | Build command | `pnpm run build` |
 | Deploy command (production branch) | `npx wrangler deploy` |
-| Version command (other branches) | `npx wrangler preview` |
+| Preview command (other branches) | `npx wrangler preview` |
 
 Every other branch and pull request gets a preview deployment (`preview_urls` is on, and `previews` is empty, so previews inherit the Worker's configuration). A preview has the test tools on and a copy of the branch's content, so a reviewer can stand at every pin of a new quest without leaving their desk.
 

@@ -42,6 +42,25 @@ describe('schema', () => {
   })
 })
 
+describe('media paths', () => {
+  const photo = (src: string) => Pin.safeParse({ ...base, clues: [{ type: 'photo', src }] }).success
+  it('only point inside content/', () => {
+    expect(photo('media/chimney.jpg')).toBe(true)
+    expect(photo('media/oude schoorsteen.jpg')).toBe(true)
+    expect(photo('https://example.org/a.jpg')).toBe(false)
+    expect(photo('//example.org/a.jpg')).toBe(false)
+    expect(photo('/media/a.jpg')).toBe(false)
+    expect(photo('../secret.jpg')).toBe(false)
+    expect(photo('media/../../secret.jpg')).toBe(false)
+    expect(photo('data:image/png;base64,AAAA')).toBe(false)
+    expect(photo('javascript:alert(1)')).toBe(false)
+  })
+  it('apply to sounds too', () => {
+    expect(Pin.safeParse({ ...base, clues: [{ type: 'audio', src: 'https://example.org/a.mp3' }] }).success).toBe(false)
+    expect(Pin.safeParse({ ...base, clues: [{ type: 'audio', src: 'media/a.mp3' }] }).success).toBe(true)
+  })
+})
+
 describe('length limits', () => {
   it('stops text that would not fit a screen', () => {
     const long = 'x'.repeat(LIMITS.hint + 1)

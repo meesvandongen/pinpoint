@@ -48,3 +48,10 @@ test('the production build has no test tools and works offline', async ({ page, 
   await expect(page.getByRole('heading', { name: 'My book' })).toBeVisible()
   expect(problems).toEqual([])
 })
+
+test('the editor asks for a token in production, and has no copy of the content to play with', async ({ page }) => {
+  await page.goto('/admin')
+  await expect(page.getByRole('heading', { name: 'Edit the quests' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByLabel('GitHub token')).toBeVisible()
+  await expect(page.getByText('Preview: edits go to a copy')).toHaveCount(0)
+})

@@ -93,7 +93,7 @@ A pin gives its clues in order, and any clue can be left out. A pin with only a 
 | `distance` | | How far the player is. |
 | `direction` | `mode`: `arrow` (default) or `cardinal` | An arrow that follows the phone's compass, or a compass point. |
 | `map` | `view`: `full` (default) or `area` | The pin and its arrival circle, or only a loose circle that contains it. |
-| `photo` | `src`, `alt` (optional) | A picture. `src` is a path under `content/` or a URL. |
+| `photo` | `src`, `alt` (optional) | A picture. `src` is a path under `content/`, never a web address. |
 | `audio` | `src`, `caption` (optional) | A sound. |
 | `wordShape` | `word`, `showFirstLetter` (default true) | The shape of a word to find: `D_ S__________`. |
 
@@ -143,4 +143,4 @@ Each has a parent it falls back to (`chimney` → `industrial` → `building` �
 
 ## Photos and sounds
 
-Put files under `content/media/` (or anywhere under `content/`) and point at them with a path relative to `content/`, such as `media/chimney.jpg`. The check fails when a file is missing. Keep pictures small: a clue photo does not need to be wider than 1200 pixels.
+Put files under `content/media/` (or anywhere under `content/`) and point at them with a path relative to `content/`, such as `media/chimney.jpg`. Web addresses are refused: a picture hosted elsewhere could change after review, and its host would learn who is playing. The check fails when a file is missing. Keep pictures small: a clue photo does not need to be wider than 1200 pixels.

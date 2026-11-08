@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { defineCollection, field, geoPoint, geoPolygon, type CommitMessageContext } from 'gitvfs-cms'
-import { CATEGORY_IDS, LIMITS, STAMP_SHAPES, type LocalizedText } from 'pinpoint-core'
+import { CATEGORY_IDS, LIMITS, MediaPath, STAMP_SHAPES, type LocalizedText } from 'pinpoint-core'
 
 // The editor's own copy of the content model. It describes the same files as `pinpoint-core`, with
 // the editor hints (map fields, the clue list, language-aware texts) on top. `model.test.ts`
@@ -39,8 +39,8 @@ const Clue = z.union([
     z.object({ type: z.literal('direction'), mode: z.enum(['arrow', 'cardinal']).default('arrow'), reveal }),
     z.object({ type: z.literal('map'), view: z.enum(['full', 'area']).default('full'), reveal }),
     z.object({ type: z.literal('text'), text: localized(LIMITS.hint, { label: 'Text' }), reveal }),
-    z.object({ type: z.literal('photo'), src: z.string().min(1), alt: localized(LIMITS.caption, { label: 'Description' }).optional(), reveal }),
-    z.object({ type: z.literal('audio'), src: z.string().min(1), caption: localized(LIMITS.caption, { label: 'Caption' }).optional(), reveal }),
+    z.object({ type: z.literal('photo'), src: MediaPath, alt: localized(LIMITS.caption, { label: 'Description' }).optional(), reveal }),
+    z.object({ type: z.literal('audio'), src: MediaPath, caption: localized(LIMITS.caption, { label: 'Caption' }).optional(), reveal }),
     z.object({ type: z.literal('wordShape'), word: localized(LIMITS.word, { label: 'The word' }), showFirstLetter: z.boolean().default(true), reveal }),
   ]),
   // A clue type this version does not know is kept, but a known type with wrong fields is an error.

@@ -17,8 +17,8 @@ const HELP: Record<KnownClueType, string> = {
   distance: 'How far the player is from the pin.',
   direction: 'An arrow or a compass point towards the pin.',
   map: 'A map: the exact pin, or only a rough area around it.',
-  photo: 'A picture of the place. Put the file in content/ and give its path.',
-  audio: 'A sound or a spoken hint. Put the file in content/ and give its path.',
+  photo: 'A picture of the place. Put the file under content/ and give its path, not a web address.',
+  audio: 'A sound or a spoken hint. Put the file under content/ and give its path, not a web address.',
   wordShape: 'The shape of a word to find: its length, and the first letter of each word.',
 }
 

@@ -24,7 +24,6 @@
     "pinpoint-core": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "zod": "^4.6.7",
     "gitvfs-github-auth": "file:../../vendor/gitvfs-github-auth.tgz"
   },
   "devDependencies": {
@@ -36,7 +35,6 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.0.0",
     "fake-indexeddb": "^6.2.7",
-    "gitvfs": "file:../../vendor/gitvfs.tgz",
     "gitvfs-github-msw": "file:../../vendor/gitvfs-github-msw.tgz",
     "happy-dom": "^21.0.4",
     "msw": "^3.0.4",

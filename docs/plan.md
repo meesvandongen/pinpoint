@@ -82,9 +82,9 @@ This is the main review tool for quest pull requests: a reviewer opens the previ
 
 Built, and covered by tests:
 
-- Core: schemas, geo, play rules, sun position, categories and their OSM mapping, collage layout, quest checks. 77 tests.
+- Core: schemas, geo, play rules, sun position, categories and their OSM mapping, collage layout, quest checks. 79 tests.
 - App: the whole game, English and Dutch, offline, the test tools. 38 tests, plus a browser suite that plays the game.
-- Editor: all content types, with checks that its schema and the game's agree. 20 tests.
+- Editor: all content types, with checks that its schema and the game's agree. 22 tests.
 - CI: lint, content check, typecheck, unit tests, build and the browser suite.
 
 Open:

@@ -39,6 +39,17 @@ export const Slug = z
   .string()
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'use lowercase letters, digits and dashes')
 
+/**
+ * A file the content points at, as a path under `content/`, such as `media/chimney.jpg`. Never a web
+ * address: a picture hosted elsewhere could change after review, and would tell its host who plays.
+ */
+export const MediaPath = z
+  .string()
+  .min(1)
+  .refine((path) => !/^([a-z][a-z0-9+.-]*:|\/)/i.test(path) && !path.split('/').includes('..'), {
+    message: 'use a path under content/, such as media/chimney.jpg, not a web address',
+  })
+
 /** When a clue becomes visible. Without a rule it is visible from the start. */
 export const Reveal = z.object({
   afterSeconds: z.number().int().positive().optional(),
@@ -63,14 +74,13 @@ const KnownClue = z.discriminatedUnion('type', [
   z.object({ type: z.literal('text'), text: localized(LIMITS.hint), ...reveal }),
   z.object({
     type: z.literal('photo'),
-    /** A path relative to the content folder, or a full URL. */
-    src: z.string().min(1),
+    src: MediaPath,
     alt: localized(LIMITS.caption).optional(),
     ...reveal,
   }),
   z.object({
     type: z.literal('audio'),
-    src: z.string().min(1),
+    src: MediaPath,
     caption: localized(LIMITS.caption).optional(),
     ...reveal,
   }),
