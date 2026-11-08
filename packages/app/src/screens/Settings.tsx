@@ -42,7 +42,7 @@ export function Settings() {
         </Link>
       </Cover>
       <Body className="settings-body">
-        <div className="setting">
+        <div className="setting stacked">
           <strong id="lang-label">{t('settings.language')}</strong>
           <div className="segmented" role="radiogroup" aria-labelledby="lang-label">
             {(['auto', ...LANGUAGES] as const).map((value) => (
@@ -67,7 +67,7 @@ export function Settings() {
           </div>
           {!compassOn && (
             <button type="button" className="btn small" onClick={() => void enableCompass().then((ok) => setCompassFailed(!ok))}>
-              {t('common.on')}
+              {t('settings.compass.turnOn')}
             </button>
           )}
         </div>

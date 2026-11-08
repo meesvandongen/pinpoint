@@ -8,7 +8,8 @@ export type LocationState = {
   device?: Fix
   /** A position set by the test tools. While it is set it replaces the device position. */
   simulated?: Fix
-  error?: string
+  /** Why there is no position, as a code the interface translates. */
+  error?: 'denied' | 'unavailable' | 'timeout' | 'unsupported'
 }
 
 export const locationStore = createStore<LocationState>({ status: 'idle' })
@@ -31,7 +32,7 @@ let watchId: number | undefined
 export function startWatching() {
   if (watchId !== undefined) return
   if (!('geolocation' in navigator)) {
-    locationStore.set((s) => ({ ...s, status: 'unavailable', error: 'This device cannot share its location.' }))
+    locationStore.set((s) => ({ ...s, status: 'unavailable', error: 'unsupported' }))
     return
   }
   locationStore.set((s) => ({ ...s, status: 'watching', error: undefined }))
@@ -46,10 +47,18 @@ export function startWatching() {
     (e) => {
       const denied = e.code === e.PERMISSION_DENIED
       if (denied) stopWatching()
-      locationStore.set((s) => ({ ...s, status: denied ? 'denied' : s.status, error: e.message }))
+      const error = denied ? 'denied' : e.code === e.TIMEOUT ? 'timeout' : 'unavailable'
+      locationStore.set((s) => ({ ...s, status: denied ? 'denied' : s.status, error }))
     },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 },
   )
+}
+
+/** Asks again after a refusal. The browser may still refuse without a prompt, and then the error comes straight back. */
+export function retryLocation() {
+  stopWatching()
+  locationStore.set((s) => ({ ...s, status: 'idle', error: undefined }))
+  startWatching()
 }
 
 export function stopWatching() {

@@ -131,4 +131,19 @@ test.describe('the clue deck', () => {
     await pins.nth(1).click()
     await expect(page.getByText('“Ducks know the way.”')).toBeVisible()
   })
+
+  test('the back button leads to the place, also after a stamp', async ({ page }) => {
+    await page.goto('/place/tilburg')
+    await page.getByRole('button', { name: /Wool city/ }).click()
+    await page.goto('/quest/tilburg-textile?sim=51.5607,5.0768,10')
+    await page.getByRole('button', { name: 'Check in' }).click()
+    // The question can be skipped, so the player is never stuck on an arrival page.
+    await page.getByRole('button', { name: 'Next' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+    await expect(page.getByText('Pin 2 of 3')).toBeVisible()
+    await page.getByRole('button', { name: /Quests/ }).click()
+    await expect(page.getByRole('heading', { name: 'Tilburg' })).toBeVisible()
+    await expect(page.getByText('Started')).toBeVisible()
+  })
 })

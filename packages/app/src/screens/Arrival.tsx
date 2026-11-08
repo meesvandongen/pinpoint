@@ -38,6 +38,7 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
   const extras = extrasOf(stamp)
   const last = index === steps.length - 1
   const photoPending = step === 'photo' && !stamp.photo
+  const quizPending = step === 'quiz' && stamp.quiz === undefined
 
   const next = () => {
     if (last) void navigate({ to: '/quest/$questId', params: { questId: quest.id }, replace: true })
@@ -64,8 +65,8 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
       </Body>
       <Foot>
         <Dots index={index} total={steps.length} />
-        <button type="button" className="btn primary" disabled={step === 'quiz' && stamp.quiz === undefined} onClick={next}>
-          {last ? t('common.continue') : photoPending ? t('arrival.photo.skip') : t('common.next')}
+        <button type="button" className="btn primary" onClick={next}>
+          {quizPending ? t('arrival.quiz.skip') : last ? t('common.continue') : photoPending ? t('arrival.photo.skip') : t('common.next')}
         </button>
       </Foot>
     </Screen>
@@ -132,7 +133,7 @@ function PhotoPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: Stamp
         }}
       />
       <button type="button" className="btn" disabled={busy} onClick={() => input.current?.click()}>
-        {stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
+        {busy ? t('arrival.photo.saving') : stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
       </button>
       {stamp.photo && !failed && <p className="status" role="status">{t('arrival.photo.saved')}</p>}
       {failed && <p className="status warn" role="alert">{t('arrival.photo.failed')}</p>}
@@ -169,6 +170,11 @@ function QuizPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampR
           )
         })}
       </div>
+      {answered && (
+        <p className={`status ${stamp.quiz === 'correct' ? 'good' : ''}`} role="status">
+          {stamp.quiz === 'correct' ? t('arrival.quiz.right') : t('arrival.quiz.wrong')}
+        </p>
+      )}
     </div>
   )
 }

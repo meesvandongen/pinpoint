@@ -93,9 +93,14 @@ export function Done() {
             )}
           </div>
         )}
-        <Link to="/" className="btn">
-          {t('done.back')}
-        </Link>
+        <div className="foot-nav">
+          <Link to="/book/$questId" params={{ questId: quest.id }} className="btn">
+            {t('done.stamps')}
+          </Link>
+          <Link to="/" className="btn">
+            {t('done.back')}
+          </Link>
+        </div>
       </Foot>
     </Screen>
   )

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate, useCanGoBack, useNavigate, useParams, useRouter, useSearch } from '@tanstack/react-router'
+import { useEffect, useMemo, useRef, useState, type TouchEvent } from 'react'
+import { Navigate, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   arrowRotation,
@@ -8,6 +8,8 @@ import {
   formatDistance,
   playablePins,
   proximity,
+  questsInLocation,
+  ringArea,
   resolveClues,
   resolveText,
   skyAt,
@@ -24,7 +26,7 @@ import { useI18n } from '../i18n/index.ts'
 import { now, useSkipSeconds } from '../lib/clock.ts'
 import { MapClue } from '../map/MapClue.tsx'
 import { enableCompass, useCompassEnabled, useHeading } from '../state/heading.ts'
-import { startWatching, useFix, useLocationState } from '../state/location.ts'
+import { retryLocation, startWatching, useFix, useLocationState } from '../state/location.ts'
 import { playContext } from '../state/play-context.ts'
 import { addStamp, patchStamp, stampedPins, useStamps } from '../state/progress.ts'
 import { useSettings } from '../state/settings.ts'
@@ -65,8 +67,7 @@ function useElapsed(): number {
 function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: string[] }) {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
+  const { data: content } = useSuspenseQuery(contentQuery)
   const stamps = useStamps()
   const settings = useSettings()
   const location = useLocationState()
@@ -94,6 +95,29 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
   const card = deck[Math.min(deckIndex, Math.max(0, deck.length - 1))]
 
   const prox = fix ? proximity(fix, pin) : undefined
+  const arrived = prox?.state === 'arrived'
+
+  // A short buzz when the pin comes within reach, for players who are looking at the street and not the screen.
+  useEffect(() => {
+    if (arrived) navigator.vibrate?.(60)
+  }, [arrived])
+
+  // Back goes to the list the quest came from, not through history: after a stamp the history holds this screen twice.
+  const place = content.locations
+    .filter((l) => questsInLocation(l, content.quests).some((q) => q.id === quest.id))
+    .sort((a, b) => ringArea(a.polygon) - ringArea(b.polygon))[0]
+
+  const swipe = useRef<number>(undefined)
+  const onTouchStart = (e: TouchEvent) => {
+    swipe.current = (e.target as HTMLElement).closest('.mapview, .areamap, audio') ? undefined : e.touches[0].clientX
+  }
+  const onTouchEnd = (e: TouchEvent) => {
+    if (swipe.current === undefined) return
+    const dx = e.changedTouches[0].clientX - swipe.current
+    swipe.current = undefined
+    if (Math.abs(dx) < 50) return
+    setDeckIndex((i) => Math.max(0, Math.min(deck.length - 1, i + (dx < 0 ? 1 : -1))))
+  }
   const bearing = fix ? bearingDegrees(fix, pin.position) : undefined
   const stamped = stampedPins(stamps, quest.id)
   const index = quest.pins.findIndex((p) => p.id === pin.id)
@@ -121,7 +145,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
   let status = t('play.waiting')
   if (prox) {
     status =
-      prox.state === 'arrived'
+      arrived
         ? t('play.here')
         : prox.state === 'near'
           ? t('play.almost')
@@ -134,6 +158,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
     <Screen className="play">
       <Cover
         title={tr(quest.title)}
+        subtitle={t('play.pinOf', { n: index + 1, total: quest.pins.length })}
         after={
           <div className="pins" role="group" aria-label={t('play.pinOf', { n: index + 1, total: quest.pins.length })}>
             {quest.pins.map((p, i) => {
@@ -156,7 +181,11 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
           </div>
         }
       >
-        <button type="button" className="back" onClick={() => (canGoBack ? router.history.back() : void navigate({ to: '/' }))}>
+        <button
+          type="button"
+          className="back"
+          onClick={() => void (place ? navigate({ to: '/place/$locationId', params: { locationId: place.id } }) : navigate({ to: '/' }))}
+        >
           ‹ {t('play.back')}
         </button>
       </Cover>
@@ -198,7 +227,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
             )}
 
             {card && (
-              <div className="deck">
+              <div className="deck" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
                 <div className="deck-card" key={card.index}>
                   {card.visible ? (
                     <ClueCard clue={card.clue as KnownClue} pin={pin} quest={quest} />
@@ -222,7 +251,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
                     </button>
                     <span className="pager-dots" role="status" aria-label={t('play.clueNumber', { n: deckIndex + 1, total: deck.length })}>
                       {deck.map((d, i) => (
-                        <i key={d.index} className={i === deckIndex ? 'on' : ''} />
+                        <i key={d.index} className={`${i === deckIndex ? 'on' : ''} ${d.visible ? '' : 'lock'}`} title={d.visible ? undefined : t('play.lockedClue')} />
                       ))}
                     </span>
                     <button type="button" className="turn" disabled={deckIndex >= deck.length - 1} onClick={() => setDeckIndex(deckIndex + 1)} aria-label={t('play.nextClue')}>
@@ -232,14 +261,23 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
                 )}
               </div>
             )}
-            {location.error && <p className="status warn">{location.error}</p>}
+            {location.error && (
+              <div className="notice">
+                <p className="status warn">{t(`location.${location.error}`)}</p>
+                {(location.error === 'denied' || location.error === 'unavailable') && (
+                  <button type="button" className="btn small" onClick={retryLocation}>
+                    {t('location.retry')}
+                  </button>
+                )}
+              </div>
+            )}
           </>
         )}
       </Body>
 
       <Foot>
         <p className="status" role="status" data-testid="status">{status}</p>
-        <button type="button" className="btn primary" disabled={prox?.state !== 'arrived'} onClick={checkIn}>
+        <button type="button" className={`btn primary ${arrived ? 'ready' : ''}`} disabled={!arrived} onClick={checkIn}>
           {t('play.checkIn')}
         </button>
       </Foot>

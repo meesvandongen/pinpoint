@@ -5,7 +5,7 @@ import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
 import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
-import { currentFix, startWatching, useLocationState } from '../state/location.ts'
+import { currentFix, retryLocation, startWatching, useLocationState } from '../state/location.ts'
 import { resolveText } from 'pinpoint-core'
 
 export const ROW_HEIGHT = 56
@@ -37,12 +37,19 @@ export function Home() {
               {t('home.ask.button')}
             </button>
           </div>
-        ) : (
-          <p className="status" role="status">
-            {fix ? (near.length ? t('home.in') : t('home.nowhere')) : (location.error ?? t('home.locating'))}
-          </p>
+        ) : fix && near.length ? null : (
+          <div className="notice" role="status">
+            <p className={`status ${location.error === 'denied' ? 'warn' : ''}`}>
+              {fix ? t('home.nowhere') : location.error ? t(`location.${location.error}`) : t('home.locating')}
+            </p>
+            {!fix && (location.error === 'denied' || location.error === 'unavailable') && (
+              <button type="button" className="btn small" onClick={retryLocation}>
+                {t('location.retry')}
+              </button>
+            )}
+          </div>
         )}
-        <h2 className="sub">{fix && near.length ? t('home.places') : t('home.choose')}</h2>
+        <h2 className="sub">{fix && near.length ? t('home.placesNear') : t('home.choose')}</h2>
         <Pager
           items={list}
           rowHeight={ROW_HEIGHT}
