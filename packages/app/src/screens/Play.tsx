@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router'
+import { Navigate, useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   arrowRotation,
@@ -18,6 +18,7 @@ import {
   type Quest,
   type Stamp,
 } from 'pinpoint-core'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { contentQuery, mediaUrl } from '../content.ts'
 import { useI18n, type MessageKey } from '../i18n/index.ts'
@@ -128,7 +129,8 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
         if (raining) patchStamp(quest.id, pin.id, { weather: 'rain' })
       })
     }
-    void navigate({ to: '/quest/$questId/arrived/$pinId', params: { questId: quest.id, pinId: pin.id } })
+    // Replaces this screen: the pin is stamped, so Back from the arrival pages must not lead here again.
+    void navigate({ to: '/quest/$questId/arrived/$pinId', params: { questId: quest.id, pinId: pin.id }, replace: true, state: { fromPin: true } as never })
   }
 
   let status = t('play.waiting')
@@ -145,10 +147,8 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
 
   return (
     <Screen className="play">
-      <Cover title={tr(quest.title)} subtitle={t('play.pinOf', { n: index + 1, total: quest.pins.length })}>
-        <Link to="/quest/$questId" params={{ questId: quest.id }} className="back">
-          ‹ {t('play.back')}
-        </Link>
+      <Cover title={tr(quest.title)} subtitle={t('play.pinOf', { n: index + 1, total: quest.pins.length })} home>
+        <BackButton label={t('play.back')} fallback={(go) => void go({ to: '/quest/$questId', params: { questId: quest.id } })} />
       </Cover>
 
       <Body>

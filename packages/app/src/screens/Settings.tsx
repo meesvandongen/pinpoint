@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Screen } from '../components/layout.tsx'
 import { LANGUAGES, useI18n } from '../i18n/index.ts'
 import { clearPhotos } from '../photos/db.ts'
@@ -37,9 +37,7 @@ export function Settings() {
   return (
     <Screen className="settings">
       <Cover title={t('settings.title')}>
-        <Link to="/" className="back">
-          ‹ {t('common.back')}
-        </Link>
+        <BackButton label={t('common.back')} fallback={(go) => void go({ to: '/' })} />
       </Cover>
       <Body className="settings-body">
         <div className="setting stacked">

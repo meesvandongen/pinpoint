@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams } from '@tanstack/react-router'
+import { Navigate, useCanGoBack, useLocation, useNavigate, useParams, useRouter } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { extrasOf, resolveText, type Pin, type Quest, type Stamp as StampRecord } from 'pinpoint-core'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
@@ -31,6 +31,9 @@ export function Arrival() {
 function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampRecord }) {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+  const fromPin = useLocation({ select: (l) => (l.state as { fromPin?: boolean }).fromPin === true })
   const stamps = useStamps()
   const [index, setIndex] = useState(0)
   const steps: Step[] = pin.quiz ? ['stamp', 'photo', 'quiz'] : ['stamp', 'photo']
@@ -45,9 +48,11 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
     if (last) {
       // The last pin of a quest leads on to the collage, the others back to the overview.
       const complete = stampedPins(stamps, quest.id).size >= quest.pins.length
-      void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
-    }
-    else setIndex(index + 1)
+      // Back to the overview by going back in history when this page came from the pin, so the history does not
+      // fill up with copies of the overview that Back would then walk through one by one.
+      if (!complete && fromPin && canGoBack) router.history.back()
+      else void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
+    } else setIndex(index + 1)
   }
 
   return (

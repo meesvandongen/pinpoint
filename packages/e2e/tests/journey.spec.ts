@@ -155,3 +155,38 @@ test.describe('the clue deck', () => {
     await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
   })
 })
+
+test.describe('moving around', () => {
+  test.use({ viewport: { width: 390, height: 780 }, reducedMotion: 'reduce' })
+
+  test('Back never walks in circles, Home is always close, and a started quest can be resumed', async ({ page }) => {
+    await page.goto('/place/tilburg?sim=51.5607,5.0768,10')
+    await page.getByRole('button', { name: /Wool city/ }).click()
+    await expect(page.getByRole('link', { name: 'Start' })).toBeVisible()
+    await page.getByRole('link', { name: 'Start' }).click()
+    await page.getByRole('button', { name: 'Check in' }).click()
+    await page.getByRole('button', { name: 'Next' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+
+    // Back on the quest page, which now offers to go on, and Back leads to the list it was chosen from.
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+    await expect(page.getByRole('link', { name: 'Continue' })).toBeVisible()
+    await page.getByRole('button', { name: 'Back' }).click()
+    await expect(page).toHaveURL(/\/place\/tilburg(\?|$)/)
+
+    // Forward again, then the home shortcut, which offers the started quest.
+    await page.getByRole('button', { name: /Wool city/ }).click()
+    await page.getByRole('link', { name: 'Home' }).click()
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
+    const resume = page.locator('.row.resume')
+    await expect(resume).toContainText('Wool city')
+    await expect(resume).toContainText('1/3')
+    await expectNoClipping(page, 'home with a started quest')
+    await resume.click()
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+    // Back from a quest entered from Home returns to Home.
+    await page.getByRole('button', { name: 'Back' }).click()
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
+  })
+})

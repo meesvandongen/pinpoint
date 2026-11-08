@@ -1,6 +1,7 @@
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { questsInLocation, resolveText } from 'pinpoint-core'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
 import { contentQuery } from '../content.ts'
@@ -23,9 +24,7 @@ export function Quests() {
   return (
     <Screen>
       <Cover title={resolveText(location.name, contentLanguages)} subtitle={tp('quests.count', quests.length)}>
-        <Link to="/" className="back">
-          ‹ {t('quests.back')}
-        </Link>
+        <BackButton label={t('quests.back')} fallback={(go) => void go({ to: '/' })} />
       </Cover>
       <Body>
         {quests.length === 0 ? (

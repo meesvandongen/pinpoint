@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { Link, useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router'
+import { Link, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   hashString,
@@ -12,10 +12,12 @@ import {
   type Quest,
   type Stamp as StampRecord,
 } from 'pinpoint-core'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { FitGrid } from '../components/FitGrid.tsx'
 import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
+import { placeOf } from '../lib/place.ts'
 import { usePhotoUrls } from '../photos/usePhoto.ts'
 import { findStamp, stampedPins, useStamps } from '../state/progress.ts'
 import { questStampPropsFor, stampPropsFor } from '../stamps/for-pin.ts'
@@ -44,9 +46,7 @@ type Cell = { kind: 'pin'; index: number } | { kind: 'quest' }
 function Overview({ quest }: { quest: Quest }) {
   const i18n = useI18n()
   const { t, contentLanguages } = i18n
-  const router = useRouter()
-  const navigate = useNavigate()
-  const canGoBack = useCanGoBack()
+  const { data: content } = useSuspenseQuery(contentQuery)
   const stamps = useStamps()
   const photoUrls = usePhotoUrls(quest.id)
   const [lifted, setLifted] = useState<string>()
@@ -56,6 +56,7 @@ function Overview({ quest }: { quest: Quest }) {
   const stamped = stampedPins(stamps, quest.id)
   const playable = new Set(playablePins(quest, stamped).map((p) => p.id))
   const complete = stamped.size >= quest.pins.length
+  const nextPin = playablePins(quest, stamped)[0]
   const cells: Cell[] = [
     ...quest.pins.map((_, index): Cell => ({ kind: 'pin', index })),
     ...(complete ? [{ kind: 'quest' } as Cell] : []),
@@ -69,14 +70,15 @@ function Overview({ quest }: { quest: Quest }) {
           done: Math.min(stamped.size, quest.pins.length),
           total: quest.pins.length,
         })}
+        home
       >
-        <button
-          type="button"
-          className="back"
-          onClick={() => (canGoBack ? router.history.back() : void navigate({ to: '/' }))}
-        >
-          ‹ {t('common.back')}
-        </button>
+        <BackButton
+          label={t('common.back')}
+          fallback={(go) => {
+            const place = placeOf(content.locations, content.quests, quest)
+            void (place ? go({ to: '/place/$locationId', params: { locationId: place.id } }) : go({ to: '/' }))
+          }}
+        />
       </Cover>
       <Body className="overview-body">
         <FitGrid
@@ -105,10 +107,16 @@ function Overview({ quest }: { quest: Quest }) {
         />
       </Body>
       <Foot>
-        {complete && (
+        {complete ? (
           <Link to="/quest/$questId/done" params={{ questId: quest.id }} className="btn primary">
             {t('book.openCollage')}
           </Link>
+        ) : (
+          nextPin && (
+            <Link to="/quest/$questId/find/$pinId" params={{ questId: quest.id, pinId: nextPin.id }} className="btn primary">
+              {stamped.size > 0 ? t('quest.continue') : t('quest.start')}
+            </Link>
+          )
         )}
       </Foot>
     </Screen>

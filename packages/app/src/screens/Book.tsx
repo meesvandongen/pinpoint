@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { extrasOf, resolveText, type Quest } from 'pinpoint-core'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
 import { contentQuery } from '../content.ts'
@@ -22,9 +23,7 @@ export function BookIndex() {
   return (
     <Screen>
       <Cover title={t('book.title')}>
-        <Link to="/" className="back">
-          ‹ {t('common.back')}
-        </Link>
+        <BackButton label={t('common.back')} fallback={(go) => void go({ to: '/' })} />
       </Cover>
       <Body>
         {started.length === 0 ? (

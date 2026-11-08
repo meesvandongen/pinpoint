@@ -6,6 +6,7 @@ import { Pager } from '../components/Pager.tsx'
 import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
 import { currentFix, retryLocation, startWatching, useLocationState } from '../state/location.ts'
+import { stampedPins, useStamps } from '../state/progress.ts'
 import { resolveText } from 'pinpoint-core'
 
 export const ROW_HEIGHT = 56
@@ -15,6 +16,7 @@ export function Home() {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
   const location = useLocationState()
+  const stamps = useStamps()
   const fix = currentFix(location)
 
   const near = fix ? locationsContaining(fix, content.locations) : []
@@ -23,6 +25,15 @@ export function Home() {
     .filter((l) => !nearIds.has(l.id))
     .sort((a, b) => ringArea(a.polygon) - ringArea(b.polygon))
   const list = [...near, ...others]
+  // Quests that were started and not finished, the one played last first: one tap to carry on.
+  const lastStamp = (questId: string) => stamps.reduce((last, s, i) => (s.questId === questId ? i : last), -1)
+  const resume = content.quests
+    .filter((q) => {
+      const done = stampedPins(stamps, q.id).size
+      return done > 0 && done < q.pins.length
+    })
+    .sort((a, b) => lastStamp(b.id) - lastStamp(a.id))
+    .slice(0, 2)
   const asking = location.status === 'idle' && !fix
 
   return (
@@ -48,6 +59,19 @@ export function Home() {
               </button>
             )}
           </div>
+        )}
+        {resume.length > 0 && (
+          <>
+            <h2 className="sub">{t('home.continue')}</h2>
+            <div className="resume-list">
+              {resume.map((q) => (
+                <button key={q.id} type="button" className="row resume" onClick={() => navigate({ to: '/quest/$questId', params: { questId: q.id } })}>
+                  <span>{resolveText(q.title, contentLanguages, q.defaultLanguage)}</span>
+                  <em className="resume-tag">{t('home.resume', { done: stampedPins(stamps, q.id).size, total: q.pins.length })}</em>
+                </button>
+              ))}
+            </div>
+          </>
         )}
         <h2 className="sub">{fix && near.length ? t('home.placesNear') : t('home.choose')}</h2>
         <Pager
