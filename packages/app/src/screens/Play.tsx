@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type TouchEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
@@ -22,7 +22,7 @@ import {
 } from 'pinpoint-core'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { contentQuery, mediaUrl } from '../content.ts'
-import { useI18n } from '../i18n/index.ts'
+import { useI18n, type MessageKey } from '../i18n/index.ts'
 import { now, useSkipSeconds } from '../lib/clock.ts'
 import { MapClue } from '../map/MapClue.tsx'
 import { enableCompass, useCompassEnabled, useHeading } from '../state/heading.ts'
@@ -76,7 +76,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
   const compassOn = useCompassEnabled()
   const elapsed = useElapsed()
   const [requested, setRequested] = useState<ReadonlySet<number>>(new Set())
-  const [deckIndex, setDeckIndex] = useState(0)
+  const [picked, setPicked] = useState<number>()
   const tr = (text: Parameters<typeof resolveText>[0]) => resolveText(text, contentLanguages, quest.defaultLanguage)
 
   useEffect(() => {
@@ -91,8 +91,22 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
   const visible = states.filter((s) => s.visible).map((s) => s.clue as KnownClue)
   const showDistance = visible.some((c) => c.type === 'distance')
   const direction = visible.find((c) => c.type === 'direction') as Extract<KnownClue, { type: 'direction' }> | undefined
-  const deck = states.filter((s) => s.clue.type !== 'distance' && s.clue.type !== 'direction')
-  const card = deck[Math.min(deckIndex, Math.max(0, deck.length - 1))]
+  // The clues you hold are a row of tabs. A clue you do not hold yet is never browsable: there is only ever one
+  // "next clue", with a countdown or a button.
+  const held = states.filter((s) => s.visible && s.clue.type !== 'distance' && s.clue.type !== 'direction')
+  const next = states.find((s) => !s.visible)
+  const heldKey = held.map((s) => s.index).join()
+  const [seen, setSeen] = useState<ReadonlySet<number>>(() => new Set(held.map((s) => s.index)))
+  useEffect(() => {
+    // A clue that opens by itself becomes the one on show.
+    const fresh = held.find((s) => !seen.has(s.index))
+    if (!fresh) return
+    setSeen(new Set(held.map((s) => s.index)))
+    setPicked(fresh.index)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heldKey])
+  const card = held.find((s) => s.index === picked) ?? held[0]
+  const reveal = (index: number) => setRequested((r) => new Set([...r, index]))
 
   const prox = fix ? proximity(fix, pin) : undefined
   const arrived = prox?.state === 'arrived'
@@ -107,17 +121,6 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
     .filter((l) => questsInLocation(l, content.quests).some((q) => q.id === quest.id))
     .sort((a, b) => ringArea(a.polygon) - ringArea(b.polygon))[0]
 
-  const swipe = useRef<number>(undefined)
-  const onTouchStart = (e: TouchEvent) => {
-    swipe.current = (e.target as HTMLElement).closest('.mapview, .areamap, audio') ? undefined : e.touches[0].clientX
-  }
-  const onTouchEnd = (e: TouchEvent) => {
-    if (swipe.current === undefined) return
-    const dx = e.changedTouches[0].clientX - swipe.current
-    swipe.current = undefined
-    if (Math.abs(dx) < 50) return
-    setDeckIndex((i) => Math.max(0, Math.min(deck.length - 1, i + (dx < 0 ? 1 : -1))))
-  }
   const bearing = fix ? bearingDegrees(fix, pin.position) : undefined
   const stamped = stampedPins(stamps, quest.id)
   const index = quest.pins.findIndex((p) => p.id === pin.id)
@@ -150,7 +153,7 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
         : prox.state === 'near'
           ? t('play.almost')
           : showDistance
-            ? t('play.toGo', { distance: formatDistance(prox.distance) })
+            ? t('play.getClose', { distance: formatDistance(pin.radius) })
             : t('play.keepExploring')
   }
 
@@ -226,38 +229,37 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
               </div>
             )}
 
+            {held.length > 1 && (
+              <div className="clue-tabs" role="tablist" aria-label={t('play.yourClues')}>
+                {held.map((c, i) => (
+                  <button key={c.index} type="button" role="tab" aria-selected={c === card} className={c === card ? 'on' : ''} onClick={() => setPicked(c.index)}>
+                    {i + 1} · {t(`play.clue.${c.clue.type}` as MessageKey)}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {card && (
-              <div className="deck" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-                <div className="deck-card" key={card.index}>
-                  {card.visible ? (
-                    <ClueCard clue={card.clue as KnownClue} pin={pin} quest={quest} />
-                  ) : (
-                    <div className="locked">
-                      <p>
-                        {card.lockedBy === 'time'
-                          ? t('play.lockedTime', { seconds: Math.max(0, (card.clue.reveal?.afterSeconds ?? 0) - elapsed) })
-                          : t('play.lockedRequest')}
-                      </p>
-                      <button type="button" className="btn" onClick={() => setRequested(new Set([...requested, card.index]))}>
-                        {t('play.showNow')}
-                      </button>
-                    </div>
-                  )}
+              <div className="deck">
+                <div className="deck-card" key={card.index} role="tabpanel">
+                  <ClueCard clue={card.clue as KnownClue} pin={pin} quest={quest} />
                 </div>
-                {deck.length > 1 && (
-                  <div className="deck-nav">
-                    <button type="button" className="turn" disabled={deckIndex === 0} onClick={() => setDeckIndex(deckIndex - 1)} aria-label={t('play.previousClue')}>
-                      ‹
+              </div>
+            )}
+
+            {next && (
+              <div className="next-clue">
+                {next.lockedBy === 'time' ? (
+                  <>
+                    <span role="timer">{t('play.next.wait', { seconds: Math.max(0, (next.clue.reveal?.afterSeconds ?? 0) - elapsed) })}</span>
+                    <button type="button" className="btn small" onClick={() => reveal(next.index)}>
+                      {t('play.next.now')}
                     </button>
-                    <span className="pager-dots" role="status" aria-label={t('play.clueNumber', { n: deckIndex + 1, total: deck.length })}>
-                      {deck.map((d, i) => (
-                        <i key={d.index} className={`${i === deckIndex ? 'on' : ''} ${d.visible ? '' : 'lock'}`} title={d.visible ? undefined : t('play.lockedClue')} />
-                      ))}
-                    </span>
-                    <button type="button" className="turn" disabled={deckIndex >= deck.length - 1} onClick={() => setDeckIndex(deckIndex + 1)} aria-label={t('play.nextClue')}>
-                      ›
-                    </button>
-                  </div>
+                  </>
+                ) : (
+                  <button type="button" className="btn small" onClick={() => reveal(next.index)}>
+                    {t('play.next.ask')}
+                  </button>
                 )}
               </div>
             )}

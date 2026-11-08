@@ -27,8 +27,8 @@ test('the production build has no test tools and works offline', async ({ page, 
   // Open a map clue while online, so the map has been seen
   await page.locator('.row', { hasText: 'Tilburg' }).click()
   await page.locator('.quest', { hasText: 'Wool city' }).click()
-  await page.getByRole('button', { name: 'Next clue' }).click()
-  await page.getByRole('button', { name: 'Show it now' }).click()
+  await page.getByRole('button', { name: 'Show now' }).click()
+  await page.getByRole('button', { name: 'Show another clue' }).click()
   await expect(page.locator('.mapview, .areamap').first()).toBeVisible({ timeout: 20_000 })
   await page.waitForTimeout(3000)
 
@@ -39,8 +39,8 @@ test('the production build has no test tools and works offline', async ({ page, 
   await expect(page.locator('.quest')).toHaveCount(2)
   await page.locator('.quest', { hasText: 'Wool city' }).click()
   await expect(page.getByTestId('distance')).toHaveText('240 m')
-  await page.getByRole('button', { name: 'Next clue' }).click()
-  await page.getByRole('button', { name: 'Show it now' }).click()
+  await page.getByRole('button', { name: 'Show now' }).click()
+  await page.getByRole('button', { name: 'Show another clue' }).click()
   await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
 
   // A deep link works offline too

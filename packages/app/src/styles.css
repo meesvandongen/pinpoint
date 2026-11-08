@@ -124,13 +124,12 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .pager-items { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: var(--gap, 10px); align-content: start; }
 .pager-item { min-width: 0; overflow: hidden; }
 .pager-item > * { height: 100%; width: 100%; }
-.pager-nav, .deck-nav { display: flex; align-items: center; justify-content: center; gap: 14px; height: 42px; flex: none; }
+.pager-nav { display: flex; align-items: center; justify-content: center; gap: 14px; height: 42px; flex: none; }
 .turn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; font-size: 24px; line-height: 1; cursor: pointer; }
 .turn:disabled { opacity: 0.3; cursor: default; }
 .pager-dots { display: flex; gap: 6px; }
 .pager-dots i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--ink); }
 .pager-dots i.on { background: var(--ink); }
-.pager-dots i.lock { border-style: dashed; }
 
 .row, .quest {
   text-align: left;
@@ -169,9 +168,14 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .dir { display: grid; justify-items: center; gap: 4px; color: var(--ink); max-width: 120px; }
 .card-dir { font-family: var(--font-type); font-weight: 700; font-size: 32px; }
 
+.clue-tabs { display: flex; gap: 6px; flex-wrap: wrap; flex: none; }
+.clue-tabs button { min-height: 36px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 18px; background: transparent; font-family: var(--font-type); font-weight: 700; font-size: 13px; cursor: pointer; }
+.clue-tabs button.on { background: var(--ink); color: var(--paper); }
+.next-clue { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px 8px 14px; border: 2px dashed #b9ad8c; border-radius: 12px; font-family: var(--font-type); font-size: 14px; color: var(--muted); }
+.next-clue > .btn:only-child { flex: 1; }
 .deck { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
 .deck-card { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 10px; }
-.deck-card > .mapview, .deck-card > .areamap { flex: 1; min-height: 140px; }
+.deck-card > .mapview, .deck-card > .areamap { flex: 1; min-height: 90px; }
 .clue-text { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 5.4vw, 23px); line-height: 1.25; }
 .clue-photo { width: 100%; max-height: 100%; object-fit: cover; border-radius: 8px; min-height: 0; }
 .clue-audio { display: grid; gap: 6px; }
@@ -213,6 +217,7 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 @media (prefers-reduced-motion: no-preference) {
   .pageturn { animation: pageturn 0.38s cubic-bezier(0.2, 0.7, 0.2, 1); transform-origin: left center; }
   @keyframes pageturn { from { opacity: 0; transform: perspective(900px) rotateY(-14deg) translateX(18px); } to { opacity: 1; transform: none; } }
+  .dir, .clue-tabs button.on { animation: pop 0.45s ease-out; }
   @keyframes pop { from { transform: scale(0.4) rotate(-20deg); opacity: 0; } to { transform: none; opacity: 1; } }
   .screen { animation: fade 0.2s ease-out; }
   /* The stamp lands on the page. */

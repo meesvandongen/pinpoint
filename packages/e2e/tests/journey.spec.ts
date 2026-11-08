@@ -54,10 +54,14 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // A locked clue opens on request, and shows the map (the real one, or the schematic one without tiles)
-      await page.getByRole('button', { name: 'Next clue' }).click()
-      await expect(page.getByText('A clue is waiting for you.')).toBeVisible()
-      await page.getByRole('button', { name: 'Show it now' }).click()
+      // Clues open one at a time: first the arrow (which also opens by itself after a minute), then, on request,
+      // the map (the real one, or the schematic one without tiles). Only the next clue can be opened.
+      await expect(page.getByRole('timer')).toHaveText(/Next clue in \d+ s/)
+      await expect(page.getByRole('tab')).toHaveCount(0)
+      await page.getByRole('button', { name: 'Show now' }).click()
+      await expect(page.getByTestId('arrow')).toBeVisible()
+      await page.getByRole('button', { name: 'Show another clue' }).click()
+      await expect(page.getByRole('tab')).toHaveCount(2)
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
 
