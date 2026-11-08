@@ -11,6 +11,16 @@ describe('fitting a grid to the room', () => {
     expect(phone.perPage).toBe(3)
     expect(phone.width).toBeCloseTo((330 - 12) / 2, 0)
   })
+  it('reads a tall phone as a grid of two, even where one column would be a little bigger', () => {
+    // 3 pins in 360 x 760: one column gives cells of about 200, two columns about 174.
+    const tall = fitGrid({ ...base, width: 360, height: 760, count: 3 })
+    expect(tall.cols).toBe(2)
+    expect(fitGrid({ ...base, width: 360, height: 760, count: 6 }).cols).toBe(2)
+  })
+  it('does not squeeze in more columns when that would make the cells much smaller', () => {
+    expect(fitGrid({ ...base, width: 360, height: 760, count: 4 }).cols).toBe(2)
+    expect(fitGrid({ ...base, width: 1400, height: 700, count: 3 }).cols).toBeLessThanOrEqual(3)
+  })
   it('puts a wide, short screen in more columns', () => {
     const wide = fitGrid({ ...base, width: 1000, height: 420, count: 6 })
     expect(wide.cols).toBeGreaterThan(2)

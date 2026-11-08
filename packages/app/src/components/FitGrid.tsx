@@ -10,6 +10,9 @@ import { useI18n } from '../i18n/index.ts'
 
 const NAV_HEIGHT = 52
 
+/** A layout with more columns is chosen when its cells are at least this share of the biggest possible. */
+const CLOSE_ENOUGH = 0.8
+
 export type Fit = {
   cols: number
   rows: number
@@ -70,12 +73,15 @@ export function fitGrid({
       Math.max(count, 1),
     )
 
-  let best: Fit | undefined
-  for (let cols = 1; cols <= count; cols++) {
+  // The largest cells win, but a layout with more columns is preferred when it costs little size: a phone
+  // reads as a grid of two, not a tall list of one that is a few pixels bigger.
+  const layouts = Array.from({ length: count }, (_, i) => {
+    const cols = i + 1
     const rows = Math.ceil(count / cols)
-    const w = cell(cols, rows, height)
-    if (!best || w > best.width + 0.5) best = make(cols, rows, w, count)
-  }
+    return make(cols, rows, cell(cols, rows, height), count)
+  })
+  const biggest = Math.max(...layouts.map((l) => l.width))
+  const best = layouts.filter((l) => l.width >= biggest * CLOSE_ENOUGH).at(-1)
   if (best && best.width >= minWidth) return best
 
   // Too small to read: page it. As many columns and rows as hold cells of the smallest size, then grown to fill.
