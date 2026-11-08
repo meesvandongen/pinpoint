@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { Category, Extra } from 'pinpoint-core'
-import { extraMarkSvg, iconSvg, questStampSvg, stampSvg, type QuestStampProps, type StampSvgProps } from './svg.ts'
+import { extraMarkSvg, iconSvg, pointStampSvg, questStampSvg, stampSvg, type QuestStampProps, type StampSvgProps } from './svg.ts'
 
 type Html = { __html: string }
 
@@ -33,4 +33,10 @@ export function ExtraMark({ extra, label, seed, className }: { extra: Extra; lab
 
 export function CategoryIcon({ category, size = 24 }: { category: Category; size?: number }) {
   return <span className="category-icon" dangerouslySetInnerHTML={html(iconSvg(category, size))} />
+}
+
+/** One small star stamp, for one point. */
+export function PointStamp({ seed, index, className }: { seed: string; index: number; className?: string }) {
+  const svg = useMemo(() => pointStampSvg(seed, index), [seed, index])
+  return <span className={`point-stamp ${className ?? ''}`} dangerouslySetInnerHTML={html(svg)} />
 }

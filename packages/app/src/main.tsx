@@ -9,6 +9,7 @@ import { registerServiceWorker } from './sw-register.ts'
 // Fonts are bundled, not loaded from Google: they work offline, load faster, and nobody is told you play Pinpoint.
 import '@fontsource/courier-prime/latin-400.css'
 import '@fontsource/courier-prime/latin-700.css'
+import '@fontsource/caveat/latin-600.css'
 import '@fontsource/newsreader/latin-400.css'
 import '@fontsource/newsreader/latin-400-italic.css'
 import '@fontsource/dm-sans/latin-400.css'

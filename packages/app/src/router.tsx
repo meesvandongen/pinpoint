@@ -5,14 +5,16 @@ import {
   createRoute,
   createRouter,
   Outlet,
+  redirect,
 } from '@tanstack/react-router'
 import { contentQuery } from './content.ts'
 import { Arrival } from './screens/Arrival.tsx'
-import { BookIndex, BookPin, BookQuest } from './screens/Book.tsx'
+import { BookIndex, BookPin } from './screens/Book.tsx'
 import { Done } from './screens/Done.tsx'
 import { Home } from './screens/Home.tsx'
 import { Loading, LoadError, NotFound } from './screens/NotFound.tsx'
 import { Play } from './screens/Play.tsx'
+import { QuestOverview } from './screens/Quest.tsx'
 import { Quests } from './screens/Quests.tsx'
 import { Settings } from './screens/Settings.tsx'
 
@@ -50,18 +52,19 @@ const appRoute = createRoute({
 
 const indexRoute = createRoute({ getParentRoute: () => appRoute, path: '/', component: Home })
 const placeRoute = createRoute({ getParentRoute: () => appRoute, path: '/place/$locationId', component: Quests })
-const questRoute = createRoute({
-  getParentRoute: () => appRoute,
-  path: '/quest/$questId',
-  validateSearch: (search: Record<string, unknown>): { pin?: string } => ({
-    pin: typeof search.pin === 'string' ? search.pin : undefined,
-  }),
-  component: Play,
-})
+const questRoute = createRoute({ getParentRoute: () => appRoute, path: '/quest/$questId', component: QuestOverview })
+const findRoute = createRoute({ getParentRoute: () => appRoute, path: '/quest/$questId/find/$pinId', component: Play })
 const arrivedRoute = createRoute({ getParentRoute: () => appRoute, path: '/quest/$questId/arrived/$pinId', component: Arrival })
 const doneRoute = createRoute({ getParentRoute: () => appRoute, path: '/quest/$questId/done', component: Done })
 const bookRoute = createRoute({ getParentRoute: () => appRoute, path: '/book', component: BookIndex })
-const bookQuestRoute = createRoute({ getParentRoute: () => appRoute, path: '/book/$questId', component: BookQuest })
+// The book's page for one quest is the quest page now. Old links and bookmarks still arrive.
+const bookQuestRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/book/$questId',
+  beforeLoad: ({ params }) => {
+    throw redirect({ to: '/quest/$questId', params, replace: true })
+  },
+})
 const bookPinRoute = createRoute({ getParentRoute: () => appRoute, path: '/book/$questId/$pinId', component: BookPin })
 const settingsRoute = createRoute({ getParentRoute: () => appRoute, path: '/settings', component: Settings })
 
@@ -80,6 +83,7 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     placeRoute,
     questRoute,
+    findRoute,
     arrivedRoute,
     doneRoute,
     bookRoute,

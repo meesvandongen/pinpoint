@@ -9,6 +9,7 @@ import {
   roughArea,
   resolveClues,
   resolveText,
+  stampPoints,
   wordLength,
   wordShape,
   type Stamp,
@@ -162,5 +163,20 @@ describe('rough area', () => {
     const small = roughArea({ id: 'x', position: { lat: 0, lng: 0 }, radius: 40 })
     const big = roughArea({ id: 'x', position: { lat: 0, lng: 0 }, radius: 150 })
     expect(big.radius).toBeGreaterThan(small.radius)
+  })
+})
+
+describe('stamp points', () => {
+  it('gives three points for finding a pin without any assisting clue', () => {
+    expect(stampPoints({ clues: [] })).toBe(3)
+    expect(stampPoints({ clues: ['text', 'photo', 'wordShape'] })).toBe(3)
+  })
+  it('takes one point for each assisting clue type that was on screen', () => {
+    expect(stampPoints({ clues: ['text', 'distance'] })).toBe(2)
+    expect(stampPoints({ clues: ['direction', 'map'] })).toBe(1)
+    expect(stampPoints({ clues: ['distance', 'direction', 'map', 'text'] })).toBe(0)
+  })
+  it('counts a type once, and ignores types it does not know', () => {
+    expect(stampPoints({ clues: ['distance', 'distance', 'smell'] })).toBe(2)
   })
 })
