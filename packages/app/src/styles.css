@@ -23,6 +23,9 @@
   --font-type: 'Courier Prime', ui-monospace, monospace;
   --font-serif: 'Newsreader', Georgia, serif;
   --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Bradley Hand', cursive;
+  --print: #b9ad8c;
+  --stamp-ink: #26385c;
   color-scheme: light;
 }
 
@@ -148,11 +151,6 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .quest small { font-size: 13px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* ---------- Play ---------- */
-.pins { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-.pins button { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed var(--gold-dim); background: transparent; color: var(--gold-dim); font-family: var(--font-type); font-weight: 700; font-size: 12px; cursor: pointer; }
-.pins button.now { border-style: solid; background: var(--gold); border-color: var(--gold); color: var(--navy); }
-.pins button.done { border-style: solid; border-color: var(--gold); color: var(--gold); }
-.pins button:disabled { cursor: default; }
 
 .compass { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 2px dashed var(--paper-2); flex: none; }
 .dist { font-family: var(--font-type); font-weight: 700; font-size: clamp(40px, 15vw, 66px); letter-spacing: -0.04em; line-height: 1; }
@@ -215,16 +213,52 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 /* Positioned out of the layout, so the picture takes the room that is left and never pushes the page taller. */
 .collage-preview { position: absolute; inset: 0; margin: auto; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 6px 16px rgba(43, 42, 38, 0.3); }
 
+/* ---------- Quest page: a printed page per pin, with a taped photo over its stamps ---------- */
+/* The grid sizes itself to the room (see FitGrid). --u is one pixel of a page drawn 150 wide, so everything on it scales. */
+.screen.overview { max-width: 1200px; }
+.overview-body { overflow: visible; }
+.fit { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.fit-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(var(--cols, 2), var(--cell-w)); grid-auto-rows: var(--cell-h); gap: var(--gap); justify-content: center; align-content: center; }
+.fit-item { min-width: 0; min-height: 0; }
+.fit-item > .slot { width: 100%; height: 100%; }
+.slot { position: relative; display: block; perspective: calc(650 * var(--u)); color: inherit; text-decoration: none; border: 0; padding: 0; background: none; }
+.slot.lifted { z-index: 6; }
+.paper { position: absolute; inset: 0; border: 1.5px solid var(--print); border-radius: 3px; color: var(--muted); background: repeating-radial-gradient(circle at 50% 130%, transparent 0 calc(5 * var(--u)), rgba(185, 173, 140, 0.26) calc(5 * var(--u)) calc(5.6 * var(--u))), var(--paper-3); }
+.paper::before, .paper::after { content: ''; position: absolute; width: calc(9 * var(--u)); height: calc(9 * var(--u)); border: 2px solid var(--print); }
+.paper::before { left: -1px; top: -1px; border-right: 0; border-bottom: 0; }
+.paper::after { right: -1px; bottom: -1px; border-left: 0; border-top: 0; }
+.paper-no { position: absolute; left: calc(8 * var(--u)); top: calc(6 * var(--u)); font: 700 max(9px, calc(10 * var(--u))) var(--font-type); text-transform: uppercase; }
+.paper-icon { position: absolute; inset: 0; display: grid; place-items: center; }
+.paper-icon svg { width: calc(54 * var(--u)); height: calc(54 * var(--u)); color: #cfc3a1; stroke-width: 1.1; }
+.paper-name { position: absolute; left: calc(6 * var(--u)); right: calc(6 * var(--u)); bottom: calc(6 * var(--u)); text-align: center; font: 700 max(9px, calc(10 * var(--u)))/1.1 var(--font-type); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ink { position: absolute; mix-blend-mode: multiply; pointer-events: none; }
+.paper-stamp { left: 50%; top: 50%; width: 112%; aspect-ratio: 1; z-index: 2; transform: translate(calc(-50% + var(--dx, 0) * var(--u)), calc(-50% + var(--dy, 0) * var(--u))); }
+.paper-stamp .stamp, .paper-stamp svg { width: 100%; height: 100%; }
+.quest-slot .paper-stamp { width: 104%; }
+.points { position: absolute; right: calc(5 * var(--u)); bottom: calc(20 * var(--u)); display: flex; z-index: 3; color: var(--stamp-ink); }
+.point-stamp { display: block; width: calc(30 * var(--u)); height: calc(30 * var(--u)); margin-left: calc(-9 * var(--u)); mix-blend-mode: multiply; }
+.point-stamp svg { width: 100%; height: 100%; display: block; }
+.slot.locked { opacity: 0.5; }
+.slot.locked .paper-no { opacity: 0; }
+.slot .lock { position: absolute; left: calc(6 * var(--u)); top: calc(6 * var(--u)); width: max(12px, calc(14 * var(--u))); height: max(12px, calc(14 * var(--u))); color: var(--muted); z-index: 5; }
+.slot.open:focus-visible, .hit:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.hit { position: absolute; inset: 0; z-index: 2; }
+/* The photo, taped on at the top. It stops a little short of the page, so the corner stamps peek out under it. */
+.flap { position: absolute; inset: 0 calc(11 * var(--u)) calc(13 * var(--u)) 0; z-index: 3; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; transform-style: preserve-3d; transform-origin: 50% 0; transform: rotate(var(--tilt, -1deg)); transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.2, 1); }
+.flap:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.slot.lifted .flap { transform: rotateX(128deg); }
+.polaroid-card, .polaroid-back { position: absolute; inset: 0; display: block; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 3px 8px rgba(43, 42, 38, 0.3); }
+.polaroid-card { background: #fffefa; padding: calc(7 * var(--u)) calc(7 * var(--u)) calc(31 * var(--u)); }
+.polaroid-card .photo { display: block; position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper-2); }
+.polaroid-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(0.3) saturate(0.88) contrast(0.9) brightness(1.06); }
+.polaroid-card .photo::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, transparent 52%, rgba(60, 35, 10, 0.34)); mix-blend-mode: multiply; }
+.hand { position: absolute; left: calc(8 * var(--u)); right: calc(8 * var(--u)); bottom: calc(4 * var(--u)); text-align: center; font: 600 max(14px, calc(20 * var(--u)))/1 var(--font-hand); color: var(--ink); transform: rotate(-1.6deg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tape { position: absolute; left: 50%; top: calc(-9 * var(--u)); width: calc(46 * var(--u)); height: calc(16 * var(--u)); margin-left: calc(-23 * var(--u)); transform: rotate(-4deg); z-index: 3; background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0 3px, transparent 3px 6px), rgba(233, 196, 106, 0.85); box-shadow: 0 1px 2px rgba(43, 42, 38, 0.25); }
+.polaroid-back { background: #f7f2e6; transform: rotateX(180deg); display: grid; place-items: center; }
+.polaroid-back span { font: 600 max(16px, calc(22 * var(--u)))/1 var(--font-hand); color: #4a4538; transform: rotate(-3deg); }
+@media (prefers-reduced-motion: reduce) { .flap { transition: none; } }
+
 /* ---------- Book ---------- */
-.tabs { display: flex; border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; flex: none; }
-.tabs button { flex: 1; min-height: 38px; background: transparent; border: 0; font-family: var(--font-type); font-weight: 700; font-size: 13px; cursor: pointer; }
-.tabs button.on { background: var(--ink); color: var(--paper); }
-.slot { display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; text-decoration: none; }
-.slot .stamp { width: 100%; height: 100%; }
-.slot.empty { border: 2px dashed #b9ad8c; border-radius: 14px; color: #8a7c5c; font-family: var(--font-type); font-weight: 700; font-size: 22px; cursor: default; }
-.mini-polaroid { display: grid; grid-template-rows: 1fr auto; gap: 4px; background: var(--paper-3); border: 0; padding: 6px 6px 8px; box-shadow: 0 4px 10px rgba(43, 42, 38, 0.2); cursor: pointer; text-align: center; font-family: var(--font-type); font-size: 12px; font-weight: 700; min-height: 0; }
-.mini-polaroid img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; }
-.mini-polaroid span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .book-pin-body { align-items: center; justify-content: center; }
 .pin-top { display: flex; gap: 14px; align-items: center; justify-content: center; width: 100%; min-height: 0; }
 .detail-stamp { display: block; height: min(28dvh, 200px); aspect-ratio: 1; flex: none; max-width: 52%; }

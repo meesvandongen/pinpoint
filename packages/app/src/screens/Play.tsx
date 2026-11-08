@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate, useCanGoBack, useNavigate, useParams, useRouter, useSearch } from '@tanstack/react-router'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   arrowRotation,
@@ -32,22 +32,17 @@ import { isRaining } from '../weather.ts'
 import { NotFound } from './NotFound.tsx'
 
 export function Play() {
-  const { questId } = useParams({ from: '/app/quest/$questId' })
-  const { pin: chosen } = useSearch({ from: '/app/quest/$questId' })
+  const { questId, pinId } = useParams({ from: '/app/quest/$questId/find/$pinId' })
   const { data: content } = useSuspenseQuery(contentQuery)
   const stamps = useStamps()
-  // The last pin shown, so checking in at the final pin does not jump to the finish before the arrival pages.
-  const shown = useRef<{ pinId: string; openIds: string[] }>(undefined)
   const quest = content.quests.find((q) => q.id === questId)
-  if (!quest) return <NotFound />
-  const open = playablePins(quest, stampedPins(stamps, quest.id))
-  if (open.length > 0) {
-    shown.current = { pinId: (open.find((p) => p.id === chosen) ?? open[0]).id, openIds: open.map((p) => p.id) }
-  } else if (!shown.current) {
-    return <Navigate to="/quest/$questId/done" params={{ questId }} replace />
-  }
-  const pin = quest.pins.find((p) => p.id === shown.current!.pinId)!
-  return <PinScreen key={pin.id} quest={quest} pin={pin} openIds={shown.current.openIds} />
+  const pin = quest?.pins.find((p) => p.id === pinId)
+  // Decided once, when the screen opens: checking in stamps the pin, which must not send the player away
+  // before the arrival pages.
+  const [allowed] = useState(() => !!quest && !!pin && playablePins(quest, stampedPins(stamps, quest.id)).some((p) => p.id === pin.id))
+  if (!quest || !pin) return <NotFound />
+  if (!allowed) return <Navigate to="/quest/$questId" params={{ questId }} replace />
+  return <PinScreen quest={quest} pin={pin} />
 }
 
 /** Seconds since the screen opened, plus whatever the test tools skipped. */
@@ -62,11 +57,9 @@ function useElapsed(): number {
   return real + skip
 }
 
-function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: string[] }) {
+function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
   const stamps = useStamps()
   const settings = useSettings()
   const location = useLocationState()
@@ -95,7 +88,6 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
 
   const prox = fix ? proximity(fix, pin) : undefined
   const bearing = fix ? bearingDegrees(fix, pin.position) : undefined
-  const stamped = stampedPins(stamps, quest.id)
   const index = quest.pins.findIndex((p) => p.id === pin.id)
 
   const checkIn = () => {
@@ -132,33 +124,10 @@ function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: s
 
   return (
     <Screen className="play">
-      <Cover
-        title={tr(quest.title)}
-        after={
-          <div className="pins" role="group" aria-label={t('play.pinOf', { n: index + 1, total: quest.pins.length })}>
-            {quest.pins.map((p, i) => {
-              const isDone = stamped.has(p.id)
-              const canPick = quest.order === 'free' && !isDone && openIds.includes(p.id)
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={isDone ? 'done' : p.id === pin.id ? 'now' : ''}
-                  disabled={!canPick}
-                  onClick={() => void navigate({ to: '/quest/$questId', params: { questId: quest.id }, search: { pin: p.id }, replace: true })}
-                  aria-label={t('book.pin', { n: i + 1 })}
-                  aria-current={p.id === pin.id ? 'step' : undefined}
-                >
-                  {i + 1}
-                </button>
-              )
-            })}
-          </div>
-        }
-      >
-        <button type="button" className="back" onClick={() => (canGoBack ? router.history.back() : void navigate({ to: '/' }))}>
+      <Cover title={tr(quest.title)} subtitle={t('play.pinOf', { n: index + 1, total: quest.pins.length })}>
+        <Link to="/quest/$questId" params={{ questId: quest.id }} className="back">
           ‹ {t('play.back')}
-        </button>
+        </Link>
       </Cover>
 
       <Body>

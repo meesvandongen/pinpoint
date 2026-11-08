@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { collectProblems, countAcrossPages, expectNoClipping, PINS, samplePhoto } from './helpers'
+import { collectProblems, countAcrossPages, expectNoClipping, lookForPin, PINS, samplePhoto } from './helpers'
 
 // A whole game on a phone: find three pins, collect stamps, photos and extra marks, finish the quest,
 // make the collage, look at the book. Run on a normal phone and on a very small one.
@@ -17,6 +17,7 @@ for (const [name, viewport] of [
       async function arrive(pin: keyof typeof PINS, { quiz }: { quiz: boolean }) {
         const [lat, lng] = PINS[pin]
         await page.goto(`/quest/tilburg-textile?sim=${lat},${lng},10`)
+        await lookForPin(page)
         await expect(page.getByTestId('status')).toHaveText('You are here.')
         await expectNoClipping(page, `play ${pin}`)
         await page.getByRole('button', { name: 'Check in' }).click()
@@ -51,6 +52,11 @@ for (const [name, viewport] of [
       await expect(page.locator('.quest')).toHaveCount(2)
       await expectNoClipping(page, 'quests')
       await page.locator('.quest', { hasText: 'Wool city' }).click()
+      await expect(page.locator('.slot')).toHaveCount(3)
+      await expect(page.locator('.slot.open')).toHaveCount(1) // in order: only the next pin can be played
+      await expect(page.locator('.slot.locked')).toHaveCount(2)
+      await expectNoClipping(page, 'quest page')
+      await lookForPin(page)
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
@@ -78,21 +84,26 @@ for (const [name, viewport] of [
       expect(collage.bytes).toBeGreaterThan(50_000)
       await expect(page.getByRole('link', { name: 'Save collage' })).toHaveAttribute('download', 'tilburg-textile-collage.png')
 
-      // The book
-      await page.goto('/book/tilburg-textile')
+      // The quest page: every pin on its own page, the photos taped over the stamps
+      await page.goto('/quest/tilburg-textile')
       await expect(page.locator('.slot').first()).toBeVisible()
-      expect(await countAcrossPages(page, '.slot')).toBe(4) // three stamps and the quest stamp, over as many pages as fit
-      await expectNoClipping(page, 'book stamps')
-      await page.getByRole('tab', { name: 'Photos' }).click()
-      await expect(page.locator('.mini-polaroid').first()).toBeVisible()
-      expect(await countAcrossPages(page, '.mini-polaroid')).toBe(3)
-      await expectNoClipping(page, 'book photos')
+      expect(await countAcrossPages(page, '.slot')).toBe(4) // three pins and the quest stamp, over as many pages as fit
+      await expectNoClipping(page, 'quest page with stamps')
+      await expect(page.locator('.points').first()).toBeVisible()
       // Back to the first page, if there are several
       const previous = page.getByRole('button', { name: 'Previous page' })
       while ((await previous.count()) > 0 && (await previous.isEnabled())) await previous.click()
-      await page.locator('.mini-polaroid').first().click()
+      // Lift a photo to show the stamps under it, then open the pin
+      const flap = page.locator('.flap').first()
+      await expect(flap).toHaveAttribute('aria-expanded', 'false')
+      await flap.click()
+      await expect(flap).toHaveAttribute('aria-expanded', 'true')
+      await expect(page.locator('.slot.lifted')).toHaveCount(1)
+      await page.locator('.slot.lifted .hit').click()
       await expect(page.locator('.detail-stamp')).toBeVisible()
-      await expect(page.locator('.extras-list li')).toHaveCount(3) // quiz, photo, together
+      // Quiz, photo and together, plus the dark or sunrise mark when the test runs at such an hour
+      await expect(page.locator('.extras-list li').nth(2)).toBeVisible()
+      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(3)
       await expectNoClipping(page, 'book pin')
 
       // The progress survives a reload
@@ -118,6 +129,7 @@ test.describe('the clue deck', () => {
     await page.goto('/settings')
     await page.getByRole('switch', { name: 'Local expert' }).click()
     await page.goto('/quest/tilburg-textile?sim=51.5629,5.0768,10')
+    await lookForPin(page)
     await expect(page.getByText('“Look for the old chimney')).toBeVisible()
     await expect(page.getByTestId('distance')).toHaveCount(0)
     await expect(page.getByTestId('arrow')).toHaveCount(0)
@@ -125,10 +137,17 @@ test.describe('the clue deck', () => {
 
   test('a quest in any order lets the player pick the pin', async ({ page }) => {
     await page.goto('/quest/tilburg-green?sim=51.5629,5.0768,10')
-    const pins = page.getByRole('group').locator('button')
-    await expect(pins).toHaveCount(3)
-    await expect(pins.nth(1)).toBeEnabled()
-    await pins.nth(1).click()
+    await expect(page.locator('.slot.open')).toHaveCount(3)
+    await expect(page.locator('.slot.locked')).toHaveCount(0)
+    await lookForPin(page, 'The pond')
     await expect(page.getByText('“Ducks know the way.”')).toBeVisible()
+  })
+
+  test('a pin that is not open yet cannot be played', async ({ page }) => {
+    await page.goto('/quest/tilburg-textile')
+    await expect(page.locator('.slot.locked')).toHaveCount(2)
+    // Asking for a later pin by its address leads back to the page of the quest.
+    await page.goto('/quest/tilburg-textile/find/harbour')
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
   })
 })
