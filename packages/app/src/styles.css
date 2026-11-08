@@ -220,7 +220,9 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .tabs button { flex: 1; min-height: 38px; background: transparent; border: 0; font-family: var(--font-type); font-weight: 700; font-size: 13px; cursor: pointer; }
 .tabs button.on { background: var(--ink); color: var(--paper); }
 .slot { display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; text-decoration: none; }
-.slot .stamp { width: 100%; height: 100%; }
+/* One fixed cell: without it the grid row grows to the stamp's width-derived height and the pager item crops the bottom. */
+.slot { grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
+.slot .stamp { width: 100%; height: 100%; min-width: 0; min-height: 0; }
 .slot.empty { border: 2px dashed #b9ad8c; border-radius: 14px; color: #8a7c5c; font-family: var(--font-type); font-weight: 700; font-size: 22px; cursor: default; }
 .mini-polaroid { display: grid; grid-template-rows: 1fr auto; gap: 4px; background: var(--paper-3); border: 0; padding: 6px 6px 8px; box-shadow: 0 4px 10px rgba(43, 42, 38, 0.2); cursor: pointer; text-align: center; font-family: var(--font-type); font-size: 12px; font-weight: 700; min-height: 0; }
 .mini-polaroid img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; }
