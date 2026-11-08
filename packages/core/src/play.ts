@@ -82,6 +82,15 @@ export type ClueState = { clue: Clue; index: number; visible: boolean; lockedBy?
 /** Types that tell the player where to go. Expert mode hides them. */
 const ASSISTIVE = new Set(['distance', 'direction', 'map'])
 
+/** Most points a stamp can earn: one for each of the three assisting clue types (distance, direction, map) not used. */
+export const MAX_POINTS = ASSISTIVE.size
+
+/** Points for finding a pin with less help: one for every assisting clue type that was not on screen at check-in. */
+export function stampPoints(stamp: Pick<Stamp, 'clues'>): number {
+  const used = new Set(stamp.clues.filter((type) => ASSISTIVE.has(type)))
+  return MAX_POINTS - used.size
+}
+
 export type ClueContext = {
   elapsedSeconds: number
   /** Indexes of clues the player asked for. */

@@ -169,6 +169,24 @@ export function questStampSvg(props: QuestStampProps): string {
   return wrap(props.title, props.ink, id, seed, inner)
 }
 
+/** A small round star stamp in `currentColor`: one is pressed for every point a stamp earned. */
+export function pointStampSvg(seed: string, index: number): string {
+  const n = hashString(`${seed}|point|${index}`)
+  const id = n.toString(36)
+  const tilt = (n % 27) - 13
+  const star = Array.from({ length: 10 }, (_, k) => {
+    const angle = -Math.PI / 2 + (k * Math.PI) / 5
+    const r = k % 2 ? 10.5 : 25
+    return `${(50 + r * Math.cos(angle)).toFixed(1)},${(52 + r * Math.sin(angle)).toFixed(1)}`
+  }).join(' ')
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 104 104" aria-hidden="true"><defs>${inkFilter(id, n)}</defs>` +
+    `<g filter="url(#ink${id})"><g transform="rotate(${tilt} 50 50)" fill="none" stroke="currentColor" opacity=".92">` +
+    `<circle cx="50" cy="50" r="46" stroke-width="6"/><circle cx="50" cy="50" r="37" stroke-width="2"/>` +
+    `<polygon points="${star}" fill="currentColor" stroke="none"/></g></g></svg>`
+  )
+}
+
 /** A small round bonus mark. */
 export function extraMarkSvg(extra: Extra, ink: string, label: string, seed: string): string {
   const n = hashString(`${seed}|${extra}`)

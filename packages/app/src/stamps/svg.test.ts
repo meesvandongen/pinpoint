@@ -1,6 +1,6 @@
 import { CATEGORY_IDS, STAMP_SHAPES } from 'pinpoint-core'
 import { CATEGORY_ICONS } from './icons.ts'
-import { extraMarkSvg, iconSvg, questStampSvg, shortDate, stampSvg, type StampSvgProps } from './svg.ts'
+import { extraMarkSvg, iconSvg, pointStampSvg, questStampSvg, shortDate, stampSvg, type StampSvgProps } from './svg.ts'
 
 const base: StampSvgProps = {
   shape: 'round',
@@ -78,5 +78,16 @@ describe('icons', () => {
       expect(CATEGORY_ICONS[id].length, id).toBeGreaterThan(20)
       parse(iconSvg(id))
     }
+  })
+})
+
+describe('point stamps', () => {
+  it('is well formed, the same every time, and differs per point', () => {
+    parse(pointStampSvg('quest/pin', 0))
+    expect(pointStampSvg('quest/pin', 0)).toBe(pointStampSvg('quest/pin', 0))
+    expect(pointStampSvg('quest/pin', 0)).not.toBe(pointStampSvg('quest/pin', 1))
+  })
+  it('is drawn in the current colour, so the page decides the ink', () => {
+    expect(pointStampSvg('quest/pin', 2)).toContain('currentColor')
   })
 })

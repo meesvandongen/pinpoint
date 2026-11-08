@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { collectProblems } from './helpers'
+import { collectProblems, lookForPin } from './helpers'
 
 // What a reviewer of a pull request does on a preview deployment: stand somewhere, change the time and
 // the weather, and see the marks. The devtools shell and its panels are the interface.
@@ -15,6 +15,7 @@ test('moves the player, changes the time and the weather, and earns the marks', 
   await page.getByText('‹ Back').click()
   await page.locator('.row', { hasText: 'Tilburg' }).click()
   await page.locator('.quest', { hasText: 'Wool city' }).click()
+  await lookForPin(page)
   await expect(page.getByRole('button', { name: 'Use my location' })).toBeVisible()
 
   await page.getByLabel('Open TanStack Devtools').click()

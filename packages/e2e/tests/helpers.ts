@@ -69,3 +69,8 @@ export async function countAcrossPages(page: Page, items: string): Promise<numbe
   }
   return total
 }
+
+/** From a quest's page, look for the pin that can be played now (or the one with this name). */
+export async function lookForPin(page: Page, name?: string) {
+  await page.getByRole('link', { name: name ? `Look for ${name}` : /^Look for / }).first().click()
+}

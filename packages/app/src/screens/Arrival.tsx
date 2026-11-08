@@ -9,7 +9,7 @@ import { useI18n } from '../i18n/index.ts'
 import { putPhoto } from '../photos/db.ts'
 import { downscaleImage } from '../photos/resize.ts'
 import { usePhotoUrl } from '../photos/usePhoto.ts'
-import { findStamp, patchStamp, useStamps } from '../state/progress.ts'
+import { findStamp, patchStamp, stampedPins, useStamps } from '../state/progress.ts'
 import { stampPropsFor } from '../stamps/for-pin.ts'
 import { ExtraMark, Stamp } from '../stamps/Stamp.tsx'
 import { NotFound } from './NotFound.tsx'
@@ -31,6 +31,7 @@ export function Arrival() {
 function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampRecord }) {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
+  const stamps = useStamps()
   const [index, setIndex] = useState(0)
   const steps: Step[] = pin.quiz ? ['stamp', 'photo', 'quiz'] : ['stamp', 'photo']
   const step = steps[index]
@@ -41,7 +42,11 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
   const quizPending = step === 'quiz' && stamp.quiz === undefined
 
   const next = () => {
-    if (last) void navigate({ to: '/quest/$questId', params: { questId: quest.id }, replace: true })
+    if (last) {
+      // The last pin of a quest leads on to the collage, the others back to the overview.
+      const complete = stampedPins(stamps, quest.id).size >= quest.pins.length
+      void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
+    }
     else setIndex(index + 1)
   }
 
