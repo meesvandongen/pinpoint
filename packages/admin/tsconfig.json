@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "types": ["vite-plus/test/globals"]
+    "types": ["vite-plus/test/globals", "node"]
   },
   "include": ["src"]
 }

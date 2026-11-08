@@ -1,4 +1,4 @@
-import { ContentIndex, Location, Quest } from './schema.ts'
+import { ContentIndex, idFromPath, Location, Quest } from './schema.ts'
 
 export type Content = { locations: Location[]; quests: Quest[] }
 
@@ -26,7 +26,9 @@ export async function loadContent(
     const settled = await Promise.all(
       paths.map(async (path) => {
         try {
-          const parsed = schema.safeParse(await getJson(path))
+          // The file name is the id; a stray `id` inside the file does not count.
+          const json = (await getJson(path)) as Record<string, unknown>
+          const parsed = schema.safeParse({ ...json, id: idFromPath(path) })
           if (parsed.success) return parsed.data
           options.onInvalid?.(path, parsed.error.message)
         } catch (error) {

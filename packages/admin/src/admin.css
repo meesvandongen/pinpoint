@@ -1,0 +1,38 @@
+/* Only what the custom fields and the sign-in screen need; everything else comes from gitvfs-cms/styles.css. */
+.pp-localized { display: grid; gap: 6px; }
+.pp-localized-row { display: flex; gap: 6px; align-items: flex-start; }
+.pp-localized-row .gcms-input { flex: 1; min-width: 0; }
+.pp-lang { padding: 6px 0; min-width: 2.2em; }
+.pp-counter { font-size: 12px; color: #6a6a64; padding-top: 8px; min-width: 4.5em; text-align: right; }
+.pp-counter.over { color: #b3261e; font-weight: 600; }
+.pp-add-language, .pp-field, .pp-add-clue { display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.pp-add-language { flex-direction: row; align-items: center; gap: 8px; }
+.pp-add-language select { width: auto; }
+.pp-clues { display: grid; gap: 12px; }
+.pp-clue { border: 1px solid #c8c8c0; border-radius: 8px; padding: 10px 12px 12px; display: grid; gap: 8px; position: relative; }
+.pp-clue legend { font-weight: 600; padding: 0 6px; }
+.pp-clue-tools { position: absolute; top: -14px; right: 8px; display: flex; gap: 4px; background: var(--gcms-surface, #fff); padding: 0 4px; }
+.pp-reveal { display: flex; gap: 12px; flex-wrap: wrap; }
+.pp-check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.pp-json { margin: 0; padding: 8px; background: #f3f3ee; border-radius: 6px; font-size: 12px; overflow: auto; }
+.pp-preview { padding: 16px; display: grid; gap: 10px; align-content: start; }
+.pp-preview h2, .pp-preview h3 { margin: 0; }
+.pp-issues { margin: 0; padding-left: 1.2em; color: #b3261e; }
+.pp-ok { color: #1c7a58; margin: 0; }
+.pp-pins { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.pp-pins li span { display: block; font-size: 13px; }
+.pp-signin { max-width: 440px; margin: 0 auto; padding: 48px 16px; display: grid; gap: 18px; font-family: system-ui, sans-serif; }
+.pp-signin h1 { margin: 0; font-size: 26px; }
+.pp-signin label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.pp-signin small { font-weight: 400; color: #5c5c55; }
+.pp-signin input { padding: 8px 10px; border: 1px solid #b9b9b0; border-radius: 6px; font: inherit; }
+.pp-signin button { padding: 10px 16px; border-radius: 999px; border: 1px solid #1f2a44; background: #1f2a44; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.pp-signin button.secondary { background: transparent; color: #1f2a44; }
+.pp-signin .error { color: #b3261e; margin: 0; }
+.pp-banner { background: #e9c46a; color: #1f2a44; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+.pp-admin { height: 100dvh; }
+.pp-quiz { display: grid; gap: 10px; }
+.pp-quiz-option { display: flex; gap: 8px; align-items: flex-start; }
+.pp-quiz-option input[type='radio'] { margin-top: 10px; }
+.pp-quiz-text { flex: 1; min-width: 0; }
+.pp-row { display: flex; gap: 8px; flex-wrap: wrap; }

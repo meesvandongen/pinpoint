@@ -31,6 +31,8 @@ jobs:
       - run: pnpm run content
       - run: pnpm --filter pinpoint-core run typecheck
       - run: pnpm --filter pinpoint-core run test
+      - run: pnpm --filter pinpoint-admin run typecheck
+      - run: pnpm --filter pinpoint-admin run test
       - run: pnpm --filter pinpoint-app run typecheck
       - run: pnpm --filter pinpoint-app run test
       - run: pnpm --filter pinpoint-app run build

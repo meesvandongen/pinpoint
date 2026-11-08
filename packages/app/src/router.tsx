@@ -71,7 +71,7 @@ const adminRoute = createRoute({
   path: '/admin',
   component: () => (
     <Suspense fallback={<Loading />}>
-      <AdminPage />
+      <AdminPage mock={TEST_TOOLS} />
     </Suspense>
   ),
 })

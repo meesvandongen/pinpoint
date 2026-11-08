@@ -144,30 +144,44 @@ export const Pin = z.object({
 })
 export type Pin = z.infer<typeof Pin>
 
-export const Quest = z
-  .object({
-    id: Slug,
-    title: localized(LIMITS.title),
-    description: localized(LIMITS.description).optional(),
-    /** Language used when a text has no entry for the player's language. */
-    defaultLanguage: Language.default('en'),
-    order: z.enum(['linear', 'free']).default('linear'),
-    /** Where the quest is played. Derived from the pins when missing. */
-    area: Ring.optional(),
-    pins: z.array(Pin).min(1).max(24),
-  })
-  .refine((q) => new Set(q.pins.map((p) => p.id)).size === q.pins.length, {
-    message: 'pin ids must be unique within a quest',
-    path: ['pins'],
-  })
+const questShape = {
+  title: localized(LIMITS.title),
+  description: localized(LIMITS.description).optional(),
+  /** Language used when a text has no entry for the player's language. */
+  defaultLanguage: Language.default('en'),
+  order: z.enum(['linear', 'free']).default('linear'),
+  /** Where the quest is played. Derived from the pins when missing. */
+  area: Ring.optional(),
+  pins: z.array(Pin).min(1).max(24),
+}
+
+const uniquePins = {
+  message: 'pin ids must be unique within a quest',
+  path: ['pins'] as PropertyKey[],
+}
+const hasUniquePins = (q: { pins: { id: string }[] }) => new Set(q.pins.map((p) => p.id)).size === q.pins.length
+
+/** What `content/quests/<id>.json` holds. The id is the file name, so the file does not repeat it. */
+export const QuestFile = z.object(questShape).refine(hasUniquePins, uniquePins)
+export type QuestFile = z.infer<typeof QuestFile>
+
+/** A quest as the game uses it: the file plus its id. */
+export const Quest = z.object({ id: Slug, ...questShape }).refine(hasUniquePins, uniquePins)
 export type Quest = z.infer<typeof Quest>
 
-export const Location = z.object({
-  id: Slug,
-  name: localized(LIMITS.name),
-  polygon: Ring,
-})
+const locationShape = { name: localized(LIMITS.name), polygon: Ring }
+
+/** What `content/locations/<id>.json` holds. */
+export const LocationFile = z.object(locationShape)
+export type LocationFile = z.infer<typeof LocationFile>
+
+export const Location = z.object({ id: Slug, ...locationShape })
 export type Location = z.infer<typeof Location>
+
+/** `quests/tilburg.json` → `tilburg`. */
+export function idFromPath(path: string): string {
+  return (path.split('/').pop() ?? path).replace(/\.json$/i, '')
+}
 
 /** `index.json`, generated when the app is built: files to load, relative to the content root. */
 export const ContentIndex = z.object({

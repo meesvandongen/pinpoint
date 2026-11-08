@@ -6,9 +6,9 @@
 // The app builds its own index of these files, so there is nothing to regenerate.
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
-import { basename, join, relative, resolve } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { Location, Quest, questProblems } from '../packages/core/src/index.ts'
+import { idFromPath, Location, Quest, questProblems } from '../packages/core/src/index.ts'
 
 const root = join(fileURLToPath(new URL('..', import.meta.url)), 'content')
 
@@ -27,13 +27,17 @@ async function jsonFiles(dir) {
 }
 
 async function check(dir, schema, extra) {
-  const ids = new Set()
   let count = 0
   for (const path of await jsonFiles(dir)) {
     count++
     let data
     try {
-      const parsed = schema.safeParse(JSON.parse(await readFile(path, 'utf8')))
+      const json = JSON.parse(await readFile(path, 'utf8'))
+      // The file name is the id, so a file never repeats it.
+      if (json && typeof json === 'object' && 'id' in json) {
+        fail(path, 'remove "id": the file name is the id')
+      }
+      const parsed = schema.safeParse({ ...json, id: idFromPath(path) })
       if (!parsed.success) {
         fail(path, parsed.error.issues.map((i) => `${i.path.join('.') || '(file)'}: ${i.message}`).join('\n'))
         continue
@@ -43,9 +47,6 @@ async function check(dir, schema, extra) {
       fail(path, error instanceof Error ? error.message : String(error))
       continue
     }
-    if (data.id !== basename(path, '.json')) fail(path, `the file name must be the id: ${data.id}.json`)
-    if (ids.has(data.id)) fail(path, `duplicate id "${data.id}"`)
-    ids.add(data.id)
     for (const problem of extra?.(data) ?? []) fail(path, problem)
   }
   return count
