@@ -1,13 +1,19 @@
 import {
   arrowRotation,
+  extrasOf,
   formatDistance,
   locationsContaining,
   playablePins,
   proximity,
   questsInLocation,
+  roughArea,
   resolveClues,
   resolveText,
+  wordLength,
+  wordShape,
+  type Stamp,
 } from './play.ts'
+import { distanceMeters } from './geo.ts'
 import { Location, Quest } from './schema.ts'
 
 const pin = (id: string, lat: number, lng: number, clues: unknown[] = [{ type: 'distance' }]) => ({
@@ -86,11 +92,25 @@ describe('clues', () => {
     const states = resolveClues(p, { elapsedSeconds: 999, requested: new Set([3]), expert: true })
     expect(states.map((s) => s.clue.type)).toEqual(['text'])
   })
+  it('shows the shape of a word', () => {
+    expect(wordShape('De Schoorsteen').map((c) => c.char).join('')).toBe('D_ S__________')
+    expect(wordShape('Pier', false).every((c) => !c.known)).toBe(true)
+    expect(wordLength('De Schoorsteen')).toBe(13)
+  })
 })
 
 describe('locations', () => {
   const loc = (id: string, w: number, s: number, e: number, n: number) =>
-    Location.parse({ id, name: id, polygon: [[w, s], [e, s], [e, n], [w, n]] })
+    Location.parse({
+      id,
+      name: id,
+      polygon: [
+        { lat: s, lng: w },
+        { lat: s, lng: e },
+        { lat: n, lng: e },
+        { lat: n, lng: w },
+      ],
+    })
   const all = [loc('nl', 3.35, 50.75, 7.23, 53.55), loc('tilburg', 5.02, 51.52, 5.14, 51.6), loc('nb', 4.3, 51.27, 6.05, 51.83)]
   it('suggests the smallest place first', () => {
     expect(locationsContaining({ lat: 51.56, lng: 5.08 }, all).map((l) => l.id)).toEqual(['tilburg', 'nb', 'nl'])
@@ -109,5 +129,38 @@ describe('text', () => {
     expect(resolveText(t, ['de'], 'en')).toBe('Hello')
     expect(resolveText({ fr: 'Salut' }, ['de'], 'en')).toBe('Salut')
     expect(resolveText('plain', ['nl'])).toBe('plain')
+  })
+})
+
+describe('extra marks', () => {
+  const base: Stamp = { questId: 'q', pinId: 'a', at: '2026-11-08T10:00:00Z', clues: [] }
+  it('earns none by default', () => {
+    expect(extrasOf(base)).toEqual([])
+  })
+  it('counts a wrong quiz answer as answering', () => {
+    expect(extrasOf({ ...base, quiz: 'wrong' })).toEqual(['quiz'])
+  })
+  it('lists marks in a fixed order', () => {
+    const all: Stamp = { ...base, together: true, weather: 'rain', sky: 'night', photo: true, quiz: 'correct' }
+    expect(extrasOf(all)).toEqual(['quiz', 'photo', 'night', 'rain', 'together'])
+    expect(extrasOf({ ...base, sky: 'sunrise' })).toEqual(['sunrise'])
+  })
+})
+
+describe('rough area', () => {
+  it('always contains the pin without being centred on it, and stays put', () => {
+    for (const id of ['chimney', 'market', 'harbour', 'a', 'oak', 'bandstand', 'castle']) {
+      const pin = { id, position: { lat: 51.56, lng: 5.08 }, radius: 40 }
+      const area = roughArea(pin)
+      const off = distanceMeters(area.center, pin.position)
+      expect(off, id).toBeLessThan(area.radius * 0.55)
+      expect(off, id).toBeGreaterThan(area.radius * 0.15)
+      expect(roughArea(pin)).toEqual(area)
+    }
+  })
+  it('grows with the pin radius', () => {
+    const small = roughArea({ id: 'x', position: { lat: 0, lng: 0 }, radius: 40 })
+    const big = roughArea({ id: 'x', position: { lat: 0, lng: 0 }, radius: 150 })
+    expect(big.radius).toBeGreaterThan(small.radius)
   })
 })

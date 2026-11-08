@@ -1,0 +1,54 @@
+{
+  "id": "tilburg-green",
+  "title": { "en": "Green corners", "nl": "Groene hoeken" },
+  "description": {
+    "en": "Three quiet places, in any order. Sample content: the coordinates are approximate.",
+    "nl": "Drie rustige plekken, in willekeurige volgorde. Voorbeeldinhoud: de coördinaten zijn bij benadering."
+  },
+  "defaultLanguage": "en",
+  "order": "free",
+  "pins": [
+    {
+      "id": "oak",
+      "title": { "en": "The old oak", "nl": "De oude eik" },
+      "category": "tree",
+      "position": { "lat": 51.5578, "lng": 5.0705 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Older than the street names around it.", "nl": "Ouder dan de straatnamen eromheen." } },
+        { "type": "distance" },
+        { "type": "direction", "mode": "arrow" }
+      ]
+    },
+    {
+      "id": "pond",
+      "title": { "en": "The pond", "nl": "De vijver" },
+      "category": "water",
+      "position": { "lat": 51.5532, "lng": 5.0712 },
+      "radius": 45,
+      "clues": [
+        { "type": "text", "text": { "en": "Ducks know the way.", "nl": "De eenden kennen de weg." } },
+        { "type": "map", "view": "area" },
+        { "type": "distance" }
+      ],
+      "quiz": {
+        "question": { "en": "How many ducks can you count?", "nl": "Hoeveel eenden kun je tellen?" },
+        "options": ["0 to 3", "4 to 10", "More than 10"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "bandstand",
+      "title": { "en": "The bandstand", "nl": "De muziektent" },
+      "category": "park",
+      "position": { "lat": 51.5549, "lng": 5.0662 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Music has no walls here.", "nl": "Muziek heeft hier geen muren." } },
+        { "type": "direction", "mode": "cardinal" },
+        { "type": "distance", "reveal": { "afterSeconds": 30 } }
+      ],
+      "stamp": { "ink": "#1c7a58" }
+    }
+  ]
+}

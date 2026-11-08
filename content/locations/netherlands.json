@@ -1,5 +1,10 @@
 {
   "id": "netherlands",
   "name": { "en": "Netherlands", "nl": "Nederland" },
-  "polygon": [[3.35, 50.75], [7.23, 50.75], [7.23, 53.55], [3.35, 53.55]]
+  "polygon": [
+    { "lat": 50.75, "lng": 3.35 },
+    { "lat": 50.75, "lng": 7.23 },
+    { "lat": 53.55, "lng": 7.23 },
+    { "lat": 53.55, "lng": 3.35 }
+  ]
 }

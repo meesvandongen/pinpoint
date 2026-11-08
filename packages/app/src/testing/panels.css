@@ -1,0 +1,16 @@
+.pp-panel { font: 13px/1.4 system-ui, sans-serif; color: #e6e6e6; background: #1c2128; border-radius: 8px; min-height: 100%; padding: 12px 14px 20px; display: grid; gap: 14px; align-content: start; }
+.pp-panel h3 { margin: 0 0 4px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #9aa0a6; font-weight: 600; }
+.pp-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pp-panel button, .pp-panel select, .pp-panel input { font: inherit; background: #2a2f36; color: #e6e6e6; border: 1px solid #454c55; border-radius: 6px; padding: 5px 9px; }
+.pp-panel button { cursor: pointer; }
+.pp-panel button:hover { background: #343b44; }
+.pp-panel button.on { background: #e9c46a; color: #1f2a44; border-color: #e9c46a; }
+.pp-panel button.danger { border-color: #a8302a; color: #ff9a92; }
+.pp-panel input[type='number'], .pp-panel input[type='text'], .pp-panel input[type='datetime-local'] { width: 130px; }
+.pp-panel input[type='range'] { padding: 0; width: 160px; }
+.pp-panel label { display: inline-flex; gap: 6px; align-items: center; }
+.pp-panel small, .pp-muted { color: #9aa0a6; }
+.pp-map { height: 230px; border-radius: 8px; overflow: hidden; background: #1c2128; display: grid; place-items: center; }
+.pp-map .mapview { height: 100%; }
+.pp-log { font: 12px/1.4 ui-monospace, monospace; display: grid; gap: 2px; max-height: 180px; overflow: auto; }
+.pp-panel code { background: #2a2f36; padding: 1px 5px; border-radius: 4px; }

@@ -1,67 +1,61 @@
-import { questsInLocation, resolveText, type Content, type Location, type Quest, type Stamp } from 'pinpoint-core'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { questsInLocation, resolveText } from 'pinpoint-core'
+import { Body, Cover, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
+import { contentQuery } from '../content.ts'
+import { useI18n } from '../i18n/index.ts'
+import { stampedPins, useStamps } from '../state/progress.ts'
+import { NotFound } from './NotFound.tsx'
 
-export function Quests({
-  content,
-  location,
-  stamps,
-  languages,
-  expert,
-  onExpert,
-  onPick,
-  onBack,
-}: {
-  content: Content
-  location: Location
-  stamps: Stamp[]
-  languages: readonly string[]
-  expert: boolean
-  onExpert(on: boolean): void
-  onPick(quest: Quest): void
-  onBack(): void
-}) {
+export const QUEST_HEIGHT = 104
+
+export function Quests() {
+  const { locationId } = useParams({ from: '/app/place/$locationId' })
+  const { data: content } = useSuspenseQuery(contentQuery)
+  const { t, tp, contentLanguages } = useI18n()
+  const navigate = useNavigate()
+  const stamps = useStamps()
+  const location = content.locations.find((l) => l.id === locationId)
+  if (!location) return <NotFound />
   const quests = questsInLocation(location, content.quests)
+
   return (
-    <section className="screen">
-      <header className="cover">
-        <button type="button" className="back" onClick={onBack}>
-          ‹ Places
-        </button>
-        <h1>{resolveText(location.name, languages)}</h1>
-        <p>{quests.length === 1 ? '1 quest' : `${quests.length} quests`}</p>
-      </header>
-      <div className="body">
+    <Screen>
+      <Cover title={resolveText(location.name, contentLanguages)} subtitle={tp('quests.count', quests.length)}>
+        <Link to="/" className="back">
+          ‹ {t('quests.back')}
+        </Link>
+      </Cover>
+      <Body>
         {quests.length === 0 ? (
           <div className="card">
-            <h2>No quests yet</h2>
-            <p>Anyone can add one. Quests are plain files in the Pinpoint repository.</p>
+            <h2>{t('quests.none.title')}</h2>
+            <p>{t('quests.none.body')}</p>
           </div>
         ) : (
           <Pager
             items={quests}
-            perPage={3}
-            label="quests"
+            rowHeight={QUEST_HEIGHT}
+            label={t('home.places')}
+            keyOf={(q) => q.id}
             render={(q) => {
-              const done = q.pins.filter((p) => stamps.some((s) => s.questId === q.id && s.pinId === p.id)).length
+              const done = stampedPins(stamps, q.id).size
               return (
-                <button type="button" key={q.id} className="quest" onClick={() => onPick(q)}>
-                  <strong>{resolveText(q.title, languages, q.defaultLanguage)}</strong>
+                <button type="button" className="quest" onClick={() => navigate({ to: '/quest/$questId', params: { questId: q.id } })}>
+                  <strong>{resolveText(q.title, contentLanguages, q.defaultLanguage)}</strong>
                   <span>
-                    {done} of {q.pins.length} stamps · {q.order === 'linear' ? 'in order' : 'any order'}
+                    {t('quests.progress', { done: Math.min(done, q.pins.length), total: q.pins.length })} ·{' '}
+                    {q.order === 'linear' ? t('quests.order.linear') : t('quests.order.free')}
                   </span>
-                  {q.description && <small>{resolveText(q.description, languages, q.defaultLanguage)}</small>}
+                  {q.description && <small>{resolveText(q.description, contentLanguages, q.defaultLanguage)}</small>}
                 </button>
               )
             }}
           />
         )}
-      </div>
-      <footer className="foot">
-        <label className="toggle">
-          <input type="checkbox" checked={expert} onChange={(e) => onExpert(e.target.checked)} />
-          <span>Local expert: hide distance, direction and map</span>
-        </label>
-      </footer>
-    </section>
+      </Body>
+      <div className="foot" />
+    </Screen>
   )
 }

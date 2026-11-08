@@ -1,0 +1,41 @@
+{
+  "id": "breda-castle",
+  "title": { "en": "Castle and church", "nl": "Kasteel en kerk" },
+  "description": {
+    "en": "Two landmarks in the heart of Breda. Sample content: the coordinates are approximate.",
+    "nl": "Twee herkenningspunten in het hart van Breda. Voorbeeldinhoud: de coördinaten zijn bij benadering."
+  },
+  "defaultLanguage": "en",
+  "order": "linear",
+  "pins": [
+    {
+      "id": "great-church",
+      "title": { "en": "The great church", "nl": "De Grote Kerk" },
+      "category": "church",
+      "position": { "lat": 51.5887, "lng": 4.7759 },
+      "radius": 60,
+      "clues": [
+        { "type": "text", "text": { "en": "Its tower is the tallest thing for miles.", "nl": "De toren is kilometers ver te zien." } },
+        { "type": "distance" },
+        { "type": "direction", "mode": "arrow" }
+      ]
+    },
+    {
+      "id": "castle",
+      "title": { "en": "The castle", "nl": "Het kasteel" },
+      "category": "castle",
+      "position": { "lat": 51.5878, "lng": 4.7807 },
+      "radius": 60,
+      "clues": [
+        { "type": "text", "text": { "en": "A moat, and a very old military school.", "nl": "Een gracht en een heel oude militaire school." } },
+        { "type": "map", "view": "full" },
+        { "type": "distance" }
+      ],
+      "quiz": {
+        "question": "Which water surrounds it?",
+        "options": [{ "en": "A moat", "nl": "Een gracht" }, { "en": "A lake", "nl": "Een meer" }],
+        "answer": 0
+      }
+    }
+  ]
+}

@@ -10,13 +10,18 @@
     "dev": "vp dev",
     "build": "tsc --noEmit && vp build",
     "preview": "wrangler dev",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vp test run"
   },
   "dependencies": {
     "pinpoint-core": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "@tanstack/react-query": "^5.107.1",
+    "@tanstack/react-router": "^1.170.46",
+    "maplibre-gl": "^6.17.0",
+    "pinpoint-admin": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -26,6 +31,14 @@
     "typescript": "^5.5.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "wrangler": "4.156.0"
+    "wrangler": "4.156.0",
+    "@tanstack/react-devtools": "^0.10.14",
+    "@tanstack/react-query-devtools": "^5.107.1",
+    "@tanstack/react-router-devtools": "^1.167.3",
+    "msw": "^3.0.4",
+    "happy-dom": "^21.0.4",
+    "fake-indexeddb": "^6.2.7",
+    "gitvfs": "file:../../vendor/gitvfs.tgz",
+    "gitvfs-github-msw": "file:../../vendor/gitvfs-github-msw.tgz"
   }
 }

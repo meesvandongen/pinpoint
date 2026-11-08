@@ -9,6 +9,10 @@ catalog:
   vite: npm:@voidzero-dev/vite-plus-core@1.4.0
   vitest: 5.0.5
   vite-plus: 1.4.0
+minimumReleaseAgeExclude:
+  - '@tanstack/react-router-devtools@1.167.3'
+  - '@tanstack/router-devtools-core@1.168.3'
+  - maplibre-gl@6.17.0
 overrides:
   vite@*: 'catalog:'
   vitest@*: 'catalog:'

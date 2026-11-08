@@ -1,4 +1,5 @@
-import { CATEGORY_IDS, categoryChain } from './categories.ts'
+import { CATEGORY_IDS, categoryChain, isCategory } from './categories.ts'
+import { mappedCategories } from './osm.ts'
 
 describe('categories', () => {
   it('every category falls back to other without loops', () => {
@@ -10,6 +11,15 @@ describe('categories', () => {
     }
   })
   it('follows the parents', () => {
-    expect(categoryChain('industrial')).toEqual(['industrial', 'building', 'other'])
+    expect(categoryChain('chimney')).toEqual(['chimney', 'industrial', 'building', 'other'])
+  })
+  it('recognises ids', () => {
+    expect(isCategory('church')).toBe(true)
+    expect(isCategory('toString')).toBe(false)
+  })
+  it('every category has an OpenStreetMap tag pointing at it, except the generic fallback', () => {
+    const mapped = mappedCategories()
+    const orphans = CATEGORY_IDS.filter((id) => id !== 'other' && !mapped.has(id))
+    expect(orphans).toEqual([])
   })
 })

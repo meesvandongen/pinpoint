@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Navigate, useCanGoBack, useNavigate, useParams, useRouter, useSearch } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   arrowRotation,
   bearingDegrees,
@@ -8,157 +10,186 @@ import {
   proximity,
   resolveClues,
   resolveText,
+  skyAt,
+  wordLength,
+  wordShape,
   type KnownClue,
   type Pin,
   type Quest,
-  type Stamp as StampRecord,
+  type Stamp,
 } from 'pinpoint-core'
-import { AreaMap } from '../components/AreaMap.tsx'
-import { Stamp } from '../components/Stamp.tsx'
-import type { FixState } from '../lib/useFix.ts'
+import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
+import { contentQuery, mediaUrl } from '../content.ts'
+import { useI18n } from '../i18n/index.ts'
+import { now, useSkipSeconds } from '../lib/clock.ts'
+import { MapClue } from '../map/MapClue.tsx'
+import { enableCompass, useCompassEnabled, useHeading } from '../state/heading.ts'
+import { startWatching, useFix, useLocationState } from '../state/location.ts'
+import { playContext } from '../state/play-context.ts'
+import { addStamp, patchStamp, stampedPins, useStamps } from '../state/progress.ts'
+import { useSettings } from '../state/settings.ts'
+import { isRaining } from '../weather.ts'
+import { NotFound } from './NotFound.tsx'
 
-type Props = {
-  quest: Quest
-  stamps: StampRecord[]
-  fixState: FixState
-  heading?: number
-  onAskHeading(): void
-  languages: readonly string[]
-  expert: boolean
-  onStamp(stamp: StampRecord): void
-  onQuiz(pinId: string, result: 'correct' | 'wrong'): void
-  onExit(): void
-}
-
-export function Play(props: Props) {
-  const { quest, stamps } = props
-  const stamped = useMemo(
-    () => new Set(stamps.filter((s) => s.questId === quest.id).map((s) => s.pinId)),
-    [stamps, quest.id],
-  )
-  const open = playablePins(quest, stamped)
-  const [chosen, setChosen] = useState<string>()
-  const pin = open.find((p) => p.id === chosen) ?? open[0]
-  const [arrived, setArrived] = useState<StampRecord>()
-
-  if (arrived) {
-    const done = quest.pins.find((p) => p.id === arrived.pinId)!
-    return <Arrival {...props} pin={done} stamp={arrived} onContinue={() => setArrived(undefined)} />
+export function Play() {
+  const { questId } = useParams({ from: '/app/quest/$questId' })
+  const { pin: chosen } = useSearch({ from: '/app/quest/$questId' })
+  const { data: content } = useSuspenseQuery(contentQuery)
+  const stamps = useStamps()
+  // The last pin shown, so checking in at the final pin does not jump to the finish before the arrival pages.
+  const shown = useRef<{ pinId: string; openIds: string[] }>(undefined)
+  const quest = content.quests.find((q) => q.id === questId)
+  if (!quest) return <NotFound />
+  const open = playablePins(quest, stampedPins(stamps, quest.id))
+  if (open.length > 0) {
+    shown.current = { pinId: (open.find((p) => p.id === chosen) ?? open[0]).id, openIds: open.map((p) => p.id) }
+  } else if (!shown.current) {
+    return <Navigate to="/quest/$questId/done" params={{ questId }} replace />
   }
-  if (!pin) return <Finished {...props} />
-  return <PinScreen key={pin.id} {...props} pin={pin} open={open} stamped={stamped} onChoose={setChosen} onArrive={setArrived} />
+  const pin = quest.pins.find((p) => p.id === shown.current!.pinId)!
+  return <PinScreen key={pin.id} quest={quest} pin={pin} openIds={shown.current.openIds} />
 }
 
-function t(quest: Quest, languages: readonly string[], text: Parameters<typeof resolveText>[0]) {
-  return resolveText(text, languages, quest.defaultLanguage)
-}
-
-function PinScreen({
-  quest,
-  pin,
-  open,
-  stamped,
-  fixState,
-  heading,
-  onAskHeading,
-  languages,
-  expert,
-  onStamp,
-  onChoose,
-  onArrive,
-  onExit,
-}: Props & { pin: Pin; open: Pin[]; stamped: Set<string>; onChoose(id: string): void; onArrive(s: StampRecord): void }) {
-  const [elapsed, setElapsed] = useState(0)
-  const [requested, setRequested] = useState<ReadonlySet<number>>(new Set())
-  const [deckIndex, setDeckIndex] = useState(0)
+/** Seconds since the screen opened, plus whatever the test tools skipped. */
+function useElapsed(): number {
+  const skip = useSkipSeconds()
+  const [real, setReal] = useState(0)
   useEffect(() => {
     const started = Date.now()
-    const id = setInterval(() => setElapsed(Math.floor((Date.now() - started) / 1000)), 1000)
+    const id = setInterval(() => setReal(Math.floor((Date.now() - started) / 1000)), 1000)
     return () => clearInterval(id)
   }, [])
+  return real + skip
+}
 
-  const { fix } = fixState
-  const states = resolveClues(pin, { elapsedSeconds: elapsed, requested, expert })
+function PinScreen({ quest, pin, openIds }: { quest: Quest; pin: Pin; openIds: string[] }) {
+  const { t, contentLanguages } = useI18n()
+  const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+  const stamps = useStamps()
+  const settings = useSettings()
+  const location = useLocationState()
+  const fix = useFix()
+  const heading = useHeading()
+  const compassOn = useCompassEnabled()
+  const elapsed = useElapsed()
+  const [requested, setRequested] = useState<ReadonlySet<number>>(new Set())
+  const [deckIndex, setDeckIndex] = useState(0)
+  const tr = (text: Parameters<typeof resolveText>[0]) => resolveText(text, contentLanguages, quest.defaultLanguage)
+
+  useEffect(() => {
+    playContext.set({ quest, pin })
+    return () => playContext.set({})
+  }, [quest, pin])
+
+  const states = useMemo(
+    () => resolveClues(pin, { elapsedSeconds: elapsed, requested, expert: settings.expert }),
+    [pin, elapsed, requested, settings.expert],
+  )
   const visible = states.filter((s) => s.visible).map((s) => s.clue as KnownClue)
-  const prox = fix ? proximity(fix, pin) : undefined
-  const bearing = fix ? bearingDegrees(fix, pin.position) : undefined
   const showDistance = visible.some((c) => c.type === 'distance')
-  const dir = visible.find((c) => c.type === 'direction')
+  const direction = visible.find((c) => c.type === 'direction') as Extract<KnownClue, { type: 'direction' }> | undefined
   const deck = states.filter((s) => s.clue.type !== 'distance' && s.clue.type !== 'direction')
   const card = deck[Math.min(deckIndex, Math.max(0, deck.length - 1))]
+
+  const prox = fix ? proximity(fix, pin) : undefined
+  const bearing = fix ? bearingDegrees(fix, pin.position) : undefined
+  const stamped = stampedPins(stamps, quest.id)
   const index = quest.pins.findIndex((p) => p.id === pin.id)
 
   const checkIn = () => {
-    const used = new Set(visible.map((c) => c.type))
-    const stamp: StampRecord = { questId: quest.id, pinId: pin.id, at: new Date().toISOString(), clues: [...used] }
-    onStamp(stamp)
-    onArrive(stamp)
+    if (!fix) return
+    const at = now()
+    const stamp: Stamp = {
+      questId: quest.id,
+      pinId: pin.id,
+      at: at.toISOString(),
+      clues: [...new Set(visible.map((c) => c.type))],
+    }
+    const sky = skyAt(at, fix)
+    if (sky !== 'day') stamp.sky = sky
+    addStamp(stamp)
+    if (settings.weatherMarks) {
+      void isRaining(fix).then((raining) => {
+        if (raining) patchStamp(quest.id, pin.id, { weather: 'rain' })
+      })
+    }
+    void navigate({ to: '/quest/$questId/arrived/$pinId', params: { questId: quest.id, pinId: pin.id } })
   }
 
-  let status = 'Waiting for your location…'
+  let status = t('play.waiting')
   if (prox) {
     status =
       prox.state === 'arrived'
-        ? 'You are here.'
+        ? t('play.here')
         : prox.state === 'near'
-          ? 'Almost there. Hold still while GPS settles.'
+          ? t('play.almost')
           : showDistance
-            ? `${formatDistance(prox.distance)} to go.`
-            : 'Keep exploring.'
+            ? t('play.toGo', { distance: formatDistance(prox.distance) })
+            : t('play.keepExploring')
   }
 
   return (
-    <section className="screen play">
-      <header className="cover">
-        <button type="button" className="back" onClick={onExit}>
-          ‹ Quests
+    <Screen className="play">
+      <Cover
+        title={tr(quest.title)}
+        after={
+          <div className="pins" role="group" aria-label={t('play.pinOf', { n: index + 1, total: quest.pins.length })}>
+            {quest.pins.map((p, i) => {
+              const isDone = stamped.has(p.id)
+              const canPick = quest.order === 'free' && !isDone && openIds.includes(p.id)
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={isDone ? 'done' : p.id === pin.id ? 'now' : ''}
+                  disabled={!canPick}
+                  onClick={() => void navigate({ to: '/quest/$questId', params: { questId: quest.id }, search: { pin: p.id }, replace: true })}
+                  aria-label={t('book.pin', { n: i + 1 })}
+                  aria-current={p.id === pin.id ? 'step' : undefined}
+                >
+                  {i + 1}
+                </button>
+              )
+            })}
+          </div>
+        }
+      >
+        <button type="button" className="back" onClick={() => (canGoBack ? router.history.back() : void navigate({ to: '/' }))}>
+          ‹ {t('play.back')}
         </button>
-        <h1>{t(quest, languages, quest.title)}</h1>
-        <div className="pins" aria-label={`Pin ${index + 1} of ${quest.pins.length}`}>
-          {quest.pins.map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              className={stamped.has(p.id) ? 'done' : p.id === pin.id ? 'now' : ''}
-              disabled={quest.order === 'linear' || stamped.has(p.id) || !open.some((o) => o.id === p.id)}
-              onClick={() => onChoose(p.id)}
-              aria-label={`Pin ${i + 1}`}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
-      </header>
+      </Cover>
 
-      <div className="body">
-        {!fixState.active ? (
+      <Body>
+        {location.status === 'idle' && !fix ? (
           <div className="card">
-            <h2>Share your location</h2>
-            <p>Needed to measure how far the pin is.</p>
-            <button type="button" className="btn primary" onClick={fixState.start}>
-              Use my location
+            <h2>{t('play.share.title')}</h2>
+            <p>{t('play.share.body')}</p>
+            <button type="button" className="btn primary" onClick={startWatching}>
+              {t('play.share.button')}
             </button>
           </div>
         ) : (
           <>
-            {(showDistance || dir) && (
+            {(showDistance || direction) && (
               <div className="compass">
-                {showDistance && <div className="dist">{prox ? formatDistance(prox.distance) : '…'}</div>}
-                {dir && bearing !== undefined && (
+                {showDistance && <div className="dist" data-testid="distance">{prox ? formatDistance(prox.distance) : '…'}</div>}
+                {direction && bearing !== undefined && (
                   <div className="dir">
-                    {(dir as Extract<KnownClue, { type: 'direction' }>).mode === 'cardinal' ? (
-                      <span className="card-dir">{cardinal(bearing)}</span>
+                    {direction.mode === 'cardinal' ? (
+                      <span className="card-dir" data-testid="cardinal">{cardinal(bearing)}</span>
                     ) : (
-                      <svg viewBox="-28 -28 56 56" width="64" height="64" aria-label={`Direction ${cardinal(bearing)}`}>
+                      <svg viewBox="-28 -28 56 56" width="64" height="64" role="img" aria-label={t('play.directionLabel', { direction: cardinal(bearing) })}>
                         <circle r="25" fill="none" stroke="currentColor" strokeWidth="2" />
-                        <g transform={`rotate(${arrowRotation(bearing, heading)})`}>
+                        <g transform={`rotate(${arrowRotation(bearing, heading)})`} data-testid="arrow">
                           <path d="M0-18 L8 12 L0 7 L-8 12Z" fill="var(--needle)" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
                         </g>
                       </svg>
                     )}
-                    {heading === undefined && (dir as { mode?: string }).mode !== 'cardinal' && (
-                      <button type="button" className="link" onClick={onAskHeading}>
-                        {`Points ${cardinal(bearing)}. Use compass`}
+                    {direction.mode !== 'cardinal' && !compassOn && (
+                      <button type="button" className="link" onClick={() => void enableCompass()}>
+                        {t('play.points', { direction: cardinal(bearing) })} {t('play.compass')}
                       </button>
                     )}
                   </div>
@@ -168,143 +199,93 @@ function PinScreen({
 
             {card && (
               <div className="deck">
-                {card.visible ? <ClueCard state={card.clue as KnownClue} pin={pin} fix={fixState.fix} quest={quest} languages={languages} /> : (
-                  <div className="locked">
-                    {card.lockedBy === 'time' ? (
-                      <p>Another clue opens in {Math.max(0, (card.clue.reveal?.afterSeconds ?? 0) - elapsed)} s.</p>
-                    ) : (
-                      <p>A clue is waiting for you.</p>
-                    )}
-                    <button type="button" className="btn" onClick={() => setRequested(new Set([...requested, card.index]))}>
-                      Show it now
-                    </button>
-                  </div>
-                )}
+                <div className="deck-card" key={card.index}>
+                  {card.visible ? (
+                    <ClueCard clue={card.clue as KnownClue} pin={pin} quest={quest} />
+                  ) : (
+                    <div className="locked">
+                      <p>
+                        {card.lockedBy === 'time'
+                          ? t('play.lockedTime', { seconds: Math.max(0, (card.clue.reveal?.afterSeconds ?? 0) - elapsed) })
+                          : t('play.lockedRequest')}
+                      </p>
+                      <button type="button" className="btn" onClick={() => setRequested(new Set([...requested, card.index]))}>
+                        {t('play.showNow')}
+                      </button>
+                    </div>
+                  )}
+                </div>
                 {deck.length > 1 && (
                   <div className="deck-nav">
-                    <button type="button" className="turn" disabled={deckIndex === 0} onClick={() => setDeckIndex(deckIndex - 1)} aria-label="Previous clue">‹</button>
-                    <span className="pager-dots">{deck.map((d, i) => <i key={d.index} className={i === deckIndex ? 'on' : ''} />)}</span>
-                    <button type="button" className="turn" disabled={deckIndex >= deck.length - 1} onClick={() => setDeckIndex(deckIndex + 1)} aria-label="Next clue">›</button>
+                    <button type="button" className="turn" disabled={deckIndex === 0} onClick={() => setDeckIndex(deckIndex - 1)} aria-label={t('play.previousClue')}>
+                      ‹
+                    </button>
+                    <span className="pager-dots" role="status" aria-label={t('play.clueNumber', { n: deckIndex + 1, total: deck.length })}>
+                      {deck.map((d, i) => (
+                        <i key={d.index} className={i === deckIndex ? 'on' : ''} />
+                      ))}
+                    </span>
+                    <button type="button" className="turn" disabled={deckIndex >= deck.length - 1} onClick={() => setDeckIndex(deckIndex + 1)} aria-label={t('play.nextClue')}>
+                      ›
+                    </button>
                   </div>
                 )}
               </div>
             )}
-            {fixState.error && <p className="status warn">{fixState.error}</p>}
+            {location.error && <p className="status warn">{location.error}</p>}
           </>
         )}
-      </div>
+      </Body>
 
-      <footer className="foot">
-        <p className="status">{status}</p>
+      <Foot>
+        <p className="status" role="status" data-testid="status">{status}</p>
         <button type="button" className="btn primary" disabled={prox?.state !== 'arrived'} onClick={checkIn}>
-          Check in
+          {t('play.checkIn')}
         </button>
-        <Debug pin={pin} fixState={fixState} />
-      </footer>
-    </section>
+      </Foot>
+    </Screen>
   )
 }
 
-function ClueCard({ state, pin, fix, quest, languages }: { state: KnownClue; pin: Pin; fix?: FixState['fix']; quest: Quest; languages: readonly string[] }) {
-  if (state.type === 'text') return <p className="clue-text">“{t(quest, languages, state.text)}”</p>
-  if (state.type === 'map') return <AreaMap pin={pin} fix={fix} view={state.view} />
-  if (state.type === 'photo') {
-    return <img className="clue-photo" src={state.src} alt={state.alt ? t(quest, languages, state.alt) : ''} />
-  }
-  return null
-}
 
-function Arrival({
-  quest,
-  pin,
-  stamp,
-  languages,
-  onQuiz,
-  onContinue,
-}: Props & { pin: Pin; stamp: StampRecord; onContinue(): void }) {
-  const [picked, setPicked] = useState<number>()
-  const quiz = pin.quiz
-  return (
-    <section className="screen arrival">
-      <header className="cover">
-        <h1>{t(quest, languages, pin.title)}</h1>
-        <p>You arrived.</p>
-      </header>
-      <div className="body">
-        <Stamp
-          className="big-stamp"
-          title={t(quest, languages, pin.title)}
-          category={pin.category}
-          ink={pin.stamp?.ink}
-          at={stamp.at}
-          clues={stamp.clues}
-        />
-        {quiz && (
-          <div className="quiz">
-            <p>{t(quest, languages, quiz.question)}</p>
-            <div className="options">
-              {quiz.options.map((o, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={`btn ${picked === undefined ? '' : i === quiz.answer ? 'right' : i === picked ? 'wrong' : ''}`}
-                  disabled={picked !== undefined}
-                  onClick={() => {
-                    setPicked(i)
-                    onQuiz(pin.id, i === quiz.answer ? 'correct' : 'wrong')
-                  }}
-                >
-                  {t(quest, languages, o)}
-                </button>
-              ))}
-            </div>
+function ClueCard({ clue, pin, quest }: { clue: KnownClue; pin: Pin; quest: Quest }) {
+  const { t, contentLanguages } = useI18n()
+  const fix = useFix()
+  const tr = (text: Parameters<typeof resolveText>[0]) => resolveText(text, contentLanguages, quest.defaultLanguage)
+  switch (clue.type) {
+    case 'text':
+      return <p className="clue-text">“{tr(clue.text)}”</p>
+    case 'photo':
+      return <img className="clue-photo" src={mediaUrl(clue.src)} alt={clue.alt ? tr(clue.alt) : ''} />
+    case 'audio':
+      return (
+        <div className="clue-audio">
+          <audio controls src={mediaUrl(clue.src)} aria-label={t('play.audio')} />
+          {clue.caption && <small>{tr(clue.caption)}</small>}
+        </div>
+      )
+    case 'wordShape': {
+      const word = tr(clue.word)
+      return (
+        <div className="clue-word" role="img" aria-label={t('play.letters', { n: wordLength(word) })}>
+          <div className="cells">
+            {wordShape(word, clue.showFirstLetter).map((cell, i) =>
+              cell.char === ' ' ? (
+                <span key={i} className="gap" />
+              ) : (
+                <span key={i} className={cell.known ? 'cell known' : 'cell'}>
+                  {cell.char === '_' ? '' : cell.char}
+                </span>
+              ),
+            )}
           </div>
-        )}
-      </div>
-      <footer className="foot">
-        <button type="button" className="btn primary" disabled={!!quiz && picked === undefined} onClick={onContinue}>
-          Continue
-        </button>
-      </footer>
-    </section>
-  )
-}
-
-function Finished({ quest, stamps, languages, onExit }: Props) {
-  const mine = stamps.filter((s) => s.questId === quest.id)
-  return (
-    <section className="screen">
-      <header className="cover">
-        <h1>{t(quest, languages, quest.title)}</h1>
-        <p>Quest complete.</p>
-      </header>
-      <div className="body stampgrid">
-        {quest.pins.map((p) => {
-          const s = mine.find((x) => x.pinId === p.id)
-          return s ? (
-            <Stamp key={p.id} title={t(quest, languages, p.title)} category={p.category} ink={p.stamp?.ink} at={s.at} clues={s.clues} />
-          ) : null
-        })}
-      </div>
-      <footer className="foot">
-        <button type="button" className="btn primary" onClick={onExit}>
-          Back to quests
-        </button>
-      </footer>
-    </section>
-  )
-}
-
-/** Only with `?debug`: moves the simulated position so the game can be tried at a desk. */
-function Debug({ pin, fixState }: { pin: Pin; fixState: FixState }) {
-  if (!new URLSearchParams(location.search).has('debug')) return null
-  const at = (dLat: number, accuracy = 10) => fixState.simulate({ lat: pin.position.lat + dLat, lng: pin.position.lng, accuracy })
-  return (
-    <div className="debug">
-      <button type="button" onClick={() => at(0.0022)}>240 m N</button>
-      <button type="button" onClick={() => at(0.0007)}>80 m N</button>
-      <button type="button" onClick={() => at(0.0001, 120)}>vague fix</button>
-      <button type="button" onClick={() => at(0)}>on the pin</button>
-    </div>
-  )
+          <small>{t('play.letters', { n: wordLength(word) })}</small>
+        </div>
+      )
+    }
+    case 'map':
+      return <MapClue pin={pin} fix={fix} view={clue.view} />
+    default:
+      return null
+  }
 }

@@ -1,5 +1,6 @@
-import { distanceMeters, pointInRing, questArea, ringArea, ringsOverlap } from './geo.ts'
-import type { Clue, KnownClue, Location, Pin, Position, Quest } from './schema.ts'
+import { destinationPoint, distanceMeters, pointInRing, questArea, ringArea, ringsOverlap } from './geo.ts'
+import { hashString } from './stamp-style.ts'
+import { KNOWN_CLUE_TYPES, type Clue, type KnownClue, type Location, type Pin, type Position, type Quest } from './schema.ts'
 
 export type Fix = Position & {
   /** Reported accuracy radius in metres. */
@@ -44,7 +45,30 @@ export type Stamp = {
   /** Clue types the player looked at, in no particular order. */
   clues: string[]
   quiz?: 'correct' | 'wrong'
+  /** A photo of the pin is in the album. */
   photo?: boolean
+  together?: boolean
+  /** The sky at arrival, when it was dark or around sunrise. */
+  sky?: 'night' | 'sunrise'
+  /** Only recorded when the player allowed a weather lookup. */
+  weather?: 'rain'
+}
+
+/** Small bonus marks beside a stamp. They reward things anyone can choose to do. */
+export const EXTRAS = ['quiz', 'photo', 'night', 'sunrise', 'rain', 'together'] as const
+export type Extra = (typeof EXTRAS)[number]
+
+/** The extra marks a stamp has earned, in a fixed order. Getting a quiz wrong still counts as answering it. */
+export function extrasOf(stamp: Stamp): Extra[] {
+  const earned: Record<Extra, boolean> = {
+    quiz: stamp.quiz !== undefined,
+    photo: stamp.photo === true,
+    night: stamp.sky === 'night',
+    sunrise: stamp.sky === 'sunrise',
+    rain: stamp.weather === 'rain',
+    together: stamp.together === true,
+  }
+  return EXTRAS.filter((e) => earned[e])
 }
 
 /** Pins the player can work on now: only the next one when the quest is linear. */
@@ -80,7 +104,26 @@ export function resolveClues(pin: Pick<Pin, 'clues'>, ctx: ClueContext): ClueSta
 }
 
 export function isPlayable(clue: Clue): clue is KnownClue {
-  return ['distance', 'direction', 'map', 'text', 'photo'].includes(clue.type)
+  return (KNOWN_CLUE_TYPES as readonly string[]).includes(clue.type)
+}
+
+/** The cells of a word-shape clue: the first letter of each word when shown, every other letter hidden. */
+export function wordShape(word: string, showFirstLetter = true): { char: string; known: boolean }[] {
+  let atStart = true
+  return Array.from(word).map((char) => {
+    if (!/\p{L}|\p{N}/u.test(char)) {
+      atStart = true
+      return { char, known: true }
+    }
+    const known = showFirstLetter && atStart
+    atStart = false
+    return { char: known ? char : '_', known }
+  })
+}
+
+/** How many letters a word-shape clue spells, for "(11)" style hints. */
+export function wordLength(word: string): number {
+  return Array.from(word).filter((c) => /\p{L}|\p{N}/u.test(c)).length
 }
 
 /** Locations containing the position, smallest first (city before province before country). */
@@ -107,4 +150,16 @@ export function resolveText(
     if (hit) return hit
   }
   return text[fallback] ?? Object.values(text)[0] ?? ''
+}
+
+/**
+ * A circle that contains the pin without being centred on it, for the "rough area" map clue. The
+ * centre is moved by a fixed amount that depends on the pin, so it does not change between visits
+ * and cannot be averaged out by reloading.
+ */
+export function roughArea(pin: Pick<Pin, 'id' | 'position' | 'radius'>): { center: Position; radius: number } {
+  const radius = Math.max(200, pin.radius * 4)
+  const seed = hashString(pin.id)
+  const shift = radius * (0.2 + 0.3 * ((seed % 100) / 100))
+  return { center: destinationPoint(pin.position, shift, seed % 360), radius }
 }

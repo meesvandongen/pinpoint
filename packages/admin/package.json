@@ -1,0 +1,30 @@
+{
+  "name": "pinpoint-admin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "The quest editor: gitvfs-cms with Pinpoint's content model",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "test": "vp test run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pinpoint-core": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "happy-dom": "^21.0.4",
+    "typescript": "^5.5.0",
+    "vite-plus": "catalog:"
+  }
+}

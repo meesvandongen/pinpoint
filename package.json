@@ -8,11 +8,12 @@
   },
   "scripts": {
     "content": "node scripts/content.mjs",
-    "content:check": "node scripts/content.mjs --check",
     "build": "vp run -r build",
     "test": "vp run -r test",
     "typecheck": "vp run -r typecheck",
-    "lint": "vp lint"
+    "lint": "vp lint",
+    "taginfo": "node scripts/taginfo.mjs",
+    "vendor": "node scripts/vendor-gitvfs.mjs"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

@@ -2,8 +2,8 @@
   "id": "tilburg-textile",
   "title": { "en": "Wool city", "nl": "Wollenstad" },
   "description": {
-    "en": "Three stops in the old textile quarter. Sample content: coordinates are approximate.",
-    "nl": "Drie plekken in de oude textielwijk. Voorbeeldinhoud: coördinaten zijn bij benadering."
+    "en": "Three stops in the old textile quarter. Sample content: the coordinates are approximate.",
+    "nl": "Drie plekken in de oude textielwijk. Voorbeeldinhoud: de coördinaten zijn bij benadering."
   },
   "defaultLanguage": "en",
   "order": "linear",
@@ -11,14 +11,15 @@
     {
       "id": "chimney",
       "title": { "en": "The chimney", "nl": "De schoorsteen" },
-      "category": "industrial",
+      "category": "chimney",
       "position": { "lat": 51.5607, "lng": 5.0768 },
       "radius": 50,
       "clues": [
         { "type": "text", "text": { "en": "Look for the old chimney that still has a name on it.", "nl": "Zoek de oude schoorsteen waar nog een naam op staat." } },
         { "type": "distance" },
         { "type": "direction", "mode": "arrow", "reveal": { "afterSeconds": 60 } },
-        { "type": "map", "view": "area", "reveal": { "onRequest": true } }
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Chimney", "nl": "Schoorsteen" }, "reveal": { "onRequest": true } }
       ],
       "photoPrompt": { "en": "Photograph the base of the chimney.", "nl": "Fotografeer de voet van de schoorsteen." },
       "quiz": {
@@ -35,7 +36,7 @@
     {
       "id": "market",
       "title": { "en": "The market square", "nl": "Het marktplein" },
-      "category": "square",
+      "category": "market",
       "position": { "lat": 51.5552, "lng": 5.0833 },
       "radius": 45,
       "clues": [
@@ -43,7 +44,7 @@
         { "type": "distance" },
         { "type": "direction", "mode": "cardinal" }
       ],
-      "stamp": { "shape": "postage", "ink": "#1c7a58" }
+      "photoPrompt": { "en": "Photograph the busiest corner.", "nl": "Fotografeer de drukste hoek." }
     },
     {
       "id": "harbour",
@@ -56,6 +57,7 @@
         { "type": "map", "view": "full" },
         { "type": "distance" }
       ],
+      "photoPrompt": { "en": "Photograph a boat or a reflection.", "nl": "Fotografeer een boot of een weerspiegeling." },
       "stamp": { "shape": "oval", "ink": "#17707a" }
     }
   ]

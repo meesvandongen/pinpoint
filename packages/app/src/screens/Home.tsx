@@ -1,61 +1,75 @@
-import { locationsContaining, resolveText, ringArea, type Content, type Location } from 'pinpoint-core'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { locationsContaining, ringArea } from 'pinpoint-core'
+import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
-import type { FixState } from '../lib/useFix.ts'
+import { contentQuery } from '../content.ts'
+import { useI18n } from '../i18n/index.ts'
+import { currentFix, startWatching, useLocationState } from '../state/location.ts'
+import { resolveText } from 'pinpoint-core'
 
-export function Home({
-  content,
-  fixState,
-  languages,
-  onPick,
-}: {
-  content: Content
-  fixState: FixState
-  languages: readonly string[]
-  onPick(location: Location): void
-}) {
-  const near = fixState.fix ? locationsContaining(fixState.fix, content.locations) : []
+export const ROW_HEIGHT = 56
+
+export function Home() {
+  const { data: content } = useSuspenseQuery(contentQuery)
+  const { t, contentLanguages } = useI18n()
+  const navigate = useNavigate()
+  const location = useLocationState()
+  const fix = currentFix(location)
+
+  const near = fix ? locationsContaining(fix, content.locations) : []
   const nearIds = new Set(near.map((l) => l.id))
   const others = content.locations
     .filter((l) => !nearIds.has(l.id))
     .sort((a, b) => ringArea(a.polygon) - ringArea(b.polygon))
   const list = [...near, ...others]
+  const asking = location.status === 'idle' && !fix
+
   return (
-    <section className="screen">
-      <header className="cover">
-        <h1>Pinpoint</h1>
-        <p>Find real places. Collect stamps.</p>
-      </header>
-      <div className="body">
-        {!fixState.active ? (
+    <Screen>
+      <Cover title={t('app.name')} subtitle={t('home.tagline')} />
+      <Body>
+        {asking ? (
           <div className="card">
-            <h2>Where are you?</h2>
-            <p>Share your location and Pinpoint suggests where to play. It stays on your phone.</p>
-            <button type="button" className="btn primary" onClick={fixState.start}>
-              Use my location
+            <h2>{t('home.ask.title')}</h2>
+            <p>{t('home.ask.body')}</p>
+            <button type="button" className="btn primary" onClick={startWatching}>
+              {t('home.ask.button')}
             </button>
           </div>
         ) : (
-          <p className="status">
-            {fixState.fix
-              ? near.length
-                ? 'You are in:'
-                : 'No quests here yet. Pick another place:'
-              : fixState.error ?? 'Looking for you…'}
+          <p className="status" role="status">
+            {fix ? (near.length ? t('home.in') : t('home.nowhere')) : (location.error ?? t('home.locating'))}
           </p>
         )}
-        <h2 className="sub">{fixState.active && near.length ? 'Places' : 'Or choose a place'}</h2>
+        <h2 className="sub">{fix && near.length ? t('home.places') : t('home.choose')}</h2>
         <Pager
           items={list}
-          perPage={4}
-          label="places"
+          rowHeight={ROW_HEIGHT}
+          label={t('home.places')}
+          keyOf={(l) => l.id}
           render={(l) => (
-            <button type="button" key={l.id} className="row" onClick={() => onPick(l)}>
-              <span>{resolveText(l.name, languages)}</span>
-              {nearIds.has(l.id) && <em>near you</em>}
+            <button
+              type="button"
+              className="row"
+              onClick={() => navigate({ to: '/place/$locationId', params: { locationId: l.id } })}
+            >
+              <span>{resolveText(l.name, contentLanguages)}</span>
+              {nearIds.has(l.id) && <em>{t('home.near')}</em>}
             </button>
           )}
         />
-      </div>
-    </section>
+      </Body>
+      <Foot>
+        <nav className="foot-nav">
+          <Link to="/book" className="btn">
+            {t('home.book')}
+          </Link>
+          <Link to="/settings" className="btn">
+            {t('home.settings')}
+          </Link>
+        </nav>
+      </Foot>
+    </Screen>
   )
 }

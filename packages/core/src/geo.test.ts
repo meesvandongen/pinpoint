@@ -1,19 +1,24 @@
 import {
   bearingDegrees,
   boundingRing,
+  bounds,
   cardinal,
+  circleRing,
+  destinationPoint,
   distanceMeters,
+  moveToward,
   pointInRing,
+  questArea,
   ringArea,
   ringsOverlap,
 } from './geo.ts'
 import type { Ring } from './schema.ts'
 
 const square = (w: number, s: number, e: number, n: number): Ring => [
-  [w, s],
-  [e, s],
-  [e, n],
-  [w, n],
+  { lat: s, lng: w },
+  { lat: s, lng: e },
+  { lat: n, lng: e },
+  { lat: n, lng: w },
 ]
 
 describe('distance and bearing', () => {
@@ -42,6 +47,28 @@ describe('distance and bearing', () => {
   })
 })
 
+describe('moving on the globe', () => {
+  const o = { lat: 51.56, lng: 5.08 }
+  it('finds the point a distance away and round-trips with distance and bearing', () => {
+    const p = destinationPoint(o, 240, 30)
+    expect(distanceMeters(o, p)).toBeCloseTo(240, 0)
+    expect(bearingDegrees(o, p)).toBeCloseTo(30, 1)
+  })
+  it('moves towards a target and stops on it', () => {
+    const target = destinationPoint(o, 100, 90)
+    const step = moveToward(o, target, 30)
+    expect(distanceMeters(o, step)).toBeCloseTo(30, 0)
+    expect(distanceMeters(step, target)).toBeCloseTo(70, 0)
+    expect(moveToward(o, target, 500)).toEqual(target)
+  })
+  it('draws a circle of the right radius', () => {
+    const ring = circleRing(o, 220, 36)
+    expect(ring).toHaveLength(36)
+    for (const p of ring) expect(distanceMeters(o, p)).toBeCloseTo(220, 0)
+    expect(pointInRing(o, ring)).toBe(true)
+  })
+})
+
 describe('rings', () => {
   const tilburg = square(5.02, 51.52, 5.14, 51.6)
   it('finds points inside and outside', () => {
@@ -66,5 +93,14 @@ describe('rings', () => {
     const ring = boundingRing([{ lat: 51.5, lng: 5 }, { lat: 51.6, lng: 5.1 }], 100)
     expect(pointInRing({ lat: 51.4995, lng: 4.9995 }, ring)).toBe(true)
     expect(pointInRing({ lat: 51.45, lng: 5.05 }, ring)).toBe(false)
+  })
+  it('reports west, south, east and north bounds', () => {
+    expect(bounds([{ lat: 51.5, lng: 5 }, { lat: 51.6, lng: 4.9 }])).toEqual([4.9, 51.5, 5, 51.6])
+  })
+  it('uses the author area, or a box around the pins', () => {
+    const area = square(5, 51, 5.1, 51.1)
+    expect(questArea({ area, pins: [{ position: { lat: 0, lng: 0 } }] })).toBe(area)
+    const derived = questArea({ pins: [{ position: { lat: 51.5, lng: 5 } }, { position: { lat: 51.51, lng: 5.01 } }] })
+    expect(pointInRing({ lat: 51.505, lng: 5.005 }, derived)).toBe(true)
   })
 })

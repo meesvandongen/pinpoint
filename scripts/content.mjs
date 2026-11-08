@@ -1,22 +1,16 @@
-// Validates everything under content/ with the shared schemas and writes content/index.json.
-// `--check` fails instead of writing, so CI notices a stale index.
-import { readdir, readFile, writeFile } from 'node:fs/promises'
-import { join, relative } from 'node:path'
+// Validates everything under content/ with the shared schemas: shapes, length limits, the default
+// language in every text, pins inside the quest area, files referenced by clues.
+//
+//   pnpm run content
+//
+// The app builds its own index of these files, so there is nothing to regenerate.
+import { existsSync } from 'node:fs'
+import { readdir, readFile } from 'node:fs/promises'
+import { basename, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ContentIndex, Location, Quest } from '../packages/core/src/index.ts'
+import { Location, Quest, questProblems } from '../packages/core/src/index.ts'
 
 const root = join(fileURLToPath(new URL('..', import.meta.url)), 'content')
-const check = process.argv.includes('--check')
-
-async function files(dir) {
-  const out = []
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...(await files(path)))
-    else if (entry.name.endsWith('.json') && entry.name !== 'index.json') out.push(path)
-  }
-  return out.sort((a, b) => a.localeCompare(b))
-}
 
 let failed = false
 const fail = (path, message) => {
@@ -24,35 +18,52 @@ const fail = (path, message) => {
   console.error(`✗ ${relative(root, path)}\n  ${message.replaceAll('\n', '\n  ')}`)
 }
 
-async function validate(dir, schema) {
-  const paths = []
+async function jsonFiles(dir) {
+  const entries = await readdir(join(root, dir), { withFileTypes: true })
+  return entries
+    .filter((entry) => entry.name.endsWith('.json'))
+    .map((entry) => join(root, dir, entry.name))
+    .sort((a, b) => a.localeCompare(b))
+}
+
+async function check(dir, schema, extra) {
   const ids = new Set()
-  for (const path of await files(join(root, dir))) {
+  let count = 0
+  for (const path of await jsonFiles(dir)) {
+    count++
+    let data
     try {
-      const data = schema.parse(JSON.parse(await readFile(path, 'utf8')))
-      if (ids.has(data.id)) fail(path, `duplicate id "${data.id}"`)
-      ids.add(data.id)
-      paths.push(relative(root, path).split('\\').join('/'))
+      const parsed = schema.safeParse(JSON.parse(await readFile(path, 'utf8')))
+      if (!parsed.success) {
+        fail(path, parsed.error.issues.map((i) => `${i.path.join('.') || '(file)'}: ${i.message}`).join('\n'))
+        continue
+      }
+      data = parsed.data
     } catch (error) {
       fail(path, error instanceof Error ? error.message : String(error))
+      continue
     }
+    if (data.id !== basename(path, '.json')) fail(path, `the file name must be the id: ${data.id}.json`)
+    if (ids.has(data.id)) fail(path, `duplicate id "${data.id}"`)
+    ids.add(data.id)
+    for (const problem of extra?.(data) ?? []) fail(path, problem)
   }
-  return paths
+  return count
 }
 
-const index = ContentIndex.parse({
-  locations: await validate('locations', Location),
-  quests: await validate('quests', Quest),
-})
-const next = `${JSON.stringify(index, null, 2)}\n`
-const indexPath = join(root, 'index.json')
+// Files a clue points at must exist, and stay inside content/.
+const missingFiles = (quest) =>
+  quest.pins.flatMap((pin) =>
+    pin.clues.flatMap((clue) => {
+      if ((clue.type !== 'photo' && clue.type !== 'audio') || /^https?:\/\//.test(clue.src)) return []
+      const file = resolve(root, clue.src)
+      if (!file.startsWith(`${root}/`)) return [`pins.${pin.id}: ${clue.src} points outside content/`]
+      return existsSync(file) ? [] : [`pins.${pin.id}: ${clue.src} does not exist`]
+    }),
+  )
 
-if (check) {
-  const current = await readFile(indexPath, 'utf8').catch(() => '')
-  if (current !== next) fail(indexPath, 'content/index.json is out of date; run `pnpm content`')
-} else if (!failed) {
-  await writeFile(indexPath, next)
-}
+const locations = await check('locations', Location)
+const quests = await check('quests', Quest, (quest) => [...questProblems(quest), ...missingFiles(quest)])
 
 if (failed) process.exit(1)
-console.log(`✓ ${index.locations.length} locations, ${index.quests.length} quests`)
+console.log(`✓ ${locations} locations, ${quests} quests`)

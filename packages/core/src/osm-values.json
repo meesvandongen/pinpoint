@@ -1,0 +1,1806 @@
+{
+ "source": "https://taginfo.openstreetmap.org",
+ "dataUntil": "2026-11-08T00:59:35Z",
+ "keys": {
+  "tourism": [
+   {
+    "value": "information",
+    "count": 1534992
+   },
+   {
+    "value": "hotel",
+    "count": 456019
+   },
+   {
+    "value": "artwork",
+    "count": 373765
+   },
+   {
+    "value": "viewpoint",
+    "count": 266165
+   },
+   {
+    "value": "attraction",
+    "count": 256095
+   },
+   {
+    "value": "guest_house",
+    "count": 201341
+   },
+   {
+    "value": "picnic_site",
+    "count": 169311
+   },
+   {
+    "value": "camp_site",
+    "count": 163547
+   },
+   {
+    "value": "camp_pitch",
+    "count": 145192
+   },
+   {
+    "value": "chalet",
+    "count": 113821
+   },
+   {
+    "value": "museum",
+    "count": 111877
+   },
+   {
+    "value": "apartment",
+    "count": 92129
+   },
+   {
+    "value": "hostel",
+    "count": 62887
+   },
+   {
+    "value": "motel",
+    "count": 49687
+   },
+   {
+    "value": "caravan_site",
+    "count": 36470
+   },
+   {
+    "value": "gallery",
+    "count": 22754
+   },
+   {
+    "value": "wilderness_hut",
+    "count": 17124
+   },
+   {
+    "value": "alpine_hut",
+    "count": 14101
+   },
+   {
+    "value": "theme_park",
+    "count": 11166
+   },
+   {
+    "value": "yes",
+    "count": 9928
+   },
+   {
+    "value": "zoo",
+    "count": 9328
+   },
+   {
+    "value": "aquarium",
+    "count": 1712
+   },
+   {
+    "value": "trail_riding_station",
+    "count": 1612
+   },
+   {
+    "value": "checkpoint",
+    "count": 1088
+   },
+   {
+    "value": "cabin",
+    "count": 881
+   },
+   {
+    "value": "no",
+    "count": 699
+   },
+   {
+    "value": "wine_cellar",
+    "count": 672
+   },
+   {
+    "value": "hunting_lodge",
+    "count": 664
+   },
+   {
+    "value": "lean_to",
+    "count": 444
+   },
+   {
+    "value": "giant_furniture",
+    "count": 435
+   },
+   {
+    "value": "resort",
+    "count": 324
+   },
+   {
+    "value": "picnic_table",
+    "count": 223
+   },
+   {
+    "value": "spa_resort",
+    "count": 175
+   },
+   {
+    "value": "disused_camp_site",
+    "count": 156
+   },
+   {
+    "value": "nature_centre",
+    "count": 151
+   },
+   {
+    "value": "winery",
+    "count": 146
+   },
+   {
+    "value": "register",
+    "count": 142
+   },
+   {
+    "value": "holiday_village",
+    "count": 141
+   },
+   {
+    "value": "guest_house;apartment",
+    "count": 138
+   },
+   {
+    "value": "photopoint",
+    "count": 113
+   }
+  ],
+  "historic": [
+   {
+    "value": "memorial",
+    "count": 519939
+   },
+   {
+    "value": "wayside_cross",
+    "count": 241039
+   },
+   {
+    "value": "archaeological_site",
+    "count": 230935
+   },
+   {
+    "value": "yes",
+    "count": 192526
+   },
+   {
+    "value": "ruins",
+    "count": 189900
+   },
+   {
+    "value": "wayside_shrine",
+    "count": 174249
+   },
+   {
+    "value": "boundary_stone",
+    "count": 98526
+   },
+   {
+    "value": "building",
+    "count": 95415
+   },
+   {
+    "value": "tomb",
+    "count": 74467
+   },
+   {
+    "value": "monument",
+    "count": 72162
+   },
+   {
+    "value": "castle",
+    "count": 54785
+   },
+   {
+    "value": "charcoal_pile",
+    "count": 52278
+   },
+   {
+    "value": "shieling",
+    "count": 22075
+   },
+   {
+    "value": "citywalls",
+    "count": 21122
+   },
+   {
+    "value": "manor",
+    "count": 20947
+   },
+   {
+    "value": "bomb_crater",
+    "count": 20360
+   },
+   {
+    "value": "railway",
+    "count": 19549
+   },
+   {
+    "value": "heritage",
+    "count": 16826
+   },
+   {
+    "value": "mine",
+    "count": 13572
+   },
+   {
+    "value": "church",
+    "count": 13134
+   },
+   {
+    "value": "mine_shaft",
+    "count": 11254
+   },
+   {
+    "value": "milestone",
+    "count": 10203
+   },
+   {
+    "value": "no",
+    "count": 9969
+   },
+   {
+    "value": "city_gate",
+    "count": 9752
+   },
+   {
+    "value": "fort",
+    "count": 9427
+   },
+   {
+    "value": "aircraft",
+    "count": 8229
+   },
+   {
+    "value": "house",
+    "count": 7894
+   },
+   {
+    "value": "cannon",
+    "count": 6775
+   },
+   {
+    "value": "wreck",
+    "count": 5954
+   },
+   {
+    "value": "stone",
+    "count": 5212
+   },
+   {
+    "value": "hollow_way",
+    "count": 5050
+   },
+   {
+    "value": "tower",
+    "count": 4256
+   },
+   {
+    "value": "roman_road",
+    "count": 4210
+   },
+   {
+    "value": "bunker",
+    "count": 3678
+   },
+   {
+    "value": "monastery",
+    "count": 2981
+   },
+   {
+    "value": "maritime",
+    "count": 2980
+   },
+   {
+    "value": "farm",
+    "count": 2893
+   },
+   {
+    "value": "bridge",
+    "count": 2791
+   },
+   {
+    "value": "locomotive",
+    "count": 2714
+   },
+   {
+    "value": "district",
+    "count": 2595
+   }
+  ],
+  "amenity": [
+   {
+    "value": "parking",
+    "count": 6946664
+   },
+   {
+    "value": "parking_space",
+    "count": 5144564
+   },
+   {
+    "value": "bench",
+    "count": 3464546
+   },
+   {
+    "value": "place_of_worship",
+    "count": 1632317
+   },
+   {
+    "value": "restaurant",
+    "count": 1631373
+   },
+   {
+    "value": "school",
+    "count": 1453280
+   },
+   {
+    "value": "waste_basket",
+    "count": 1275530
+   },
+   {
+    "value": "bicycle_parking",
+    "count": 957185
+   },
+   {
+    "value": "shelter",
+    "count": 697180
+   },
+   {
+    "value": "fast_food",
+    "count": 670859
+   },
+   {
+    "value": "cafe",
+    "count": 656698
+   },
+   {
+    "value": "recycling",
+    "count": 593755
+   },
+   {
+    "value": "fuel",
+    "count": 570640
+   },
+   {
+    "value": "toilets",
+    "count": 527908
+   },
+   {
+    "value": "pharmacy",
+    "count": 444234
+   },
+   {
+    "value": "post_box",
+    "count": 415015
+   },
+   {
+    "value": "bank",
+    "count": 413338
+   },
+   {
+    "value": "vending_machine",
+    "count": 374837
+   },
+   {
+    "value": "drinking_water",
+    "count": 371375
+   },
+   {
+    "value": "kindergarten",
+    "count": 341143
+   },
+   {
+    "value": "waste_disposal",
+    "count": 323905
+   },
+   {
+    "value": "hunting_stand",
+    "count": 312167
+   },
+   {
+    "value": "parking_entrance",
+    "count": 287074
+   },
+   {
+    "value": "bar",
+    "count": 246961
+   },
+   {
+    "value": "atm",
+    "count": 244604
+   },
+   {
+    "value": "community_centre",
+    "count": 223858
+   },
+   {
+    "value": "clinic",
+    "count": 222474
+   },
+   {
+    "value": "post_office",
+    "count": 218328
+   },
+   {
+    "value": "hospital",
+    "count": 217875
+   },
+   {
+    "value": "doctors",
+    "count": 210903
+   },
+   {
+    "value": "charging_station",
+    "count": 210024
+   },
+   {
+    "value": "fountain",
+    "count": 203936
+   },
+   {
+    "value": "pub",
+    "count": 200650
+   },
+   {
+    "value": "social_facility",
+    "count": 182323
+   },
+   {
+    "value": "townhall",
+    "count": 178646
+   },
+   {
+    "value": "police",
+    "count": 163617
+   },
+   {
+    "value": "dentist",
+    "count": 162740
+   },
+   {
+    "value": "grave_yard",
+    "count": 160382
+   },
+   {
+    "value": "fire_station",
+    "count": 148996
+   },
+   {
+    "value": "car_wash",
+    "count": 126592
+   },
+   {
+    "value": "library",
+    "count": 113671
+   },
+   {
+    "value": "parcel_locker",
+    "count": 104001
+   },
+   {
+    "value": "marketplace",
+    "count": 99267
+   },
+   {
+    "value": "bicycle_rental",
+    "count": 94871
+   },
+   {
+    "value": "childcare",
+    "count": 76999
+   },
+   {
+    "value": "telephone",
+    "count": 74656
+   },
+   {
+    "value": "college",
+    "count": 72208
+   },
+   {
+    "value": "bus_station",
+    "count": 67771
+   },
+   {
+    "value": "ice_cream",
+    "count": 67613
+   },
+   {
+    "value": "veterinary",
+    "count": 66034
+   },
+   {
+    "value": "university",
+    "count": 58349
+   },
+   {
+    "value": "theatre",
+    "count": 53704
+   },
+   {
+    "value": "taxi",
+    "count": 52415
+   },
+   {
+    "value": "public_bookcase",
+    "count": 48738
+   },
+   {
+    "value": "letter_box",
+    "count": 48538
+   },
+   {
+    "value": "motorcycle_parking",
+    "count": 47937
+   },
+   {
+    "value": "bbq",
+    "count": 47760
+   },
+   {
+    "value": "water_point",
+    "count": 42911
+   },
+   {
+    "value": "loading_dock",
+    "count": 41947
+   },
+   {
+    "value": "grit_bin",
+    "count": 41768
+   },
+   {
+    "value": "shower",
+    "count": 38008
+   },
+   {
+    "value": "ferry_terminal",
+    "count": 37605
+   },
+   {
+    "value": "events_venue",
+    "count": 37192
+   },
+   {
+    "value": "clock",
+    "count": 36076
+   },
+   {
+    "value": "driving_school",
+    "count": 35835
+   },
+   {
+    "value": "public_building",
+    "count": 33332
+   },
+   {
+    "value": "car_rental",
+    "count": 33178
+   },
+   {
+    "value": "courthouse",
+    "count": 31791
+   },
+   {
+    "value": "cinema",
+    "count": 31683
+   },
+   {
+    "value": "watering_place",
+    "count": 30739
+   }
+  ],
+  "building": [
+   {
+    "value": "yes",
+    "count": 564597937
+   },
+   {
+    "value": "house",
+    "count": 68998346
+   },
+   {
+    "value": "residential",
+    "count": 16716012
+   },
+   {
+    "value": "detached",
+    "count": 10571481
+   },
+   {
+    "value": "garage",
+    "count": 8359582
+   },
+   {
+    "value": "apartments",
+    "count": 8147680
+   },
+   {
+    "value": "shed",
+    "count": 4656289
+   },
+   {
+    "value": "industrial",
+    "count": 2712708
+   },
+   {
+    "value": "roof",
+    "count": 2604681
+   },
+   {
+    "value": "hut",
+    "count": 2447413
+   },
+   {
+    "value": "farm_auxiliary",
+    "count": 2428626
+   },
+   {
+    "value": "semidetached_house",
+    "count": 2097302
+   },
+   {
+    "value": "commercial",
+    "count": 1543050
+   },
+   {
+    "value": "school",
+    "count": 1386884
+   },
+   {
+    "value": "terrace",
+    "count": 1383576
+   },
+   {
+    "value": "retail",
+    "count": 1338205
+   },
+   {
+    "value": "construction",
+    "count": 1155872
+   },
+   {
+    "value": "outbuilding",
+    "count": 1119445
+   },
+   {
+    "value": "garages",
+    "count": 1090854
+   },
+   {
+    "value": "greenhouse",
+    "count": 856231
+   },
+   {
+    "value": "barn",
+    "count": 818942
+   },
+   {
+    "value": "cabin",
+    "count": 663677
+   },
+   {
+    "value": "static_caravan",
+    "count": 588432
+   },
+   {
+    "value": "service",
+    "count": 571477
+   },
+   {
+    "value": "warehouse",
+    "count": 510588
+   },
+   {
+    "value": "bungalow",
+    "count": 451491
+   },
+   {
+    "value": "church",
+    "count": 441650
+   },
+   {
+    "value": "farm",
+    "count": 419941
+   },
+   {
+    "value": "allotment_house",
+    "count": 372626
+   },
+   {
+    "value": "carport",
+    "count": 366568
+   },
+   {
+    "value": "office",
+    "count": 315474
+   },
+   {
+    "value": "ruins",
+    "count": 301254
+   },
+   {
+    "value": "public",
+    "count": 248183
+   },
+   {
+    "value": "civic",
+    "count": 213402
+   },
+   {
+    "value": "university",
+    "count": 181206
+   },
+   {
+    "value": "hospital",
+    "count": 175031
+   },
+   {
+    "value": "hotel",
+    "count": 167495
+   },
+   {
+    "value": "kindergarten",
+    "count": 131735
+   },
+   {
+    "value": "chapel",
+    "count": 123569
+   },
+   {
+    "value": "boathouse",
+    "count": 119286
+   },
+   {
+    "value": "ger",
+    "count": 113598
+   },
+   {
+    "value": "mosque",
+    "count": 110222
+   },
+   {
+    "value": "storage_tank",
+    "count": 108531
+   },
+   {
+    "value": "manufacture",
+    "count": 99951
+   },
+   {
+    "value": "hangar",
+    "count": 97435
+   },
+   {
+    "value": "dormitory",
+    "count": 76586
+   },
+   {
+    "value": "bunker",
+    "count": 75845
+   },
+   {
+    "value": "silo",
+    "count": 69171
+   },
+   {
+    "value": "train_station",
+    "count": 61923
+   },
+   {
+    "value": "transformer_tower",
+    "count": 59298
+   }
+  ],
+  "man_made": [
+   {
+    "value": "storage_tank",
+    "count": 896385
+   },
+   {
+    "value": "pier",
+    "count": 756315
+   },
+   {
+    "value": "cutline",
+    "count": 625858
+   },
+   {
+    "value": "surveillance",
+    "count": 593526
+   },
+   {
+    "value": "manhole",
+    "count": 534047
+   },
+   {
+    "value": "mast",
+    "count": 531180
+   },
+   {
+    "value": "tower",
+    "count": 463434
+   },
+   {
+    "value": "utility_pole",
+    "count": 453351
+   },
+   {
+    "value": "survey_point",
+    "count": 393292
+   },
+   {
+    "value": "pipeline",
+    "count": 385717
+   },
+   {
+    "value": "water_well",
+    "count": 372201
+   },
+   {
+    "value": "silo",
+    "count": 371507
+   },
+   {
+    "value": "embankment",
+    "count": 365564
+   },
+   {
+    "value": "petroleum_well",
+    "count": 341798
+   },
+   {
+    "value": "bridge",
+    "count": 339822
+   },
+   {
+    "value": "street_cabinet",
+    "count": 335394
+   },
+   {
+    "value": "works",
+    "count": 243842
+   },
+   {
+    "value": "flagpole",
+    "count": 212529
+   },
+   {
+    "value": "water_tower",
+    "count": 169931
+   },
+   {
+    "value": "chimney",
+    "count": 118632
+   },
+   {
+    "value": "wastewater_plant",
+    "count": 93545
+   },
+   {
+    "value": "clearcut",
+    "count": 85095
+   },
+   {
+    "value": "water_tap",
+    "count": 81666
+   },
+   {
+    "value": "bunker_silo",
+    "count": 75593
+   },
+   {
+    "value": "breakwater",
+    "count": 65654
+   },
+   {
+    "value": "monitoring_station",
+    "count": 65164
+   },
+   {
+    "value": "reservoir_covered",
+    "count": 64810
+   },
+   {
+    "value": "cairn",
+    "count": 62532
+   },
+   {
+    "value": "beehive",
+    "count": 60540
+   },
+   {
+    "value": "antenna",
+    "count": 53893
+   },
+   {
+    "value": "groyne",
+    "count": 52513
+   },
+   {
+    "value": "planter",
+    "count": 51160
+   },
+   {
+    "value": "water_works",
+    "count": 46741
+   },
+   {
+    "value": "charge_point",
+    "count": 44879
+   },
+   {
+    "value": "cross",
+    "count": 39049
+   },
+   {
+    "value": "pumping_station",
+    "count": 38859
+   },
+   {
+    "value": "dyke",
+    "count": 38514
+   },
+   {
+    "value": "gantry",
+    "count": 34970
+   },
+   {
+    "value": "kiln",
+    "count": 32166
+   },
+   {
+    "value": "courtyard",
+    "count": 27156
+   }
+  ],
+  "leisure": [
+   {
+    "value": "swimming_pool",
+    "count": 3089480
+   },
+   {
+    "value": "pitch",
+    "count": 2889587
+   },
+   {
+    "value": "garden",
+    "count": 1594435
+   },
+   {
+    "value": "park",
+    "count": 1307185
+   },
+   {
+    "value": "playground",
+    "count": 1020353
+   },
+   {
+    "value": "picnic_table",
+    "count": 508618
+   },
+   {
+    "value": "sports_centre",
+    "count": 270392
+   },
+   {
+    "value": "track",
+    "count": 167417
+   },
+   {
+    "value": "nature_reserve",
+    "count": 151543
+   },
+   {
+    "value": "fitness_centre",
+    "count": 110095
+   },
+   {
+    "value": "fitness_station",
+    "count": 104685
+   },
+   {
+    "value": "outdoor_seating",
+    "count": 91338
+   },
+   {
+    "value": "slipway",
+    "count": 69154
+   },
+   {
+    "value": "bleachers",
+    "count": 61957
+   },
+   {
+    "value": "stadium",
+    "count": 52123
+   },
+   {
+    "value": "firepit",
+    "count": 51740
+   },
+   {
+    "value": "sports_hall",
+    "count": 49160
+   },
+   {
+    "value": "golf_course",
+    "count": 39663
+   },
+   {
+    "value": "marina",
+    "count": 31950
+   },
+   {
+    "value": "dog_park",
+    "count": 31225
+   },
+   {
+    "value": "common",
+    "count": 30610
+   },
+   {
+    "value": "resort",
+    "count": 25938
+   },
+   {
+    "value": "horse_riding",
+    "count": 22192
+   },
+   {
+    "value": "fishing",
+    "count": 19940
+   },
+   {
+    "value": "sauna",
+    "count": 18272
+   },
+   {
+    "value": "beach_resort",
+    "count": 15345
+   },
+   {
+    "value": "water_park",
+    "count": 13363
+   },
+   {
+    "value": "dance",
+    "count": 11855
+   },
+   {
+    "value": "miniature_golf",
+    "count": 10999
+   },
+   {
+    "value": "ice_rink",
+    "count": 10093
+   },
+   {
+    "value": "amusement_arcade",
+    "count": 9238
+   },
+   {
+    "value": "bird_hide",
+    "count": 8341
+   },
+   {
+    "value": "bandstand",
+    "count": 8303
+   },
+   {
+    "value": "schoolyard",
+    "count": 7999
+   },
+   {
+    "value": "adult_gaming_centre",
+    "count": 7964
+   },
+   {
+    "value": "swimming_area",
+    "count": 6897
+   },
+   {
+    "value": "bowling_alley",
+    "count": 6490
+   },
+   {
+    "value": "recreation_ground",
+    "count": 6206
+   },
+   {
+    "value": "bathing_place",
+    "count": 5972
+   },
+   {
+    "value": "hot_tub",
+    "count": 5348
+   }
+  ],
+  "natural": [
+   {
+    "value": "tree",
+    "count": 34922063
+   },
+   {
+    "value": "water",
+    "count": 23662358
+   },
+   {
+    "value": "wood",
+    "count": 12788950
+   },
+   {
+    "value": "scrub",
+    "count": 5819152
+   },
+   {
+    "value": "wetland",
+    "count": 4907966
+   },
+   {
+    "value": "grassland",
+    "count": 2446352
+   },
+   {
+    "value": "tree_row",
+    "count": 2146869
+   },
+   {
+    "value": "bare_rock",
+    "count": 1344215
+   },
+   {
+    "value": "coastline",
+    "count": 1293386
+   },
+   {
+    "value": "peak",
+    "count": 1114508
+   },
+   {
+    "value": "cliff",
+    "count": 1053278
+   },
+   {
+    "value": "heath",
+    "count": 685820
+   },
+   {
+    "value": "sand",
+    "count": 599261
+   },
+   {
+    "value": "scree",
+    "count": 407685
+   },
+   {
+    "value": "shrub",
+    "count": 313975
+   },
+   {
+    "value": "spring",
+    "count": 285506
+   },
+   {
+    "value": "ridge",
+    "count": 272070
+   },
+   {
+    "value": "beach",
+    "count": 250844
+   },
+   {
+    "value": "rock",
+    "count": 250342
+   },
+   {
+    "value": "glacier",
+    "count": 118365
+   },
+   {
+    "value": "shrubbery",
+    "count": 105200
+   },
+   {
+    "value": "reef",
+    "count": 104636
+   },
+   {
+    "value": "stone",
+    "count": 96113
+   },
+   {
+    "value": "bay",
+    "count": 94741
+   },
+   {
+    "value": "shingle",
+    "count": 89056
+   }
+  ],
+  "shop": [
+   {
+    "value": "convenience",
+    "count": 848643
+   },
+   {
+    "value": "supermarket",
+    "count": 496982
+   },
+   {
+    "value": "clothes",
+    "count": 469190
+   },
+   {
+    "value": "hairdresser",
+    "count": 418469
+   },
+   {
+    "value": "car_repair",
+    "count": 297680
+   },
+   {
+    "value": "bakery",
+    "count": 256824
+   },
+   {
+    "value": "yes",
+    "count": 196756
+   },
+   {
+    "value": "beauty",
+    "count": 193453
+   },
+   {
+    "value": "car",
+    "count": 166813
+   },
+   {
+    "value": "hardware",
+    "count": 108197
+   },
+   {
+    "value": "butcher",
+    "count": 105796
+   },
+   {
+    "value": "kiosk",
+    "count": 104274
+   },
+   {
+    "value": "mobile_phone",
+    "count": 103782
+   },
+   {
+    "value": "furniture",
+    "count": 102354
+   },
+   {
+    "value": "car_parts",
+    "count": 97779
+   },
+   {
+    "value": "alcohol",
+    "count": 93388
+   },
+   {
+    "value": "variety_store",
+    "count": 91639
+   },
+   {
+    "value": "florist",
+    "count": 88592
+   },
+   {
+    "value": "optician",
+    "count": 85092
+   },
+   {
+    "value": "jewelry",
+    "count": 84691
+   },
+   {
+    "value": "electronics",
+    "count": 84394
+   },
+   {
+    "value": "vacant",
+    "count": 84184
+   },
+   {
+    "value": "outpost",
+    "count": 83902
+   },
+   {
+    "value": "shoes",
+    "count": 83420
+   },
+   {
+    "value": "mall",
+    "count": 79039
+   },
+   {
+    "value": "gift",
+    "count": 75025
+   },
+   {
+    "value": "doityourself",
+    "count": 69280
+   },
+   {
+    "value": "greengrocer",
+    "count": 67533
+   },
+   {
+    "value": "chemist",
+    "count": 62301
+   },
+   {
+    "value": "laundry",
+    "count": 60064
+   },
+   {
+    "value": "books",
+    "count": 58957
+   },
+   {
+    "value": "bicycle",
+    "count": 57297
+   },
+   {
+    "value": "department_store",
+    "count": 52686
+   },
+   {
+    "value": "pet",
+    "count": 50930
+   },
+   {
+    "value": "travel_agency",
+    "count": 50173
+   },
+   {
+    "value": "stationery",
+    "count": 49822
+   },
+   {
+    "value": "sports",
+    "count": 46644
+   },
+   {
+    "value": "confectionery",
+    "count": 42699
+   },
+   {
+    "value": "tyres",
+    "count": 41761
+   },
+   {
+    "value": "storage_rental",
+    "count": 41432
+   }
+  ],
+  "railway": [
+   {
+    "value": "rail",
+    "count": 2841552
+   },
+   {
+    "value": "switch",
+    "count": 1260842
+   },
+   {
+    "value": "level_crossing",
+    "count": 1005125
+   },
+   {
+    "value": "signal",
+    "count": 524265
+   },
+   {
+    "value": "abandoned",
+    "count": 442292
+   },
+   {
+    "value": "buffer_stop",
+    "count": 282526
+   },
+   {
+    "value": "milestone",
+    "count": 252503
+   },
+   {
+    "value": "crossing",
+    "count": 228197
+   },
+   {
+    "value": "platform",
+    "count": 196511
+   },
+   {
+    "value": "disused",
+    "count": 195097
+   },
+   {
+    "value": "stop",
+    "count": 165397
+   },
+   {
+    "value": "tram",
+    "count": 118546
+   },
+   {
+    "value": "tram_level_crossing",
+    "count": 104624
+   },
+   {
+    "value": "station",
+    "count": 104070
+   },
+   {
+    "value": "subway",
+    "count": 101197
+   }
+  ],
+  "waterway": [
+   {
+    "value": "stream",
+    "count": 29780189
+   },
+   {
+    "value": "ditch",
+    "count": 5028319
+   },
+   {
+    "value": "river",
+    "count": 2072621
+   },
+   {
+    "value": "drain",
+    "count": 1914030
+   },
+   {
+    "value": "canal",
+    "count": 812677
+   },
+   {
+    "value": "dam",
+    "count": 273695
+   },
+   {
+    "value": "weir",
+    "count": 155535
+   },
+   {
+    "value": "rapids",
+    "count": 128305
+   },
+   {
+    "value": "waterfall",
+    "count": 90080
+   },
+   {
+    "value": "flowline",
+    "count": 67781
+   },
+   {
+    "value": "tidal_channel",
+    "count": 29903
+   },
+   {
+    "value": "lock_gate",
+    "count": 24639
+   }
+  ],
+  "public_transport": [
+   {
+    "value": "platform",
+    "count": 4215263
+   },
+   {
+    "value": "stop_position",
+    "count": 1630954
+   },
+   {
+    "value": "stop_area",
+    "count": 584535
+   },
+   {
+    "value": "station",
+    "count": 204765
+   },
+   {
+    "value": "stop_area_group",
+    "count": 7097
+   },
+   {
+    "value": "pole",
+    "count": 3635
+   }
+  ],
+  "landuse": [
+   {
+    "value": "farmland",
+    "count": 11857288
+   },
+   {
+    "value": "residential",
+    "count": 10800481
+   },
+   {
+    "value": "grass",
+    "count": 7746579
+   },
+   {
+    "value": "forest",
+    "count": 6027984
+   },
+   {
+    "value": "meadow",
+    "count": 5630615
+   },
+   {
+    "value": "orchard",
+    "count": 1900953
+   },
+   {
+    "value": "farmyard",
+    "count": 1648694
+   },
+   {
+    "value": "industrial",
+    "count": 1460673
+   },
+   {
+    "value": "vineyard",
+    "count": 881295
+   },
+   {
+    "value": "commercial",
+    "count": 606275
+   },
+   {
+    "value": "cemetery",
+    "count": 605827
+   },
+   {
+    "value": "allotments",
+    "count": 496142
+   },
+   {
+    "value": "retail",
+    "count": 424437
+   },
+   {
+    "value": "construction",
+    "count": 277120
+   },
+   {
+    "value": "basin",
+    "count": 276244
+   },
+   {
+    "value": "quarry",
+    "count": 254830
+   },
+   {
+    "value": "recreation_ground",
+    "count": 195529
+   },
+   {
+    "value": "reservoir",
+    "count": 186009
+   },
+   {
+    "value": "religious",
+    "count": 164115
+   },
+   {
+    "value": "flowerbed",
+    "count": 163298
+   },
+   {
+    "value": "brownfield",
+    "count": 162102
+   },
+   {
+    "value": "greenhouse_horticulture",
+    "count": 124283
+   },
+   {
+    "value": "aquaculture",
+    "count": 102811
+   },
+   {
+    "value": "railway",
+    "count": 101043
+   },
+   {
+    "value": "garages",
+    "count": 98720
+   }
+  ],
+  "place": [
+   {
+    "value": "hamlet",
+    "count": 2137811
+   },
+   {
+    "value": "locality",
+    "count": 1988463
+   },
+   {
+    "value": "village",
+    "count": 1780645
+   },
+   {
+    "value": "isolated_dwelling",
+    "count": 859320
+   },
+   {
+    "value": "islet",
+    "count": 726642
+   },
+   {
+    "value": "neighbourhood",
+    "count": 554402
+   },
+   {
+    "value": "plot",
+    "count": 325535
+   },
+   {
+    "value": "farm",
+    "count": 289603
+   },
+   {
+    "value": "quarter",
+    "count": 164826
+   },
+   {
+    "value": "suburb",
+    "count": 164153
+   },
+   {
+    "value": "town",
+    "count": 116938
+   },
+   {
+    "value": "square",
+    "count": 114516
+   },
+   {
+    "value": "city_block",
+    "count": 105813
+   },
+   {
+    "value": "island",
+    "count": 100583
+   },
+   {
+    "value": "municipality",
+    "count": 25463
+   }
+  ],
+  "highway": [
+   {
+    "value": "residential",
+    "count": 70126658
+   },
+   {
+    "value": "service",
+    "count": 66452858
+   },
+   {
+    "value": "footway",
+    "count": 33293091
+   },
+   {
+    "value": "track",
+    "count": 30193001
+   },
+   {
+    "value": "unclassified",
+    "count": 18592512
+   },
+   {
+    "value": "path",
+    "count": 16642682
+   },
+   {
+    "value": "crossing",
+    "count": 13745221
+   },
+   {
+    "value": "tertiary",
+    "count": 9218313
+   },
+   {
+    "value": "street_lamp",
+    "count": 6825229
+   },
+   {
+    "value": "secondary",
+    "count": 5897958
+   },
+   {
+    "value": "bus_stop",
+    "count": 4216626
+   },
+   {
+    "value": "primary",
+    "count": 4152659
+   },
+   {
+    "value": "turning_circle",
+    "count": 2571363
+   },
+   {
+    "value": "stop",
+    "count": 2544703
+   },
+   {
+    "value": "living_street",
+    "count": 2356985
+   },
+   {
+    "value": "cycleway",
+    "count": 2267042
+   },
+   {
+    "value": "steps",
+    "count": 2155356
+   },
+   {
+    "value": "traffic_signals",
+    "count": 2032479
+   },
+   {
+    "value": "trunk",
+    "count": 2023253
+   },
+   {
+    "value": "give_way",
+    "count": 1713313
+   },
+   {
+    "value": "motorway",
+    "count": 1380299
+   },
+   {
+    "value": "motorway_link",
+    "count": 921922
+   },
+   {
+    "value": "pedestrian",
+    "count": 896095
+   },
+   {
+    "value": "trunk_link",
+    "count": 593316
+   },
+   {
+    "value": "primary_link",
+    "count": 499330
+   }
+  ]
+ }
+}
