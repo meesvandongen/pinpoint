@@ -1,0 +1,24 @@
+{
+  "name": "pinpoint-core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Content schemas, geo maths and play rules shared by the Pinpoint app and tooling",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "test": "vp test run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vite-plus": "catalog:"
+  }
+}

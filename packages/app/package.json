@@ -1,0 +1,31 @@
+{
+  "name": "pinpoint-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "vp dev",
+    "build": "tsc --noEmit && vp build",
+    "preview": "wrangler dev",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pinpoint-core": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.5.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "4.156.0"
+  }
+}

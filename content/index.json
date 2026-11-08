@@ -1,0 +1,10 @@
+{
+  "locations": [
+    "locations/netherlands.json",
+    "locations/noord-brabant.json",
+    "locations/tilburg.json"
+  ],
+  "quests": [
+    "quests/tilburg-textile/quest.json"
+  ]
+}

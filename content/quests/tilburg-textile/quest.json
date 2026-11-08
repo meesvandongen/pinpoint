@@ -1,0 +1,62 @@
+{
+  "id": "tilburg-textile",
+  "title": { "en": "Wool city", "nl": "Wollenstad" },
+  "description": {
+    "en": "Three stops in the old textile quarter. Sample content: coordinates are approximate.",
+    "nl": "Drie plekken in de oude textielwijk. Voorbeeldinhoud: coördinaten zijn bij benadering."
+  },
+  "defaultLanguage": "en",
+  "order": "linear",
+  "pins": [
+    {
+      "id": "chimney",
+      "title": { "en": "The chimney", "nl": "De schoorsteen" },
+      "category": "industrial",
+      "position": { "lat": 51.5607, "lng": 5.0768 },
+      "radius": 50,
+      "clues": [
+        { "type": "text", "text": { "en": "Look for the old chimney that still has a name on it.", "nl": "Zoek de oude schoorsteen waar nog een naam op staat." } },
+        { "type": "distance" },
+        { "type": "direction", "mode": "arrow", "reveal": { "afterSeconds": 60 } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } }
+      ],
+      "photoPrompt": { "en": "Photograph the base of the chimney.", "nl": "Fotografeer de voet van de schoorsteen." },
+      "quiz": {
+        "question": { "en": "What did the buildings around you produce?", "nl": "Wat werd er in de gebouwen om je heen gemaakt?" },
+        "options": [
+          { "en": "Wool cloth", "nl": "Wollen stof" },
+          { "en": "Bicycles", "nl": "Fietsen" },
+          { "en": "Cheese", "nl": "Kaas" }
+        ],
+        "answer": 0
+      },
+      "stamp": { "shape": "round", "ink": "#5b34a8" }
+    },
+    {
+      "id": "market",
+      "title": { "en": "The market square", "nl": "Het marktplein" },
+      "category": "square",
+      "position": { "lat": 51.5552, "lng": 5.0833 },
+      "radius": 45,
+      "clues": [
+        { "type": "text", "text": { "en": "Where the town has met to trade for centuries.", "nl": "Waar de stad al eeuwen samenkomt om te handelen." } },
+        { "type": "distance" },
+        { "type": "direction", "mode": "cardinal" }
+      ],
+      "stamp": { "shape": "postage", "ink": "#1c7a58" }
+    },
+    {
+      "id": "harbour",
+      "title": { "en": "The harbour", "nl": "De haven" },
+      "category": "harbour",
+      "position": { "lat": 51.5599, "lng": 5.0912 },
+      "radius": 50,
+      "clues": [
+        { "type": "text", "text": { "en": "Boats once brought wool here. Find the water.", "nl": "Boten brachten hier ooit wol. Zoek het water." } },
+        { "type": "map", "view": "full" },
+        { "type": "distance" }
+      ],
+      "stamp": { "shape": "oval", "ink": "#17707a" }
+    }
+  ]
+}

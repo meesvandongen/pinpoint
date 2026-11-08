@@ -1,6 +1,6 @@
 # Pinpoint: plan and decisions
 
-Status: early planning. Nothing is built yet. This file records what has been decided, what is still open, and why.
+Status: first playable slice built. This file records what has been decided, what is still open, and why.
 
 ## The game
 
@@ -40,10 +40,59 @@ Rules:
 
 Possible later: pins without fixed coordinates inside a quest area ("photograph something red in this neighbourhood"), and an optional tag to force a quest under a location.
 
+## Clues
+
+A pin has a list of clues and any clue can be missing, so a pin can have only a riddle (for players who know the city). Types:
+
+- **Spatial:** distance, direction (arrow or cardinal), map (full or rough area), named area, shrinking circle, old map.
+- **Visual:** photo, detail crop, old photo of the same place.
+- **Verbal:** hint or riddle, word shape.
+- **Knowledge:** a question whose answer is the location, or a chain where one pin's quiz answer is the next clue.
+- **Sensory:** audio.
+
+Each clue has an optional reveal rule: visible from the start, unlocked after some seconds, or unlocked on request. Players can switch on a "local expert" mode that hides distance, direction and map; it only ever makes a quest harder. Clue types are an open set: a client skips types it does not know.
+
+## Stamps
+
+The stamp is the reward for arriving. It records what happened and never grades the player.
+
+- Every stamp is a full stamp. No tiers, no numeric score.
+- Small clue marks show which clue types were used. Two players get two different stamps and neither is better.
+- Extra marks reward choices anyone can make: quiz answered, photo taken, found after dark, in rain, at sunrise, with friends.
+- A skipped pin can be stamped later by returning to it. The book is never failed, only incomplete.
+- Photos feed a collage at the end of a quest. Photo matching is optional and never part of the stamp.
+- Contributors choose a shape, an icon and an ink colour per pin, or the app generates a stamp from templates. Shapes explored: round seal, postage stamp, hexagon, ticket, oval postmark, and a starburst for finishing a quest.
+
+## Icons
+
+A pin has a `category` from a controlled list (about 16 now, meant to grow to 40-60). Each category has a parent to fall back to for its icon (chimney, industrial, building, other), and `other` always has an icon. The app's icon table is typed on the category list, so adding a category without an icon does not compile.
+
+Planned coverage test: map OpenStreetMap tag values (tourism, historic, amenity, building, man_made, natural, leisure) to our categories and report how many of the most used values on taginfo end up in `other`. Open icon sets worth drawing from: Maki and Temaki (check licences).
+
+## Interface rules
+
+- The play screens (current pin, clues, arrival, stamp) never scroll at the default text size. Content that does not fit is split into pages, never clipped. Lists are paged with dots and turn buttons.
+- There is always a button for turning a page; swiping is an extra. Page-turn animations become a fade with reduced motion.
+- Contributors get length limits (for example a hint under about 140 characters) so text fits; CI should check them per language.
+- At very large text sizes the layout may fall back to scrolling rather than hide content.
+- Style: the passport. Navy cover, cream pages, ink stamps, gold. Details such as number size are open.
+
+## Status
+
+Built:
+
+- Monorepo (pnpm, Vite+) with `packages/core` (schemas, geo, play rules, content loader; tested) and `packages/app` (React PWA).
+- Sample content: three nested locations and one quest with three pins.
+- App flow: suggest locations from the position, list quests, play a pin (distance, direction, text, rough map, timed and on-request clues), proximity check with accuracy, round stamp, quiz, quest completion.
+- Local progress and the "local expert" setting in localStorage.
+- Content validation in CI (`pnpm run content:check`) and a Cloudflare Worker config named `pinpoint`.
+
+Not built yet: photo capture and the end-of-quest collage, extra marks, stamp shapes other than round, real map tiles (the map clue is schematic), the service worker for offline play, the `/admin` authoring page with gitvfs-cms, UI translations, length-limit checks, the icon coverage test.
+
 ## Open questions
 
 - **Runtime role of gitvfs.** Leaning towards authoring only. The player would fetch the content files from GitHub (raw JSON/YAML) and validate them with the same zod schemas. That keeps both options open: bundle content at build time later, or use gitvfs live.
-- **Stack.** gitvfs-cms is React with Vite and pnpm, so a React PWA in a pnpm monorepo like `gitvfs` is the default candidate.
+- **Stack.** Decided: React PWA in a pnpm monorepo with Vite+, like `gitvfs`, deployed as a Cloudflare Worker with static assets.
 - **Naming.** "Quest" for the whole, "pins" for the stops. Alternatives considered: mission, expedition. Route, trail and hunt were rejected because they imply order or overlap with quest.
 
 ## Visual style
@@ -57,13 +106,12 @@ Players use the app outdoors in sunlight, one-handed, while walking. Constraints
 
 Directions explored: field journal, treasure map, modern map-first, radar/HUD, bold and playful, polaroid/film. Four were mocked up on the "current pin" screen.
 
-Decision so far: **bold and playful** (flat colour, thick outlines, hard shadows) and **field journal** (paper, ink, stamps) are the two strongest. Modern map-first and radar/HUD are dropped as base styles. Radar's dark screen washes out in sun; map-first has little personality.
-
-Next: explore variations on both before merging them into one style.
+Decision: the overall style is the **passport** (variation 2B: a navy cover with a cream page and stamps in different inks). Bold and playful and field journal were the two strongest directions; modern map-first and radar/HUD were dropped. Elements still open: how large the distance number is, and whether clue marks on stamps are always visible or behind a tap.
 
 ## Next steps
 
-1. Finish the style decision (variations on bold/playful and field journal).
-2. Scaffold the repo: pnpm monorepo, content schemas, sample content (a few locations and one quest of about 3 pins), empty player PWA.
-3. Player loop: detect location, suggest location, list quests, show current pin, proximity check, photo, quiz, album.
-4. Authoring: an `/admin` page using gitvfs-cms, plus CI schema validation and a contributor guide.
+1. Photo capture (stored on the device) and the end-of-quest collage.
+2. The remaining stamp shapes and the extra marks.
+3. Real map tiles and the service worker for offline play.
+4. Authoring: an `/admin` page using gitvfs-cms, a contributor guide, and length-limit checks in CI.
+5. The icon coverage test against OpenStreetMap tags.

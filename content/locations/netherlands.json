@@ -1,0 +1,5 @@
+{
+  "id": "netherlands",
+  "name": { "en": "Netherlands", "nl": "Nederland" },
+  "polygon": [[3.35, 50.75], [7.23, 50.75], [7.23, 53.55], [3.35, 53.55]]
+}
