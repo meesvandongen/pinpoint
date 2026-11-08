@@ -2,12 +2,15 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "pinpoint",
   "compatibility_date": "2026-10-22",
+  // This file is at the root of the repository so Workers Builds finds it with the default root
+  // directory; it is found from packages/app too, because Wrangler looks in parent folders.
+  //
   // Token exchange for "Sign in with GitHub" in the editor at /admin. Only /api/github/* reaches it.
-  "main": "./worker/index.ts",
+  "main": "./packages/app/worker/index.ts",
   // Static output of `pnpm run build`, including the game content under /content.
   // Workers Builds runs the build, then deploys or previews; CI never runs Wrangler.
   "assets": {
-    "directory": "./dist",
+    "directory": "./packages/app/dist",
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/github/*"]
   },

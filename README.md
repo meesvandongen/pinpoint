@@ -14,9 +14,10 @@ It is a web app that installs like an app and keeps working offline. Quests are 
 | --- | --- |
 | `content/` | Locations and quests as JSON, and the photos and sounds clues point at. |
 | `packages/core` | The content schemas, geo maths, play rules, sun position, categories and their OpenStreetMap mapping, collage layout. No UI. Tested. |
-| `packages/app` | The game: React, TanStack Router and Query, MapLibre, Vite+. Deployed as a Cloudflare Worker with static assets. |
+| `packages/app` | The game: React, TanStack Router and Query, MapLibre, Vite+. Its build output is what the Worker serves. |
 | `packages/admin` | The quest editor at `/admin`: [gitvfs-cms](https://github.com/meesvandongen/gitvfs) with Pinpoint's content model. Loaded only when opened. |
 | `packages/e2e` | Plays the game in a real browser: the whole journey, the preview test tools, the editor and offline play. |
+| `wrangler.jsonc` | The Cloudflare Worker: the built game as static assets, plus the small Worker for editor sign-in. |
 | `scripts/` | `content.mjs` checks the content; `taginfo.mjs` refreshes the OpenStreetMap fixture; `vendor-gitvfs.mjs` rebuilds `vendor/`. |
 | `vendor/` | The gitvfs packages, as tarballs, until they are on npm. See `vendor/README.md`. |
 
@@ -54,11 +55,11 @@ Production builds contain none of this. The tools are switched on by a build fla
 
 ## Deploy
 
-The app is a Cloudflare Worker named `pinpoint` ([`packages/app/wrangler.jsonc`](packages/app/wrangler.jsonc)), built and deployed by [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). GitHub CI never runs Wrangler.
+The app is a Cloudflare Worker named `pinpoint` ([`wrangler.jsonc`](wrangler.jsonc), at the root of the repository), built and deployed by [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). GitHub CI never runs Wrangler.
 
 | Setting | Value |
 | --- | --- |
-| Root directory | `packages/app` |
+| Root directory | the repository root (the default). `packages/app` works too: Wrangler looks for its config in parent folders. |
 | Build command | `pnpm run build` |
 | Deploy command (production branch) | `npx wrangler deploy` |
 | Preview command (other branches) | `npx wrangler preview` |

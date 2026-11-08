@@ -17,6 +17,7 @@
     "e2e": "pnpm --filter pinpoint-e2e run e2e"
   },
   "devDependencies": {
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "wrangler": "4.156.0"
   }
 }
