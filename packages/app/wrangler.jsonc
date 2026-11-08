@@ -20,5 +20,7 @@
   //   "GITHUB_ALLOWED_ORIGINS": "https://pinpoint.example.com"
   // },
   "preview_urls": true,
+  // Previews get no settings of their own, and do not inherit the variables or secrets above. They
+  // do not need them: the editor in a preview runs on a mocked repository and needs no sign-in.
   "previews": {}
 }

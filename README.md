@@ -50,7 +50,7 @@ A link such as `/?sim=51.5607,5.0768` opens the game with the player standing th
 
 [MSW](https://mswjs.io) answers the requests that depend on the outside world: the weather (Open-Meteo) and the GitHub API, backed by a copy of `content/` in the browser. That is what lets the editor at `/admin` work in a preview without an account: edit a quest, save, and play the change in the other tab at once.
 
-Production builds contain none of this. The tools are switched on by a build flag that is a constant after bundling (`__TEST_TOOLS__` in `packages/app/vite.config.ts`): true for the dev server and for Cloudflare Workers Builds of any branch other than `main`, or when `VITE_TEST_TOOLS=true`. Set `PINPOINT_PRODUCTION_BRANCH` if the production branch is not called `main`.
+Production builds contain none of this. The tools are switched on by a build flag that is a constant after bundling (`__TEST_TOOLS__` in `packages/app/vite.config.ts`): true for the dev server and for Cloudflare Workers Builds of any branch other than `main` (it reads the `WORKERS_CI_BRANCH` variable Workers Builds sets), or when `VITE_TEST_TOOLS=true`. Set `PINPOINT_PRODUCTION_BRANCH` if the production branch is not called `main`.
 
 ## Deploy
 
@@ -63,7 +63,7 @@ The app is a Cloudflare Worker named `pinpoint` ([`packages/app/wrangler.jsonc`]
 | Deploy command (production branch) | `npx wrangler deploy` |
 | Preview command (other branches) | `npx wrangler preview` |
 
-Every other branch and pull request gets a preview deployment (`preview_urls` is on, and `previews` is empty, so previews inherit the Worker's configuration). A preview has the test tools on and a copy of the branch's content, so a reviewer can stand at every pin of a new quest without leaving their desk.
+Every other branch and pull request gets a preview deployment, once **Builds for Preview branches** is turned on under Settings → Builds (`preview_urls` is on in the config, and `previews` is empty). Previews do not inherit the Worker's variables or secrets, which does not matter here: the editor in a preview uses the mocked repository and needs no sign-in. A preview has the test tools on and a copy of the branch's content, so a reviewer can stand at every pin of a new quest without leaving their desk.
 
 The game's content is copied into the build, so a quest merged into `main` is live as soon as the build is, and works offline after the next visit.
 
