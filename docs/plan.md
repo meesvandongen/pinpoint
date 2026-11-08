@@ -1,56 +1,53 @@
 # Pinpoint: plan and decisions
 
-Status: first playable slice built. This file records what has been decided, what is still open, and why.
+What the game is, what has been decided and why, what is built, and what is still open. The README says how to run it; [content.md](content.md) is the file format; [contributing.md](contributing.md) is how to add a quest.
 
 ## The game
 
-You are in a real city and receive a **quest**. A quest is a list of **pins**. Each pin gives you limited clues about a place: only a distance from where you are, or a distance plus a direction pointer, or a map. When you are close enough you check in, take a photo for your **album**, and can optionally answer a quiz question about the place or about something else.
+You are in a real city and receive a **quest**: a list of **pins**. Each pin gives you limited clues about a place. When you are close enough you check in and collect a stamp, and you can take a photo, answer a question about the place, and earn small extra marks. At the end of a quest your photos become a collage.
 
-Not competitive. Cheating (reading the answers in the repo, spoofing GPS) is accepted, because the point is enjoyment.
+Not competitive. Reading the answers in the repository or faking your GPS is accepted, because the point is enjoyment.
 
 ## Platform
 
-A web app, installable as a PWA.
+A web app that installs as a PWA and works offline.
 
-- **Location:** the browser Geolocation API is enough for "am I within X metres of the pin". It needs HTTPS and works while the app is open, which is how the game is played.
-- **Accuracy:** GPS is poor between tall buildings. Each pin has its own radius, and a fix only counts when the reported accuracy is good enough.
-- **Direction pointer:** works on Android. iOS asks for a one-time motion/compass permission, and compass readings are noisy. The arrow is an extra clue; distance is always the fallback.
-- **Camera and album:** `<input capture>` or `getUserMedia`, photos stored on the device (IndexedDB). No backend.
-- **Install:** PWA (home screen, offline cache, fullscreen).
+- **Location:** the browser Geolocation API is enough for "am I within X metres of the pin". It needs HTTPS and works while the app is open, which is how the game is played. A player who allowed it once is not asked again.
+- **Accuracy:** GPS is poor between tall buildings. Each pin has its own radius, and a fix only counts as arrived when its reported accuracy is 60 m or better. A vaguer fix near the pin says "almost there".
+- **Direction pointer:** works on Android. iOS asks for a one-time compass permission, and readings are noisy. The arrow is an extra clue; distance is always the fallback.
+- **Camera and album:** a camera input, downscaled, stored in IndexedDB on the device. No backend.
+- **Offline:** a service worker caches what starts the app and the quest files, refreshes quests in the background, and caches map tiles as they are seen. The map and the editor are cached the first time they are opened.
 
 ## Content model
 
-Content lives in this repository and is authored with [gitvfs](https://github.com/meesvandongen/gitvfs). `gitvfs-cms` provides zod-schema-driven editing with every save as a commit, branches and PRs, plus map fields (point, point with radius, polygon) and references between entries.
+Content lives in this repository as JSON. [gitvfs](https://github.com/meesvandongen/gitvfs) is for authoring: `gitvfs-cms` gives the editor at `/admin` (forms from zod schemas, map fields, a commit per save, branches and pull requests). The game itself reads the files that were built into it.
 
-Entities:
+- **location**: a name and a polygon. No parent: Tilburg, Noord-Brabant and the Netherlands are three independent entries, and nesting is computed from the geometry. The app lists every location whose polygon contains the player, smallest first.
+- **quest**: title, description, `order` (`linear` or `free`), an optional `area` polygon, and pins. A quest shows under every location whose outline overlaps its area; without an `area`, a box around the pins stands in. Quests name no location.
+- **pin**: a point and a radius, clues, an optional photo prompt, an optional quiz question, an optional stamp style.
+- **The file name is the id.** The editor would otherwise show two fields, the slug and an id, that have to match.
+- **Coordinates are `{ lat, lng }`**, like the editor's map fields: nobody mixes up the order.
+- **Languages:** any text is a plain string or a map of language to text. A map has to include the quest's default language; the game falls back to it.
+- **Limits:** every kind of text has a length limit, because it has to fit on a screen that does not scroll. CI checks them in every language.
+- **Safety:** the contributor guide asks for public places only.
 
-- **location**: a name and a polygon. No parent reference. Tilburg, Noord-Brabant and the Netherlands are three independent entries. Nesting is computed from the geometry.
-- **quest**: title and description, `order: linear | free`, an optional `area` polygon, and a list of pins.
-- **pin**: a point and a radius, which clues are shown (distance, direction, map), an optional photo prompt, and an optional quiz question.
+### Why the content is built into the app
 
-Rules:
+Reading content from GitHub at runtime would need an index of the files (GitHub cannot list a folder without its API and its rate limits), and a committed index conflicts between pull requests. Instead the build lists the folders itself and copies `content/` into the output. A quest merged into `main` is live when the build is, a preview deployment shows a branch's own quests, and the service worker makes it all available offline. `VITE_CONTENT_URL` still points the app at any host that serves the same files.
 
-- **Suggesting a location:** the app lists every location whose polygon contains the player, smallest area first.
-- **Quest to location:** a quest shows under a location when its area overlaps that location's polygon. If a quest has no `area`, one is derived from its pins (hull plus margin). Quests need no location field.
-- **Order:** linear (pin 1, then 2, then 3) or free, set per quest.
-- **Languages:** any text field is either a plain string or a map such as `{ nl, en }`, with a fallback to the quest's default language. Multilingual is optional.
-- **Photos:** local only. Sharing or leaderboards would need a backend and are out of scope.
-- **Contributing:** a quest is a folder. A contributor adds one with a PR or through the editor. A schema validator in CI keeps PRs safe to merge.
-- **Safety:** the app shows a disclaimer (traffic, private property, night play). Contributor rule: pins must be publicly accessible.
+### Why gitvfs is vendored
 
-Possible later: pins without fixed coordinates inside a quest area ("photograph something red in this neighbourhood"), and an optional tag to force a quest under a location.
+`gitvfs-cms`, `gitvfs-github-msw` and `gitvfs-github-auth` are not on npm yet, and only `gitvfs` is. `vendor/` holds tarballs built from the gitvfs repository by `scripts/vendor-gitvfs.mjs`, so a clean checkout installs everywhere, including Workers Builds. When the packages are published, the `file:` dependencies become version ranges and `vendor/` goes away.
 
 ## Clues
 
-A pin has a list of clues and any clue can be missing, so a pin can have only a riddle (for players who know the city). Types:
+A pin has a list of clues and any clue can be missing, so a pin can have only a riddle, for players who know the city.
 
-- **Spatial:** distance, direction (arrow or cardinal), map (full or rough area), named area, shrinking circle, old map.
-- **Visual:** photo, detail crop, old photo of the same place.
-- **Verbal:** hint or riddle, word shape.
-- **Knowledge:** a question whose answer is the location, or a chain where one pin's quiz answer is the next clue.
-- **Sensory:** audio.
+| Built | Idea, not built |
+| --- | --- |
+| text or riddle, distance, direction (arrow or compass point), map (exact or a rough area), photo, sound, word shape | shrinking circle, old map, detail crop, a chain where one pin's quiz answer is the next clue |
 
-Each clue has an optional reveal rule: visible from the start, unlocked after some seconds, or unlocked on request. Players can switch on a "local expert" mode that hides distance, direction and map; it only ever makes a quest harder. Clue types are an open set: a client skips types it does not know.
+Each clue has an optional reveal rule: from the start, after some seconds, or on request. **Local expert** hides distance, direction and map everywhere; it only makes a quest harder. Clue types are an open set: a client skips types it does not know, and the schema keeps them.
 
 ## Stamps
 
@@ -58,60 +55,44 @@ The stamp is the reward for arriving. It records what happened and never grades 
 
 - Every stamp is a full stamp. No tiers, no numeric score.
 - Small clue marks show which clue types were used. Two players get two different stamps and neither is better.
-- Extra marks reward choices anyone can make: quiz answered, photo taken, found after dark, in rain, at sunrise, with friends.
-- A skipped pin can be stamped later by returning to it. The book is never failed, only incomplete.
-- Photos feed a collage at the end of a quest. Photo matching is optional and never part of the stamp.
-- Contributors choose a shape, an icon and an ink colour per pin, or the app generates a stamp from templates. Shapes explored: round seal, postage stamp, hexagon, ticket, oval postmark, and a starburst for finishing a quest.
+- Five shapes (round seal, postage stamp, hexagon, ticket, oval postmark) plus a starburst for finishing a quest. A pin can choose its shape, icon and ink; otherwise they follow from its category and id, so a pin always looks the same.
+- Six extra marks, for things anyone can choose to do: quiz answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain, found together. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
+- A skipped pin can be stamped later. The book is never failed, only incomplete.
+- Photos feed the collage. Photo matching is not part of the game.
+- All stamp drawing is escaped SVG built from strings, so a quest's text cannot inject markup, and the same drawing serves the screen and the collage.
 
 ## Icons
 
-A pin has a `category` from a controlled list (about 16 now, meant to grow to 40-60). Each category has a parent to fall back to for its icon (chimney, industrial, building, other), and `other` always has an icon. The app's icon table is typed on the category list, so adding a category without an icon does not compile.
-
-Planned coverage test: map OpenStreetMap tag values (tourism, historic, amenity, building, man_made, natural, leisure) to our categories and report how many of the most used values on taginfo end up in `other`. Open icon sets worth drawing from: Maki and Temaki (check licences).
+A pin has a `category` from a controlled list of 45, each with a parent to fall back to (`chimney` → `industrial` → `building` → `other`). The icon table is typed on the list, so a category without an icon does not compile. `osm.ts` maps OpenStreetMap tags to categories and a test checks the mapping against the most used values of twelve keys from taginfo (`pnpm run taginfo` refreshes them). Every value is either mapped, or listed as something that is not a destination (a bench, a parking space). When the test fails after a refresh, its message names the values to look at.
 
 ## Interface rules
 
-- The play screens (current pin, clues, arrival, stamp) never scroll at the default text size. Content that does not fit is split into pages, never clipped. Lists are paged with dots and turn buttons.
-- There is always a button for turning a page; swiping is an extra. Page-turn animations become a fade with reduced motion.
-- Contributors get length limits (for example a hint under about 140 characters) so text fits; CI should check them per language.
-- At very large text sizes the layout may fall back to scrolling rather than hide content.
-- Style: the passport. Navy cover, cream pages, ink stamps, gold. Details such as number size are open.
+- The play screens never scroll and nothing on them is cut off. A list shows as many items as fit and pages the rest; page buttons are always there, and the page-turn animation is a plain fade with reduced motion. A browser test measures every screen at 320×568, 360×640, 390×780 and 430×932.
+- The settings page is the one exception: it is a list of controls, not a game screen.
+- Style: the passport. A navy cover, cream pages, ink stamps and gold. Fonts are bundled, not loaded from a font service.
+- Text size: at very large system text the layout may still fall back to scrolling rather than hide content. Not yet tested.
+
+## Preview deployments and test tools
+
+Every branch builds to a preview deployment with **test tools** on: a TanStack Devtools shell whose panels move the player (anywhere, near a pin, with a vague fix, walking), move the clock to after dark or sunrise, skip clue timers, make it rain, stamp pins, and inspect the mocks. [MSW](https://mswjs.io) answers the weather and the GitHub API, the latter backed by a copy of `content/` in the browser, so the editor works in a preview without an account and its edits can be played at once. Production builds contain none of it (see the README for how it is switched).
+
+This is the main review tool for quest pull requests: a reviewer opens the preview and stands at each pin.
 
 ## Status
 
-Built:
+Built, and covered by tests:
 
-- Monorepo (pnpm, Vite+) with `packages/core` (schemas, geo, play rules, content loader; tested) and `packages/app` (React PWA).
-- Sample content: three nested locations and one quest with three pins.
-- App flow: suggest locations from the position, list quests, play a pin (distance, direction, text, rough map, timed and on-request clues), proximity check with accuracy, round stamp, quiz, quest completion.
-- Local progress and the "local expert" setting in localStorage.
-- Content validation in CI (`pnpm run content:check`) and a Cloudflare Worker config named `pinpoint`.
+- Core: schemas, geo, play rules, sun position, categories and their OSM mapping, collage layout, quest checks. 77 tests.
+- App: the whole game, English and Dutch, offline, the test tools. 38 tests, plus a browser suite that plays the game.
+- Editor: all content types, with checks that its schema and the game's agree. 20 tests.
+- CI: lint, content check, typecheck, unit tests, build and the browser suite.
 
-Not built yet: photo capture and the end-of-quest collage, extra marks, stamp shapes other than round, real map tiles (the map clue is schematic), the service worker for offline play, the `/admin` authoring page with gitvfs-cms, UI translations, length-limit checks, the icon coverage test.
+Open:
 
-## Open questions
-
-- **Runtime role of gitvfs.** Leaning towards authoring only. The player would fetch the content files from GitHub (raw JSON/YAML) and validate them with the same zod schemas. That keeps both options open: bundle content at build time later, or use gitvfs live.
-- **Stack.** Decided: React PWA in a pnpm monorepo with Vite+, like `gitvfs`, deployed as a Cloudflare Worker with static assets.
-- **Naming.** "Quest" for the whole, "pins" for the stops. Alternatives considered: mission, expedition. Route, trail and hunt were rejected because they imply order or overlap with quest.
-
-## Visual style
-
-Players use the app outdoors in sunlight, one-handed, while walking. Constraints for every direction:
-
-- The clue (distance, arrow, map) is the hero of the screen.
-- High contrast and large touch targets; light by default, dark optional.
-- Feedback you can feel: warmer/colder cues, a pulse when close, a satisfying arrival moment (and haptics where available).
-- The album is the reward and should look good enough to share.
-
-Directions explored: field journal, treasure map, modern map-first, radar/HUD, bold and playful, polaroid/film. Four were mocked up on the "current pin" screen.
-
-Decision: the overall style is the **passport** (variation 2B: a navy cover with a cream page and stamps in different inks). Bold and playful and field journal were the two strongest directions; modern map-first and radar/HUD were dropped. Elements still open: how large the distance number is, and whether clue marks on stamps are always visible or behind a tap.
-
-## Next steps
-
-1. Photo capture (stored on the device) and the end-of-quest collage.
-2. The remaining stamp shapes and the extra marks.
-3. Real map tiles and the service worker for offline play.
-4. Authoring: an `/admin` page using gitvfs-cms, a contributor guide, and length-limit checks in CI.
-5. The icon coverage test against OpenStreetMap tags.
+- **Licence.** None chosen for the code, or for quests and photos people contribute. Decide before taking outside contributions.
+- **Production URL and editor sign-in.** The Worker for "Sign in with GitHub" exists but needs a GitHub App and its secret; until then the editor takes a token. Contributors without write access send files in a pull request.
+- **Real quests.** The sample quests have approximate coordinates.
+- **Clue marks on stamps:** always visible, or behind a tap? The first reads as honest, but some players may read them as a judgement.
+- **Contributed media.** There is no process yet for checking that photos and sounds in a pull request may be shared.
+- **Very large system text** is not tested.
+- **Stamps for pins with no fixed place** ("photograph something red in this neighbourhood") would need a clue and arrival rule with no coordinates.

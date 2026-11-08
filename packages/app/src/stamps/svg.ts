@@ -47,10 +47,12 @@ function iconAt(category: Category, x: number, y: number, size: number) {
   return `<g stroke-width="1.5">${symbol(categoryIconMarkup(category), x, y, size)}</g>`
 }
 
-function clueRow(clues: readonly string[], y: number, size: number, cx: number) {
+/** A row of small marks under the icon, shrunk when there are so many that they would run over the rings. */
+function clueRow(clues: readonly string[], y: number, size: number, cx: number, maxWidth = 80) {
   const marks = CLUE_GLYPH_ORDER.filter((c) => clues.includes(c))
   if (marks.length === 0) return ''
   const gap = 4
+  size = Math.min(size, (maxWidth - (marks.length - 1) * gap) / marks.length)
   const start = cx - (marks.length * size + (marks.length - 1) * gap) / 2
   return marks
     .map((c, i) => `<g stroke-width="2.6">${symbol(CLUE_GLYPHS[c], start + i * (size + gap), y, size)}</g>`)
@@ -71,7 +73,7 @@ const bodies: Record<StampShape, Body> = {
     arcText(`b${id}`, `${clip(p.place.toUpperCase(), 9)} · ${shortDate(p.at)}`, 11, 2) +
     `<circle cx="31.5" cy="100" r="2.6" fill="currentColor" stroke="none"/><circle cx="168.5" cy="100" r="2.6" fill="currentColor" stroke="none"/>` +
     iconAt(p.icon, 64, 58, 72) +
-    clueRow(p.clues, 133, 14, 100),
+    clueRow(p.clues, 133, 14, 100, 78),
 
   postage: (p) =>
     `<rect x="14" y="10" width="172" height="180" stroke-width="8" stroke-dasharray="0.5 9" stroke-linecap="round"/><rect x="28" y="24" width="144" height="152" stroke-width="2.5"/>` +
@@ -79,14 +81,14 @@ const bodies: Record<StampShape, Body> = {
     text(162, 46, 12, 0, shortDate(p.at).slice(0, 5), 'end') +
     iconAt(p.icon, 62, 56, 76) +
     text(100, 150, 13, 1.5, clip(p.title.toUpperCase(), 13)) +
-    clueRow(p.clues, 156, 14, 100),
+    clueRow(p.clues, 156, 14, 100, 110),
 
   hex: (p) =>
     `<polygon points="100,8 180,54 180,146 100,192 20,146 20,54" stroke-width="5" stroke-linejoin="round"/><polygon points="100,20 169,60 169,140 100,180 31,140 31,60" stroke-width="1.5"/>` +
     text(100, 52, 11, 2, p.label) +
     iconAt(p.icon, 66, 60, 68) +
     text(100, 142, 11, 1, clip(p.title.toUpperCase(), 12)) +
-    clueRow(p.clues, 148, 12, 100),
+    clueRow(p.clues, 148, 12, 100, 84),
 
   ticket: (p) => {
     const [first, second] = splitTitle(p.title, 9)
@@ -94,7 +96,7 @@ const bodies: Record<StampShape, Body> = {
       `<path d="M18 46H182V80A14 14 0 0 0 182 108V150H18V108A14 14 0 0 0 18 80Z" stroke-width="4" stroke-linejoin="round"/>` +
       `<path d="M72 56V140" stroke-width="2" stroke-dasharray="4 5"/>` +
       iconAt(p.icon, 24, 64, 42) +
-      clueRow(p.clues, 112, 10, 45) +
+      clueRow(p.clues, 112, 10, 45, 44) +
       text(82, 70, 10, 1, p.label, 'start') +
       text(82, 92, 15, 1, first, 'start') +
       text(82, 109, 15, 1, second, 'start') +
@@ -106,7 +108,7 @@ const bodies: Record<StampShape, Body> = {
     `<ellipse cx="100" cy="100" rx="94" ry="68" stroke-width="5"/><ellipse cx="100" cy="100" rx="85" ry="59" stroke-width="1.5"/>` +
     text(100, 64, 11, 2, clip(p.title.toUpperCase(), 13)) +
     iconAt(p.icon, 72, 68, 56) +
-    clueRow(p.clues, 127, 12, 100) +
+    clueRow(p.clues, 127, 12, 100, 120) +
     text(100, 152, 10, 1.5, shortDate(p.at)),
 }
 

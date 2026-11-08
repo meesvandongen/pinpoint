@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { extname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -67,6 +68,53 @@ function content(): Plugin {
   }
 }
 
+type ChunkLike = { type: 'chunk'; fileName: string; isEntry: boolean; imports: string[]; viteMetadata?: { importedCss?: Set<string>; importedAssets?: Set<string> } }
+
+/**
+ * The files needed to start the app: the entry and what it imports directly, with their styles. Lazy
+ * parts (the map, the editor) are cached the first time they are used instead, so a first visit does
+ * not download them.
+ */
+function precacheList(bundle: Record<string, { type: string; fileName: string }>): string[] {
+  const chunks = Object.values(bundle).filter((o): o is ChunkLike => o.type === 'chunk')
+  const byName = new Map(chunks.map((c) => [c.fileName, c]))
+  const eager = new Set<string>()
+  const visit = (name: string) => {
+    const chunk = byName.get(name)
+    if (!chunk || eager.has(name)) return
+    eager.add(name)
+    chunk.imports.forEach(visit)
+    chunk.viteMetadata?.importedCss?.forEach((css) => eager.add(css))
+    chunk.viteMetadata?.importedAssets?.forEach((asset) => eager.add(asset))
+  }
+  chunks.filter((c) => c.isEntry).forEach((c) => visit(c.fileName))
+  const content = walk(contentDir)
+    .map((file) => relative(contentDir, file).split('\\').join('/'))
+    .filter((name) => name.endsWith('.json') && name !== 'index.json')
+    .map((name) => `content/${name}`)
+  // Browsers that can run the app use the woff2 files; the old woff fallbacks would only add weight.
+  const files = [...eager].filter((name) => !name.endsWith('.woff'))
+  return ['/', ...['index.html', 'manifest.webmanifest', 'icon.svg', 'content/index.json', ...files, ...content].map((name) => `/${name}`)]
+}
+
+/** Writes the service worker into the build, with the files it should cache and a version that changes when they do. */
+function serviceWorker(): Plugin {
+  return {
+    name: 'pinpoint-service-worker',
+    apply: 'build',
+    generateBundle(_, bundle) {
+      const urls = [...new Set(precacheList(bundle))]
+      const version = createHash('sha256').update(urls.join('\n')).digest('hex').slice(0, 10)
+      const template = readFileSync(fileURLToPath(new URL('./sw/sw.template.js', import.meta.url)), 'utf8')
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sw.js',
+        source: template.replace('__VERSION__', version).replace('__PRECACHE__', JSON.stringify(urls, null, 2)),
+      })
+    },
+  }
+}
+
 /**
  * Test tools (a location simulator, mocked services, the TanStack devtools) are on in the dev server
  * and in builds for branches other than the production branch on Cloudflare Workers Builds, so every
@@ -82,8 +130,10 @@ function testToolsEnabled(command: string): boolean {
 
 export default defineConfig(({ command }) => ({
   // MSW's worker script is only served and emitted when the test tools are on.
-  plugins: lazyPlugins(() => [react(), content(), ...(testToolsEnabled(command) ? [msw({ mode: 'worker-only' })] : [])]),
-  define: { 'import.meta.env.VITE_TEST_TOOLS': JSON.stringify(String(testToolsEnabled(command))) },
+  // The service worker and MSW's worker both need the root scope, so a build has one or the other.
+  plugins: lazyPlugins(() => [react(), content(), ...(testToolsEnabled(command) ? [msw({ mode: 'worker-only' })] : [serviceWorker()])]),
+  // A plain global, so every use is a constant the bundler removes when it is false.
+  define: { __TEST_TOOLS__: JSON.stringify(testToolsEnabled(command)) },
   server: { port: 3000, strictPort: true },
   test: { globals: true, environment: 'happy-dom' },
 }))

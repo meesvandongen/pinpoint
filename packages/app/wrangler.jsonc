@@ -2,12 +2,23 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "pinpoint",
   "compatibility_date": "2026-10-22",
+  // Token exchange for "Sign in with GitHub" in the editor at /admin. Only /api/github/* reaches it.
+  "main": "./worker/index.ts",
   // Static output of `pnpm run build`, including the game content under /content.
   // Workers Builds runs the build, then deploys or previews; CI never runs Wrangler.
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/github/*"]
   },
+  // Sign-in is optional. To turn it on, create a GitHub App whose callback URL is
+  // https://<your domain>/admin, then set the variables below and the secret:
+  //   wrangler secret put GITHUB_CLIENT_SECRET
+  // Until then the editor asks for a personal access token.
+  // "vars": {
+  //   "GITHUB_CLIENT_ID": "Iv23li…",
+  //   "GITHUB_ALLOWED_ORIGINS": "https://pinpoint.example.com"
+  // },
   "preview_urls": true,
   "previews": {}
 }

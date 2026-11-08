@@ -93,6 +93,7 @@ export function BookQuest() {
         </div>
         {tab === 'stamps' ? (
           <Pager
+            key="stamps"
             items={slots}
             rowHeight={SLOT_HEIGHT}
             columns={2}
@@ -123,6 +124,7 @@ export function BookQuest() {
           <p className="status">{t('book.noPhotos')}</p>
         ) : (
           <Pager
+            key="photos"
             items={withPhotos}
             rowHeight={PHOTO_HEIGHT}
             columns={2}
@@ -174,14 +176,16 @@ export function BookPin() {
         </Link>
       </Cover>
       <Body className="book-pin-body">
-        <Stamp className="detail-stamp" stamp={stampPropsFor(quest, pin, stamp, i18n)} />
-        {photo && stamp.photo && (
-          <div className="polaroid small">
-            <div className="polaroid-photo">
-              <img src={photo} alt="" />
+        <div className="pin-top">
+          <Stamp className="detail-stamp" stamp={stampPropsFor(quest, pin, stamp, i18n)} />
+          {photo && stamp.photo && (
+            <div className="polaroid small">
+              <div className="polaroid-photo">
+                <img src={photo} alt="" />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
         {extras.length > 0 && (
           <ul className="extras-list">
             {extras.map((extra) => (

@@ -14,31 +14,35 @@
     "test": "vp test run"
   },
   "dependencies": {
+    "@fontsource/courier-prime": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
+    "@tanstack/react-query": "^5.107.1",
+    "@tanstack/react-router": "^1.170.46",
+    "maplibre-gl": "^6.17.0",
+    "pinpoint-admin": "workspace:*",
     "pinpoint-core": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "zod": "^4.6.7",
-    "@tanstack/react-query": "^5.107.1",
-    "@tanstack/react-router": "^1.170.46",
-    "maplibre-gl": "^6.17.0",
-    "pinpoint-admin": "workspace:*"
+    "gitvfs-github-auth": "file:../../vendor/gitvfs-github-auth.tgz"
   },
   "devDependencies": {
+    "@tanstack/react-devtools": "^0.10.14",
+    "@tanstack/react-query-devtools": "^5.107.1",
+    "@tanstack/react-router-devtools": "^1.167.3",
     "@types/node": "^22.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "fake-indexeddb": "^6.2.7",
+    "gitvfs": "file:../../vendor/gitvfs.tgz",
+    "gitvfs-github-msw": "file:../../vendor/gitvfs-github-msw.tgz",
+    "happy-dom": "^21.0.4",
+    "msw": "^3.0.4",
     "typescript": "^5.5.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "wrangler": "4.156.0",
-    "@tanstack/react-devtools": "^0.10.14",
-    "@tanstack/react-query-devtools": "^5.107.1",
-    "@tanstack/react-router-devtools": "^1.167.3",
-    "msw": "^3.0.4",
-    "happy-dom": "^21.0.4",
-    "fake-indexeddb": "^6.2.7",
-    "gitvfs": "file:../../vendor/gitvfs.tgz",
-    "gitvfs-github-msw": "file:../../vendor/gitvfs-github-msw.tgz"
+    "wrangler": "4.156.0"
   }
 }

@@ -7,7 +7,6 @@ import { enableCompass, useCompassEnabled } from '../state/heading.ts'
 import { install, isIOS, isStandalone, useInstall } from '../state/install.ts'
 import { resetProgress } from '../state/progress.ts'
 import { updateSettings, useSettings } from '../state/settings.ts'
-import { TEST_TOOLS } from '../testing/flag.ts'
 
 const LANGUAGE_NAMES: Record<(typeof LANGUAGES)[number], string> = { en: 'English', nl: 'Nederlands' }
 
@@ -91,7 +90,7 @@ export function Settings() {
         <div className="setting">
           <small>{offline ? t('settings.offline.ready') : t('settings.offline.none')}</small>
         </div>
-        {TEST_TOOLS && (
+        {__TEST_TOOLS__ && (
           <div className="setting">
             <small>{t('settings.tools')}</small>
           </div>

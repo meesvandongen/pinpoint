@@ -12,5 +12,5 @@
     "allowImportingTsExtensions": true,
     "types": ["vite/client", "vite-plus/test/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "worker"]
 }

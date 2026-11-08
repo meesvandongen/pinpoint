@@ -15,12 +15,11 @@ import { Loading, LoadError, NotFound } from './screens/NotFound.tsx'
 import { Play } from './screens/Play.tsx'
 import { Quests } from './screens/Quests.tsx'
 import { Settings } from './screens/Settings.tsx'
-import { TEST_TOOLS } from './testing/flag.ts'
 
 export type RouterContext = { queryClient: QueryClient }
 
 // The test tools are a separate chunk that only exists in dev and preview builds.
-const TestTools = TEST_TOOLS ? lazy(() => import('./testing/TestTools.tsx')) : undefined
+const TestTools = __TEST_TOOLS__ ? lazy(() => import('./testing/TestTools.tsx')) : undefined
 
 // The editor is a separate chunk too: players never download it.
 const AdminPage = lazy(() => import('pinpoint-admin').then((m) => ({ default: m.AdminPage })))
@@ -71,7 +70,7 @@ const adminRoute = createRoute({
   path: '/admin',
   component: () => (
     <Suspense fallback={<Loading />}>
-      <AdminPage mock={TEST_TOOLS} />
+      <AdminPage mock={__TEST_TOOLS__} />
     </Suspense>
   ),
 })

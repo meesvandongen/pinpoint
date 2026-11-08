@@ -5,3 +5,5 @@ dist/
 .DS_Store
 .env
 .vitest/
+test-results/
+playwright-report/

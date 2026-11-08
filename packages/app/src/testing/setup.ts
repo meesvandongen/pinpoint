@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { clockStore } from '../lib/clock.ts'
 import { headingStore } from '../state/heading.ts'
 import { locationStore, setSimulatedFix } from '../state/location.ts'
-import { bridge, logRequest } from './bridge.ts'
+import { bridge, logRequest, testState, type MockWeather } from './bridge.ts'
 import { contentHandler, weatherHandler } from './handlers.ts'
 import { MOCK_REPO, seedFiles, seedVersion } from './seed.ts'
 
@@ -60,10 +60,10 @@ export async function startTestTools({ queryClient }: { queryClient: QueryClient
 
 const SESSION_KEY = 'pinpoint.test-tools.v1'
 
-type Saved = { fix?: { lat: number; lng: number; accuracy: number }; heading?: number; time?: number; skip?: number }
+type Saved = { fix?: { lat: number; lng: number; accuracy: number }; heading?: number; time?: number; skip?: number; weather?: MockWeather }
 
 /**
- * Keeps the simulated position, compass and clock for the tab, so a reload does not send the
+ * Keeps the simulated position, compass, clock and weather for the tab, so a reload does not send the
  * tester back to the device position, and reads `?sim=lat,lng[,accuracy]` so a link can open the
  * preview at a place: `/?sim=51.5607,5.0768`.
  */
@@ -81,6 +81,7 @@ export function restoreSimulation() {
   }
   if (saved.fix) setSimulatedFix(saved.fix)
   if (saved.heading !== undefined) headingStore.set((h) => ({ ...h, simulated: saved.heading }))
+  if (saved.weather) testState.set((t) => ({ ...t, weather: saved.weather! }))
   if (saved.time !== undefined || saved.skip) clockStore.set((c) => ({ ...c, fixed: saved.time, skipSeconds: saved.skip ?? 0 }))
 
   const persist = () => {
@@ -92,6 +93,7 @@ export function restoreSimulation() {
           heading: headingStore.get().simulated,
           time: clockStore.get().fixed,
           skip: clockStore.get().skipSeconds,
+          weather: testState.get().weather,
         } satisfies Saved),
       )
     } catch {
@@ -101,4 +103,5 @@ export function restoreSimulation() {
   locationStore.subscribe(persist)
   headingStore.subscribe(persist)
   clockStore.subscribe(persist)
+  testState.subscribe(persist)
 }

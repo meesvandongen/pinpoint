@@ -59,3 +59,16 @@ export function stopWatching() {
 
 /** True once there is a position to work with, from the device or the test tools. */
 export const hasPosition = (state: LocationState) => currentFix(state) !== undefined
+
+/**
+ * Picks the position up again on a later visit when the player already allowed it, so they do not
+ * have to tap "Use my location" every time. Never asks: without a saved permission it does nothing.
+ */
+export async function resumeIfGranted() {
+  try {
+    const permission = await navigator.permissions?.query({ name: 'geolocation' })
+    if (permission?.state === 'granted') startWatching()
+  } catch {
+    // No Permissions API (older Safari): the player taps the button.
+  }
+}

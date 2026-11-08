@@ -13,7 +13,8 @@
     "typecheck": "vp run -r typecheck",
     "lint": "vp lint",
     "taginfo": "node scripts/taginfo.mjs",
-    "vendor": "node scripts/vendor-gitvfs.mjs"
+    "vendor": "node scripts/vendor-gitvfs.mjs",
+    "e2e": "pnpm --filter pinpoint-e2e run e2e"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

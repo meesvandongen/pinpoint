@@ -1,0 +1,19 @@
+{
+  "name": "pinpoint-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Plays the game in a real browser: the journey, the preview test tools, the editor and offline play",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}
