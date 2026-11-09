@@ -12,6 +12,7 @@ export const LIMITS = {
   option: 48,
   caption: 100,
   word: 32,
+  fact: 240,
 } as const
 
 const Language = z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]+)*$/, 'use a language code such as en or nl')
@@ -112,14 +113,42 @@ export const Clue = z.union([KnownClue, UnknownClue])
 export type Clue = z.infer<typeof Clue>
 export type KnownClue = z.infer<typeof KnownClue>
 
-export const Quiz = z
-  .object({
-    question: localized(LIMITS.question),
-    options: z.array(localized(LIMITS.option)).min(2).max(4),
-    answer: z.number().int().min(0),
+const KnownArrivalStep = z.discriminatedUnion('type', [
+  /** Something to tell the player now that they are here. */
+  z.object({ type: z.literal('fact'), text: localized(LIMITS.fact) }),
+  /** One question about the place. A wrong answer can cost a star; see `stampPoints`. */
+  z
+    .object({
+      type: z.literal('quiz'),
+      question: localized(LIMITS.question),
+      options: z.array(localized(LIMITS.option)).min(2).max(4),
+      answer: z.number().int().min(0),
+    })
+    .refine((q) => q.answer < q.options.length, { message: 'answer must point at an option', path: ['answer'] }),
+  /** Where the photo page goes, and what it suggests. Every pin has one photo page, listed or not. */
+  z.object({ type: z.literal('photo'), prompt: localized(LIMITS.prompt).optional() }),
+])
+
+export const KNOWN_ARRIVAL_TYPES = ['fact', 'quiz', 'photo'] as const
+export type KnownArrivalType = (typeof KNOWN_ARRIVAL_TYPES)[number]
+
+/** A step type this version does not know. Kept so newer content still loads, and skipped when playing. */
+const UnknownArrivalStep = z
+  .object({ type: z.string().min(1) })
+  .loose()
+  .refine((s) => !(KNOWN_ARRIVAL_TYPES as readonly string[]).includes(s.type), {
+    message: 'invalid fields for a known arrival step type',
   })
-  .refine((q) => q.answer < q.options.length, { message: 'answer must point at an option' })
-export type Quiz = z.infer<typeof Quiz>
+
+/** One page shown after check-in, in the order the pin lists them. */
+export const ArrivalStep = z.union([KnownArrivalStep, UnknownArrivalStep])
+export type ArrivalStep = z.infer<typeof ArrivalStep>
+export type KnownArrivalStep = z.infer<typeof KnownArrivalStep>
+export type Quiz = Extract<KnownArrivalStep, { type: 'quiz' }>
+export type Fact = Extract<KnownArrivalStep, { type: 'fact' }>
+export type PhotoStep = Extract<KnownArrivalStep, { type: 'photo' }>
+
+const onePhoto = (steps: { type: string }[]) => steps.filter((s) => s.type === 'photo').length <= 1
 
 export const STAMP_SHAPES = ['round', 'postage', 'hex', 'ticket', 'oval'] as const
 export type StampShape = (typeof STAMP_SHAPES)[number]
@@ -144,8 +173,8 @@ export const Pin = z.object({
   /** Metres around the position that count as arrived. */
   radius: z.number().min(10).max(500).default(40),
   clues: z.array(Clue).min(1),
-  photoPrompt: localized(LIMITS.prompt).optional(),
-  quiz: Quiz.optional(),
+  /** What happens after check-in, page by page. The photo page is added after the stamp when it is not listed. */
+  arrival: z.array(ArrivalStep).max(8).refine(onePhoto, { message: 'a pin has one photo page' }).default([]),
   stamp: StampStyle.optional(),
 })
 export type Pin = z.infer<typeof Pin>
@@ -207,11 +236,16 @@ export function questTextEntries(quest: Quest): { path: string; text: LocalizedT
   for (const pin of quest.pins) {
     const at = `pins.${pin.id}`
     add(`${at}.title`, pin.title)
-    add(`${at}.photoPrompt`, pin.photoPrompt)
-    if (pin.quiz) {
-      add(`${at}.quiz.question`, pin.quiz.question)
-      pin.quiz.options.forEach((option, i) => add(`${at}.quiz.options[${i}]`, option))
-    }
+    pin.arrival.forEach((step, i) => {
+      const where = `${at}.arrival[${i}]`
+      if (step.type === 'fact') add(`${where}.text`, (step as Fact).text)
+      if (step.type === 'photo') add(`${where}.prompt`, (step as PhotoStep).prompt)
+      if (step.type === 'quiz') {
+        const quiz = step as Quiz
+        add(`${where}.question`, quiz.question)
+        quiz.options.forEach((option, j) => add(`${where}.options[${j}]`, option))
+      }
+    })
     pin.clues.forEach((clue, i) => {
       const where = `${at}.clues[${i}]`
       if (clue.type === 'text') add(`${where}.text`, (clue as KnownClue & { type: 'text' }).text)

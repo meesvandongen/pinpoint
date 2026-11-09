@@ -67,8 +67,8 @@ export const en = {
   'play.mapTarget': 'target {distance}',
   'play.audio': 'Play sound',
   'play.getClose': 'Get within {distance} to check in.',
-  'play.hint.costs': 'costs a point',
-  'play.pointsLeft': '{n} of {max} points still to earn',
+  'play.hint.costs': 'costs a star',
+  'play.pointsLeft': '{n} of {max} stars left',
   'play.hint.more': 'Get another hint',
   'play.hint.left': '{n} hints left',
   'play.hint.last': 'Last hint',
@@ -94,6 +94,7 @@ export const en = {
   'arrival.quiz.wrong': 'Not quite. The right answer is in green.',
   'arrival.photo.empty': 'No photo yet',
   'arrival.quiz.title': 'A question',
+  'arrival.fact.title': 'Did you know?',
   'arrival.extras': 'Extra marks',
 
   'extra.quiz': 'Quiz answered',
@@ -116,7 +117,7 @@ export const en = {
   'quest.open': 'Open {title}',
   'quest.showStamps': 'Show the stamps of {title}',
   'quest.locked': '{title}: not available yet',
-  'quest.points': '{n} of {max} points',
+  'quest.points': '{n} of {max} stars',
 
   'book.title': 'My book',
   'book.empty.title': 'No stamps yet',
@@ -124,8 +125,7 @@ export const en = {
   'book.pin': 'Pin {n}',
   'book.arrived': 'Arrived {date}',
   'book.back': 'Book',
-  'book.quizCorrect': 'Quiz: right answer',
-  'book.quizWrong': 'Quiz: answered',
+  'book.quiz': 'Questions: {right} of {n} right',
   'book.collage': 'Collage',
   'book.openCollage': 'Open the collage',
 

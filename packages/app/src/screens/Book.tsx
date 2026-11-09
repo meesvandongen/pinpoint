@@ -88,7 +88,7 @@ export function BookPin() {
             {extras.map((extra) => (
               <li key={extra}>
                 <ExtraMark extra={extra} label={t(`extra.${extra}`)} seed={`${quest.id}/${pin.id}`} />
-                <span>{extra === 'quiz' ? (stamp.quiz === 'correct' ? t('book.quizCorrect') : t('book.quizWrong')) : t(`extra.${extra}`)}</span>
+                <span>{extra === 'quiz' ? t('book.quiz', { right: Object.values(stamp.quiz ?? {}).filter((a) => a === 'correct').length, n: Object.keys(stamp.quiz ?? {}).length }) : t(`extra.${extra}`)}</span>
               </li>
             ))}
           </ul>

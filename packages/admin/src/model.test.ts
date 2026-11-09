@@ -41,7 +41,11 @@ describe('the editor model and the game model agree', () => {
     'a radius that is too small': (q) => (q.pins[0].radius = 5),
     'a hint that is too long': (q) => (q.pins[0].clues[0] = { type: 'text', text: 'x'.repeat(200) }),
     'a title that is too long': (q) => (q.title = 'x'.repeat(100)),
-    'a quiz answer that points nowhere': (q) => (q.pins[0].quiz.answer = 9),
+    'a quiz answer that points nowhere': (q) => (q.pins[0].arrival.find((s: any) => s.type === 'quiz').answer = 9),
+    'a fact without text': (q) => q.pins[0].arrival.push({ type: 'fact' }),
+    'a fact that is too long': (q) => q.pins[0].arrival.push({ type: 'fact', text: 'x'.repeat(300) }),
+    'two photo pages': (q) => q.pins[0].arrival.push({ type: 'photo' }),
+    'an arrival step from the future (fine)': (q) => q.pins[0].arrival.push({ type: 'dance', steps: 3 }),
     'a bad language code': (q) => (q.title = { 'not a language': 'x' }),
     'an area with two corners': (q) => (q.area = [{ lat: 1, lng: 1 }, { lat: 2, lng: 2 }]),
     'a stamp colour that is not a colour': (q) => (q.pins[0].stamp = { ink: 'purple' }),
@@ -62,7 +66,7 @@ describe('the editor model and the game model agree', () => {
       mutate(q)
       return !QuestFile.safeParse(q).success
     })
-    expect(rejected.length).toBeGreaterThanOrEqual(14)
+    expect(rejected.length).toBeGreaterThanOrEqual(17)
   })
 
   it('agree about locations', () => {

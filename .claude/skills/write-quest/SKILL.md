@@ -1,6 +1,6 @@
 ---
 name: write-quest
-description: Research and write a Pinpoint quest or pin (content/quests/*.json) that is fun to play — choosing places, researching facts, writing clues, quiz and photo prompt, checking and playtesting. Use when asked to add, draft, improve or review a quest, a pin, clues or a location for a city.
+description: Research and write a Pinpoint quest or pin (content/quests/*.json) that is fun to play — choosing places, researching facts, writing clues, facts, questions and the photo prompt, checking and playtesting. Use when asked to add, draft, improve or review a quest, a pin, clues or a location for a city.
 ---
 
 # Writing a Pinpoint quest
@@ -21,7 +21,7 @@ Settle these with the user before researching. Ask only for what you cannot sens
 - **Theme:** a thread through the pins (industry, water, lost walls, street names…). If the user has none, propose two or three after a first look at the area.
 - **Length:** default 4–6 pins, under an hour's walk.
 - **Languages:** default `en` as `defaultLanguage`; add `nl` (or the local language) when the city is not English-speaking and the user wants it.
-- **Order:** decide with the user, no default. `linear` (one pin at a time) suits a short story-like route with no very hard pins; `free` suits longer quests, spread-out pins or hard pins, because a player stuck on one pin can try another. See section 8 of `docs/writing-pins.md`.
+- **Order:** decide with the user, no default. `linear` (one pin at a time) suits a short story-like route with no very hard pins; `free` suits longer quests, spread-out pins or hard pins, because a player stuck on one pin can try another. See section 7 of `docs/writing-pins.md`.
 
 Check `content/locations/`: if no location outline covers the area, the quest also needs one (a name and a rough polygon around the city).
 
@@ -44,7 +44,7 @@ For each candidate, write a note (keep it in your scratchpad, not in the repo):
 ```
 id / name / position (source) / suggested radius
 detail you can see from the street:
-the surprise (the fact a local might not know):
+the surprise (the fact a local might not know; becomes a fact or a question):
 facts + source URL for each:
 nearby look-alikes:
 open questions to verify on site:
@@ -54,13 +54,13 @@ Pick the pins that pass the three-sentence test in `docs/writing-pins.md` (*walk
 
 ## 3. Write
 
-Follow `docs/writing-pins.md` sections 4–8. In short:
+Follow `docs/writing-pins.md` sections 4–7. In short:
 
 - The first text clue shows from the start and must find the pin on its own (local expert mode hides distance, direction and map).
-- Then hints with `"reveal": { "onRequest": true }` that generally give a little more help each time. Choose the clues and their order to suit the place: a second riddle, a `wordShape`, a photo, a `map` with `"view": "area"`, `direction`, `distance`. Distance, direction and map cost a star when on screen at check-in, so they usually come late, but that is a judgement, not a rule.
-- The quiz is answerable by looking, or teaches the surprise; wrong answers are plausible.
-- Photo prompts ask for a detail or a viewpoint and differ between pins.
-- Every text within its limit in every language: titles 40, clues 140, photo prompts 100, questions 120, answers 48, description 240.
+- Then hints with `"reveal": { "onRequest": true }` that generally give a little more help each time. Choose the clues and their order to suit the place: a second riddle, a `wordShape`, a photo, a `map` with `"view": "area"`, `direction`, `distance`. Each hint and each question is a chance to lose a star; a pin keeps three stars until fewer than three chances are left untouched (see Stars in `docs/content.md`). Distance, direction and map are the most direct help, so they usually come late, but that is a judgement, not a rule.
+- After arrival, write the `arrival` list: facts (the surprise from your research, tied to what the player sees), questions (answerable by looking, plausible wrong answers), and optionally the photo page with a prompt to choose where it goes. Usually two to four pages; order them so they tell a small story.
+- Photo prompts ask for a detail or a viewpoint and differ between pins. A pin has exactly one photo page.
+- Every text within its limit in every language: titles 40, clues 140, facts 240, photo prompts 100, questions 120, answers 48, description 240.
 - **Every fact must come from a source you found.** Never fill a gap with something plausible. If you cannot source it, leave it out or ask.
 - Consider a `photo` clue (a detail, a viewpoint, or an old archive picture of the place). Use a file the user supplies, or one you found with a licence that allows reuse (for example an openly licensed archive or Wikimedia Commons image). Download it into `content/media/`, at most 1200 px wide, give it an `alt`, and record the source and licence for the pull request. Never hot-link: `src` is a path under `content/`. Audio only from files the user supplies.
 - Translations: write each language natively, not word for word, and keep the riddle working in each.

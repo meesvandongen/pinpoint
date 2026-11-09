@@ -30,11 +30,14 @@
         { "type": "map", "view": "full" },
         { "type": "distance" }
       ],
-      "quiz": {
-        "question": "Which water surrounds it?",
-        "options": [{ "en": "A moat", "nl": "Een gracht" }, { "en": "A lake", "nl": "Een meer" }],
-        "answer": 0
-      }
+      "arrival": [
+        {
+          "type": "quiz",
+          "question": "Which water surrounds it?",
+          "options": [{ "en": "A moat", "nl": "Een gracht" }, { "en": "A lake", "nl": "Een meer" }],
+          "answer": 0
+        }
+      ]
     }
   ]
 }

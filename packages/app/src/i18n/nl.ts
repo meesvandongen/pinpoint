@@ -67,8 +67,8 @@ export const nl: Record<MessageKey, string> = {
   'play.mapTarget': 'doel {distance}',
   'play.audio': 'Speel geluid af',
   'play.getClose': 'Kom binnen {distance} om in te checken.',
-  'play.hint.costs': 'kost een punt',
-  'play.pointsLeft': 'nog {n} van {max} punten te verdienen',
+  'play.hint.costs': 'kost een ster',
+  'play.pointsLeft': 'nog {n} van {max} sterren',
   'play.hint.more': 'Toon nog een hint',
   'play.hint.left': '{n} hints over',
   'play.hint.last': 'Laatste hint',
@@ -94,6 +94,7 @@ export const nl: Record<MessageKey, string> = {
   'arrival.quiz.wrong': 'Net niet. Het juiste antwoord staat in het groen.',
   'arrival.photo.empty': 'Nog geen foto',
   'arrival.quiz.title': 'Een vraag',
+  'arrival.fact.title': 'Wist je dat?',
   'arrival.extras': 'Extra tekens',
 
   'extra.quiz': 'Vraag beantwoord',
@@ -116,7 +117,7 @@ export const nl: Record<MessageKey, string> = {
   'quest.open': 'Open {title}',
   'quest.showStamps': 'Toon de stempels van {title}',
   'quest.locked': '{title}: nog niet beschikbaar',
-  'quest.points': '{n} van {max} punten',
+  'quest.points': '{n} van {max} sterren',
 
   'book.title': 'Mijn boekje',
   'book.empty.title': 'Nog geen stempels',
@@ -124,8 +125,7 @@ export const nl: Record<MessageKey, string> = {
   'book.pin': 'Plek {n}',
   'book.arrived': 'Aangekomen op {date}',
   'book.back': 'Boekje',
-  'book.quizCorrect': 'Vraag: goed antwoord',
-  'book.quizWrong': 'Vraag: beantwoord',
+  'book.quiz': 'Vragen: {right} van {n} goed',
   'book.collage': 'Collage',
   'book.openCollage': 'Open de collage',
 

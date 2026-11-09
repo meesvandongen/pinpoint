@@ -1,31 +1,15 @@
-import { useField, type FieldProps } from 'gitvfs-cms/react'
 import { LIMITS } from 'pinpoint-core'
 import { LocalizedInput, type LocalizedValue } from './LocalizedInput.tsx'
 
-type Quiz = { question?: LocalizedValue; options?: LocalizedValue[]; answer?: number }
+export type QuizValue = { type: 'quiz'; question?: LocalizedValue; options?: LocalizedValue[]; answer?: number }
 
-const isQuiz = (value: unknown): value is Quiz =>
-  typeof value === 'object' && value !== null && Array.isArray((value as Quiz).options)
+export const NEW_QUIZ: QuizValue = { type: 'quiz', question: '', options: ['', ''], answer: 0 }
 
-/**
- * The optional question of a pin. A plain nested form cannot leave this group blank (a blank list
- * counts as a value), so the field owns it: no question is `undefined`, a question is complete.
- */
-export function QuizField({ id }: FieldProps) {
-  const field = useField(id)
-  const quiz = isQuiz(field.value) ? field.value : undefined
-  const set = (next: Quiz | undefined) => field.onChange(next)
-
-  if (!quiz) {
-    return (
-      <button type="button" className="gcms-button" onClick={() => set({ question: '', options: ['', ''], answer: 0 })}>
-        Add a question
-      </button>
-    )
-  }
-
+/** One question: the question, two to four answers, and which one is right. */
+export function QuizEditor({ id, quiz, onChange }: { id: string; quiz: QuizValue; onChange: (next: QuizValue) => void }) {
   const options = quiz.options ?? []
   const answer = typeof quiz.answer === 'number' ? quiz.answer : 0
+  const set = onChange
   const setOption = (index: number, value: string | Record<string, string> | undefined) =>
     set({ ...quiz, options: options.map((o, i) => (i === index ? (value as LocalizedValue) : o)) })
 
@@ -61,9 +45,6 @@ export function QuizField({ id }: FieldProps) {
       <div className="pp-row">
         <button type="button" className="gcms-button gcms-button--small" disabled={options.length >= 4} onClick={() => set({ ...quiz, options: [...options, ''] })}>
           Add an answer
-        </button>
-        <button type="button" className="gcms-button gcms-button--small" onClick={() => set(undefined)}>
-          Remove the question
         </button>
       </div>
     </div>

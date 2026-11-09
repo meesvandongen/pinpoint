@@ -1,4 +1,4 @@
-import { LIMITS, Location, Pin, Quest, Quiz, questLanguages, questTexts } from './schema.ts'
+import { ArrivalStep, LIMITS, Location, Pin, Quest, questLanguages, questTexts } from './schema.ts'
 
 const base = { id: 'a', title: 'A', position: { lat: 51.5, lng: 5 }, clues: [{ type: 'distance' }] }
 
@@ -27,8 +27,17 @@ describe('schema', () => {
     expect(Pin.safeParse({ ...base, clues: [{ type: 'wordShape', word: 'Pier' }] }).success).toBe(true)
   })
   it('checks the quiz answer points at an option', () => {
-    expect(Quiz.safeParse({ question: 'q', options: ['a', 'b'], answer: 2 }).success).toBe(false)
-    expect(Quiz.safeParse({ question: 'q', options: ['a', 'b'], answer: 1 }).success).toBe(true)
+    expect(ArrivalStep.safeParse({ type: 'quiz', question: 'q', options: ['a', 'b'], answer: 2 }).success).toBe(false)
+    expect(ArrivalStep.safeParse({ type: 'quiz', question: 'q', options: ['a', 'b'], answer: 1 }).success).toBe(true)
+  })
+  it('takes facts, questions and one photo page after arrival, and keeps step types it does not know', () => {
+    expect(Pin.parse(base).arrival).toEqual([])
+    const fact = { type: 'fact', text: 'Built in 1912.' }
+    expect(Pin.safeParse({ ...base, arrival: [fact, fact, { type: 'photo' }] }).success).toBe(true)
+    expect(Pin.safeParse({ ...base, arrival: [{ type: 'photo' }, { type: 'photo', prompt: 'p' }] }).success).toBe(false)
+    expect(Pin.safeParse({ ...base, arrival: [{ type: 'fact' }] }).success).toBe(false)
+    expect(Pin.safeParse({ ...base, arrival: [{ type: 'fact', text: 'x'.repeat(LIMITS.fact + 1) }] }).success).toBe(false)
+    expect(Pin.safeParse({ ...base, arrival: [{ type: 'dance', steps: 3 }] }).success).toBe(true)
   })
   it('requires unique pin ids and accepts localized text', () => {
     expect(Quest.safeParse({ id: 'q', title: { en: 'Q', nl: 'V' }, pins: [base, base] }).success).toBe(false)
@@ -84,7 +93,7 @@ describe('languages', () => {
         ...base,
         title: { en: 'A', de: 'A' },
         clues: [{ type: 'text', text: { en: 'x', fr: 'y' } }, { type: 'distance' }],
-        quiz: { question: 'q', options: [{ en: 'a', es: 'a' }, 'b'], answer: 0 },
+        arrival: [{ type: 'quiz', question: 'q', options: [{ en: 'a', es: 'a' }, 'b'], answer: 0 }],
       },
     ],
   })

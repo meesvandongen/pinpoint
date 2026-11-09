@@ -14,7 +14,7 @@ for (const [name, viewport] of [
     test('plays the sample quest from start to finish', async ({ page }) => {
       const problems = collectProblems(page)
 
-      async function arrive(pin: keyof typeof PINS, { quiz }: { quiz: boolean }) {
+      async function arrive(pin: keyof typeof PINS, { quiz, fact = false }: { quiz: boolean; fact?: boolean }) {
         const [lat, lng] = PINS[pin]
         await page.goto(`/quest/tilburg-textile?sim=${lat},${lng},10`)
         await lookForPin(page)
@@ -33,7 +33,12 @@ for (const [name, viewport] of [
         await expectNoClipping(page, `photo ${pin}`)
         await page.locator('.foot .btn.primary').click()
 
-        // Page 3: the question, where there is one
+        // Then what the pin lists after the photo: a fact, a question
+        if (fact) {
+          await expect(page.locator('.fact-page')).toBeVisible()
+          await expectNoClipping(page, `fact ${pin}`)
+          await page.locator('.foot .btn.primary').click()
+        }
         if (quiz) {
           await expect(page.locator('.quiz-page')).toBeVisible()
           await expectNoClipping(page, `quiz ${pin}`)
@@ -59,25 +64,27 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // Hints open one at a time, on request: a button says so, how many are left, and what the next one costs.
-      // Distance is on screen from the start, so one of the three points is already spent.
+      // Hints open one at a time, on request: a button says so, how many are left, and whether the next one costs.
+      // The pin starts with three stars. It has four chances to slip (three hints and a question), so the
+      // first hint is free and the second costs a star. Distance, shown from the start, costs nothing.
       const more = page.getByRole('button', { name: /Get another hint/ })
-      const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
-      await expect(points(2)).toBeVisible()
+      const stars = (n: number) => page.getByRole('img', { name: `${n} of 3 stars left` })
+      await expect(stars(3)).toBeVisible()
       await expect(more).toContainText('3 hints left')
-      await expect(more).toContainText('costs a point')
+      await expect(more).not.toContainText('costs a star')
       await expect(page.getByRole('tab')).toHaveCount(0)
       await more.click()
       await expect(page.getByTestId('arrow')).toBeVisible()
       await expect(more).toContainText('2 hints left')
-      await expect(points(1)).toBeVisible()
+      await expect(more).toContainText('costs a star')
+      await expect(stars(3)).toBeVisible()
       await more.click()
       await expect(page.getByRole('tab')).toHaveCount(2)
-      await expect(points(0)).toBeVisible()
+      await expect(stars(2)).toBeVisible()
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
 
-      await arrive('chimney', { quiz: true })
+      await arrive('chimney', { quiz: true, fact: true })
       await arrive('market', { quiz: false })
       await arrive('harbour', { quiz: false })
 
@@ -198,22 +205,24 @@ test.describe('moving around', () => {
 
   test('hints asked for stay used when the player leaves the pin and comes back', async ({ page }) => {
     await page.goto('/quest/tilburg-textile/find/chimney?sim=51.5629,5.0768,10')
-    const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
-    await expect(points(2)).toBeVisible()
-    await page.getByRole('button', { name: /Get another hint/ }).click()
-    await expect(page.getByTestId('arrow')).toBeVisible()
-    await expect(points(1)).toBeVisible()
+    const stars = (n: number) => page.getByRole('img', { name: `${n} of 3 stars left` })
+    const more = page.getByRole('button', { name: /Get another hint/ })
+    await expect(stars(3)).toBeVisible()
+    await more.click()
+    await more.click()
+    await expect(page.getByRole('tab')).toHaveCount(2)
+    await expect(stars(2)).toBeVisible()
 
-    // Leave through the quest page and come back: the compass is still open, the point still spent.
+    // Leave through the quest page and come back: the hints are still open, the star still spent.
     await page.getByRole('button', { name: /All pins/ }).click()
     await page.locator('.slot.open').click()
     await expect(page.getByTestId('arrow')).toBeVisible()
-    await expect(points(1)).toBeVisible()
-    await expect(page.getByRole('button', { name: /Get another hint/ })).toContainText('2 hints left')
+    await expect(stars(2)).toBeVisible()
+    await expect(more).toContainText('Last hint')
 
     // And it survives closing the app.
     await page.reload()
     await expect(page.getByTestId('arrow')).toBeVisible()
-    await expect(points(1)).toBeVisible()
+    await expect(stars(2)).toBeVisible()
   })
 })

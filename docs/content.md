@@ -63,8 +63,7 @@ A location is only a name and an outline. There is no parent: a player inside th
   "position": { "lat": 51.5607, "lng": 5.0768 },
   "radius": 50,
   "clues": [ … ],
-  "photoPrompt": { "en": "Photograph the base of the chimney." },
-  "quiz": { … },
+  "arrival": [ … ],
   "stamp": { "shape": "round", "ink": "#5b34a8" }
 }
 ```
@@ -77,8 +76,7 @@ A location is only a name and an outline. There is no parent: a player inside th
 | `position` | required | The centre of the place. |
 | `radius` | 40 | Metres around the position that count as arrived, 10 to 500. GPS in a street is rarely better than 20 m, so do not go below that without a reason. |
 | `clues` | required | At least one. |
-| `photoPrompt` | optional | A suggestion for the photo, up to 100 characters. |
-| `quiz` | optional | One question about the place. |
+| `arrival` | `[]` | The pages after check-in: facts, questions, and where the photo page goes. Up to 8. See below. |
 | `stamp` | optional | `shape` (`round`, `postage`, `hex`, `ticket`, `oval`), `ink` (a `#rrggbb` colour) and `icon` (a category). Anything left out is chosen from the category and the pin id. |
 
 Two pins closer together than their radius are rejected: arriving at one would be arriving at both.
@@ -104,21 +102,45 @@ Every clue can also have a `reveal`:
 { "type": "map", "view": "area", "reveal": { "onRequest": true } }
 ```
 
-Without one, a clue shows from the start. With `onRequest` it is a **hint**: it waits until the player asks for it. Hints come one at a time, in the order of the list. `distance`, `direction` and `map` cost the player a point (a star on the stamp) when they are on screen at check-in, so a quest is most interesting when they are hints to ask for and not there from the start. A reveal that names anything else, such as the old `afterSeconds`, is rejected. Players can also switch on **local expert** in the settings, which hides `distance`, `direction` and `map` everywhere. It only ever makes a quest harder, so a quest should still work with just its text.
+Without one, a clue shows from the start. With `onRequest` it is a **hint**: it waits until the player asks for it. Hints come one at a time, in the order of the list. Asking for a hint can cost a star; see [Stars](#stars). A reveal that names anything else, such as the old `afterSeconds`, is rejected. Players can also switch on **local expert** in the settings, which hides `distance`, `direction` and `map` everywhere. It only ever makes a quest harder, so a quest should still work with just its text.
 
 A clue type this version of the game does not know is kept in the file and skipped when playing, so newer content does not break older apps.
 
-### Quiz
+### After arrival
+
+After check-in the player turns pages: first the stamp, then the pin's `arrival` steps in the order they are listed.
 
 ```json
-{
-  "question": { "en": "What did the buildings around you produce?" },
-  "options": [ { "en": "Wool cloth" }, { "en": "Bicycles" }, { "en": "Cheese" } ],
-  "answer": 0
-}
+"arrival": [
+  { "type": "fact", "text": { "en": "The chimney is 42 m tall." } },
+  {
+    "type": "quiz",
+    "question": { "en": "What did the buildings around you produce?" },
+    "options": [ { "en": "Wool cloth" }, { "en": "Linen" }, { "en": "Leather" } ],
+    "answer": 0
+  },
+  { "type": "fact", "text": { "en": "The factory closed in 1975." } },
+  { "type": "photo", "prompt": { "en": "Photograph the base of the chimney." } }
+]
 ```
 
-Two to four options; `answer` counts from 0. A wrong answer is not punished: answering earns the quiz mark either way.
+| `type` | Fields | Shows |
+| --- | --- | --- |
+| `fact` | `text` (up to 240 characters) | Something to tell the player now that they are here. |
+| `quiz` | `question` (120), `options` (two to four, 48 each), `answer` (counts from 0) | A question. Answering earns the quiz mark, right or wrong; a wrong answer can cost a star. |
+| `photo` | `prompt` (optional, 100) | The photo page, with a suggestion. |
+
+Every pin has exactly one photo page, because every pin has one place in the collage. List it to choose where it goes and what it suggests; leave it out and it comes right after the stamp, with a general suggestion. Listing it twice is an error. Facts and questions can be repeated as often as the pin needs.
+
+A step type this version of the game does not know is kept and skipped, like clues.
+
+### Stars
+
+Every pin starts with three stars. Two things can cost one: **asking for a hint** and **answering a question wrong**. A pin's chances are its hints (clues with `onRequest`) plus its questions; clues that show from the start are free.
+
+The stars stay at three as long as at least three chances are untouched. So a pin with five chances forgives two slips: the third costs a star, and if everything goes wrong, none are left. A pin with three chances or fewer counts as having three, so there every slip costs a star. Skipping a question is not a slip.
+
+Stars never unlock or block anything. **Local expert** hides `distance`, `direction` and `map`, so those hints cannot be asked for, and a quest should still work with just its text.
 
 ## Languages
 

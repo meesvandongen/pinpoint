@@ -20,16 +20,20 @@
         { "type": "map", "view": "area", "reveal": { "onRequest": true } },
         { "type": "wordShape", "word": { "en": "Chimney", "nl": "Schoorsteen" }, "reveal": { "onRequest": true } }
       ],
-      "photoPrompt": { "en": "Photograph the base of the chimney.", "nl": "Fotografeer de voet van de schoorsteen." },
-      "quiz": {
-        "question": { "en": "What did the buildings around you produce?", "nl": "Wat werd er in de gebouwen om je heen gemaakt?" },
-        "options": [
-          { "en": "Wool cloth", "nl": "Wollen stof" },
-          { "en": "Bicycles", "nl": "Fietsen" },
-          { "en": "Cheese", "nl": "Kaas" }
-        ],
-        "answer": 0
-      },
+      "arrival": [
+        { "type": "photo", "prompt": { "en": "Photograph the base of the chimney.", "nl": "Fotografeer de voet van de schoorsteen." } },
+        { "type": "fact", "text": { "en": "Test fixture, made up and as long as a fact may be: chimneys like this one carried away the smoke of the steam engines that drove hundreds of looms, and the name on it told the whole town whose wool was being woven inside these walls.", "nl": "Testgegeven: dit feit is verzonnen. Schoorstenen als deze voerden de rook af van de stoommachines die de weefgetouwen aandreven." } },
+        {
+          "type": "quiz",
+          "question": { "en": "What did the buildings around you produce?", "nl": "Wat werd er in de gebouwen om je heen gemaakt?" },
+          "options": [
+            { "en": "Wool cloth", "nl": "Wollen stof" },
+            { "en": "Bicycles", "nl": "Fietsen" },
+            { "en": "Cheese", "nl": "Kaas" }
+          ],
+          "answer": 0
+        }
+      ],
       "stamp": { "shape": "round", "ink": "#5b34a8" }
     },
     {
@@ -43,7 +47,7 @@
         { "type": "distance" },
         { "type": "direction" }
       ],
-      "photoPrompt": { "en": "Photograph the busiest corner.", "nl": "Fotografeer de drukste hoek." }
+      "arrival": [{ "type": "photo", "prompt": { "en": "Photograph the busiest corner.", "nl": "Fotografeer de drukste hoek." } }]
     },
     {
       "id": "harbour",
@@ -56,7 +60,7 @@
         { "type": "map", "view": "full" },
         { "type": "distance" }
       ],
-      "photoPrompt": { "en": "Photograph a boat or a reflection.", "nl": "Fotografeer een boot of een weerspiegeling." },
+      "arrival": [{ "type": "photo", "prompt": { "en": "Photograph a boat or a reflection.", "nl": "Fotografeer een boot of een weerspiegeling." } }],
       "stamp": { "shape": "oval", "ink": "#17707a" }
     }
   ]

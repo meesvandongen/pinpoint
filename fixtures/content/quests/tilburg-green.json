@@ -30,11 +30,14 @@
         { "type": "map", "view": "area" },
         { "type": "distance" }
       ],
-      "quiz": {
-        "question": { "en": "How many ducks can you count?", "nl": "Hoeveel eenden kun je tellen?" },
-        "options": ["0 to 3", "4 to 10", "More than 10"],
-        "answer": 1
-      }
+      "arrival": [
+        {
+          "type": "quiz",
+          "question": { "en": "How many ducks can you count?", "nl": "Hoeveel eenden kun je tellen?" },
+          "options": ["0 to 3", "4 to 10", "More than 10"],
+          "answer": 1
+        }
+      ]
     },
     {
       "id": "bandstand",

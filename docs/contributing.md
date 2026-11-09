@@ -41,7 +41,7 @@ CI runs `pnpm run content`, the unit tests and a browser run of the game.
 
 - **Public places only.** Pins must be somewhere anyone can stand, in daylight, without trespassing. No private gardens, no railway tracks, no roadsides without a pavement.
 - **Short.** Three to eight pins, within a walk of an hour or so. Say in the description how far it is.
-- **One thing to find at a time.** The clue says where; the quiz and the photo prompt say what to look at once you are there.
+- **One thing to find at a time.** The clues say where; the facts, questions and photo prompt say what to look at once you are there.
 - **Clues that survive a bad day.** Do not make a pin depend on a shop being open, a sign that may be taken down, or a view that is only there in winter.
 - **Writing for a screen that does not scroll.** Hints are 140 characters or fewer. If it needs more, it is two clues.
 - **Languages are optional.** One language is fine. If you add more, add them everywhere, and always include the default.

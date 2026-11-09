@@ -5,7 +5,9 @@ import {
   destinationPoint,
   distanceMeters,
   moveToward,
+  pinChances,
   skyAt,
+  type Pin,
   type Position,
   type Sky,
 } from 'pinpoint-core'
@@ -229,10 +231,10 @@ export function ProgressPanel() {
   const loc = useLocationState()
   const fix = currentFix(loc)
 
-  const stampPin = (questId: string, pinId: string) => {
+  const stampPin = (questId: string, pin: Pin) => {
     const at = new Date(clockStore.get().fixed ?? Date.now()).toISOString()
     const sky = fix ? skyAt(new Date(at), fix) : 'day'
-    addStamp({ questId, pinId, at, clues: ['text', 'distance'], ...(sky !== 'day' ? { sky } : {}) })
+    addStamp({ questId, pinId: pin.id, at, clues: ['text', 'distance'], hints: 0, chances: pinChances(pin), ...(sky !== 'day' ? { sky } : {}) })
   }
 
   return (
@@ -241,8 +243,8 @@ export function ProgressPanel() {
         <h3>Stamps</h3>
         <p className="pp-muted">{stamps.length} in this browser.</p>
         <div className="pp-row">
-          <button disabled={!play.pin || !play.quest} onClick={() => play.quest && play.pin && stampPin(play.quest.id, play.pin.id)}>Stamp this pin now</button>
-          <button disabled={!play.quest} onClick={() => play.quest?.pins.forEach((p) => stampPin(play.quest!.id, p.id))}>Stamp every pin of this quest</button>
+          <button disabled={!play.pin || !play.quest} onClick={() => play.quest && play.pin && stampPin(play.quest.id, play.pin)}>Stamp this pin now</button>
+          <button disabled={!play.quest} onClick={() => play.quest?.pins.forEach((p) => stampPin(play.quest!.id, p))}>Stamp every pin of this quest</button>
           <button className="danger" onClick={() => { resetProgress(); void clearPhotos() }}>Reset stamps and photos</button>
         </div>
       </div>
