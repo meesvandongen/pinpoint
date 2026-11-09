@@ -42,14 +42,12 @@ for (const [name, viewport] of [
           await page.locator('.foot .btn.primary').click()
         }
 
-        // Back on the quest page, where the stamp is pressed onto the pin's page, then the stars, then the photo
+        // Back on the quest page, with the stamp and the photo on the pin's page. With reduced motion they are
+        // simply there; the animation has its own test below.
         await expect(page).toHaveURL(/\/quest\/tilburg-textile(\?|$)/)
-        const slot = page.locator('.slot.landing')
-        await expect(slot).toHaveCount(1)
-        await expect(slot.locator('.stamper')).toBeVisible()
-        await expect(slot.locator('.paper-stamp')).toBeVisible()
-        await expect(slot.locator('.flap img')).toBeVisible()
-        await expect(page.locator('.slot.landing')).toHaveCount(0, { timeout: 6000 })
+        await expect(page.locator('.slot.landing')).toHaveCount(0)
+        await expect(page.locator('.stamper')).toHaveCount(0)
+        await expect(page.locator('.slot.found .flap img').first()).toBeVisible()
       }
 
       // Home → the quest, with the position suggesting Tilburg
@@ -231,5 +229,36 @@ test.describe('moving around', () => {
     await page.reload()
     await expect(page.getByTestId('arrow')).toBeVisible()
     await expect(more).toContainText('Last hint')
+  })
+})
+
+test.describe('finishing a pin', () => {
+  test.use({ viewport: { width: 390, height: 780 }, reducedMotion: 'no-preference' })
+
+  test('presses the stamp onto the pin page, then the stars, then tapes the photo on', async ({ page }) => {
+    await page.goto('/quest/tilburg-textile/find/chimney?sim=51.5607,5.0768,10')
+    await page.getByRole('button', { name: 'Check in' }).click()
+    await page.getByTestId('photo-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: await samplePhoto(page) })
+    await expect(page.getByTestId('photo-preview')).toBeVisible()
+    await page.locator('.foot .btn.primary').click()
+    await expect(page.locator('.fact-page')).toBeVisible()
+    await page.locator('.foot .btn.primary').click()
+    await page.locator('.options .btn').first().click()
+    await page.locator('.foot .btn.primary').click()
+
+    // No stamp page: straight back to the quest page, where it all lands on the pin's own page.
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile(\?|$)/)
+    const slot = page.locator('.slot.landing')
+    await expect(slot).toHaveCount(1)
+    await expect(slot.locator('.stamper')).toBeVisible()
+    await expect(slot.locator('.paper-stamp')).toBeVisible()
+    await expect(slot.locator('.points')).toHaveAttribute('aria-label', '3 of 3 stars')
+    await expect(slot.locator('.flap img')).toBeVisible()
+    // Once it has played, the page stays as it is, and it does not play again.
+    await expect(page.locator('.slot.landing')).toHaveCount(0, { timeout: 6000 })
+    await expect(page.locator('.stamper')).toHaveCount(0)
+    await page.reload()
+    await expect(page.locator('.slot.found .flap img')).toBeVisible()
+    await expect(page.locator('.slot.landing')).toHaveCount(0)
   })
 })
