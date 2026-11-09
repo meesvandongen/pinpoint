@@ -86,7 +86,6 @@ export const nl: Record<MessageKey, string> = {
   'arrival.photo.saved': 'Bewaard in je album.',
   'arrival.photo.failed': 'Die foto kon niet worden bewaard.',
   'arrival.photo.skip': 'Overslaan',
-  'arrival.photo.saving': 'Opslaan…',
   'arrival.quiz.skip': 'Overslaan',
   'arrival.quiz.right': 'Goed!',
   'arrival.quiz.wrong': 'Net niet. Het juiste antwoord staat in het groen.',

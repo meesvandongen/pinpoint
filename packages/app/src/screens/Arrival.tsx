@@ -6,12 +6,11 @@ import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { Dots, PageTurn } from '../components/PageTurn.tsx'
 import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
-import { putPhoto } from '../photos/db.ts'
-import { downscaleImage } from '../photos/resize.ts'
+import { savePhoto } from '../photos/save.ts'
 import { usePhotoUrl } from '../photos/usePhoto.ts'
-import { findStamp, patchStamp, stampedPins, useStamps } from '../state/progress.ts'
-import { stampPropsFor } from '../stamps/for-pin.ts'
-import { ExtraMark, Stamp } from '../stamps/Stamp.tsx'
+import { land } from '../state/landing.ts'
+import { findStamp, patchStamp, useStamps } from '../state/progress.ts'
+import { ExtraMark } from '../stamps/Stamp.tsx'
 import { NotFound } from './NotFound.tsx'
 
 export function Arrival() {
@@ -32,7 +31,6 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
   const router = useRouter()
   const canGoBack = useCanGoBack()
   const fromPin = useLocation({ select: (l) => (l.state as { fromPin?: boolean }).fromPin === true })
-  const stamps = useStamps()
   const [index, setIndex] = useState(0)
   const steps: ArrivalPage[] = arrivalPages(pin)
   const step = steps[index]
@@ -44,12 +42,11 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
 
   const next = () => {
     if (last) {
-      // The last pin of a quest leads on to the collage, the others back to the overview.
-      const complete = stampedPins(stamps, quest.id).size >= quest.pins.length
-      // Back to the overview by going back in history when this page came from the pin, so the history does not
-      // fill up with copies of the overview that Back would then walk through one by one.
-      if (!complete && fromPin && canGoBack) router.history.back()
-      else void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
+      // Back to the quest page, where the stamp is pressed onto the pin's page. By going back in history when this
+      // page came from the pin, so the history does not fill up with copies of the quest page.
+      land(quest.id, pin.id)
+      if (fromPin && canGoBack) router.history.back()
+      else void navigate({ to: '/quest/$questId', params: { questId: quest.id }, replace: true })
     } else setIndex(index + 1)
   }
 
@@ -66,7 +63,6 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
       </Cover>
       <Body>
         <PageTurn index={index} total={steps.length}>
-          {step.kind === 'stamp' && <StampPage quest={quest} pin={pin} stamp={stamp} />}
           {step.kind === 'photo' && <PhotoPage quest={quest} pin={pin} stamp={stamp} step={step.step} />}
           {step.kind === 'fact' && <FactPage quest={quest} fact={step.step} />}
           {step.kind === 'quiz' && <QuizPage key={step.index} quest={quest} pin={pin} stamp={stamp} quiz={step.step} index={step.index} />}
@@ -79,15 +75,6 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
         </button>
       </Foot>
     </Screen>
-  )
-}
-
-function StampPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampRecord }) {
-  const i18n = useI18n()
-  return (
-    <div className="page stamp-page">
-      <Stamp className="big-stamp" stamp={stampPropsFor(quest, pin, stamp, i18n)} />
-    </div>
   )
 }
 
@@ -105,23 +92,19 @@ function PhotoPage({ quest, pin, stamp, step }: { quest: Quest; pin: Pin; stamp:
   const { t, contentLanguages } = useI18n()
   const url = usePhotoUrl(quest.id, pin.id)
   const input = useRef<HTMLInputElement>(null)
-  const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
   const prompt = step?.prompt ? resolveText(step.prompt, contentLanguages, quest.defaultLanguage) : t('arrival.photo.default')
 
-  const onFile = async (file: File | undefined) => {
+  // The photo shows at once and is shrunk and stored behind the scenes, so the player can go on straight away.
+  const onFile = (file: File | undefined) => {
     if (!file) return
-    setBusy(true)
+    const had = stamp.photo === true
     setFailed(false)
-    try {
-      const { blob, width, height } = await downscaleImage(file)
-      await putPhoto({ questId: quest.id, pinId: pin.id, blob, width, height, at: new Date().toISOString() })
-      patchStamp(quest.id, pin.id, { photo: true })
-    } catch {
+    patchStamp(quest.id, pin.id, { photo: true })
+    savePhoto(quest.id, pin.id, file).catch(() => {
+      patchStamp(quest.id, pin.id, { photo: had })
       setFailed(true)
-    } finally {
-      setBusy(false)
-    }
+    })
   }
 
   return (
@@ -138,12 +121,12 @@ function PhotoPage({ quest, pin, stamp, step }: { quest: Quest; pin: Pin; stamp:
         hidden
         data-testid="photo-input"
         onChange={(e) => {
-          void onFile(e.target.files?.[0])
+          onFile(e.target.files?.[0])
           e.target.value = ''
         }}
       />
-      <button type="button" className="btn" disabled={busy} onClick={() => input.current?.click()}>
-        {busy ? t('arrival.photo.saving') : stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
+      <button type="button" className="btn" onClick={() => input.current?.click()}>
+        {stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
       </button>
       {stamp.photo && !failed && <p className="status" role="status">{t('arrival.photo.saved')}</p>}
       {failed && <p className="status warn" role="alert">{t('arrival.photo.failed')}</p>}

@@ -102,7 +102,7 @@ Use a photo you took, or one whose licence allows it (many archives and Wikimedi
 
 ## 5. After arrival: facts, questions, the photo
 
-After check-in the player turns pages: the stamp, then the pin's `arrival` list in the order you write it. It can hold as many facts and questions as the place deserves, and says where the one photo page goes. A good order tells a small story: a fact that sets up a question, a question whose answer a fact then explains, the photo last as the souvenir. Keep it short: two to four pages after the stamp is plenty for most pins, and each page has to fit on a screen that does not scroll.
+After check-in the player turns pages: the pin's `arrival` list in the order you write it. Then the quest page presses the stamp onto the pin's page and tapes the photo on. It can hold as many facts and questions as the place deserves, and says where the one photo page goes. A good order tells a small story: a fact that sets up a question, a question whose answer a fact then explains, the photo last as the souvenir. Keep it short: two to four pages is plenty for most pins, and each page has to fit on a screen that does not scroll.
 
 ### Facts
 
@@ -123,7 +123,7 @@ A `quiz` has two to four answers (48 characters each). Answering earns the quiz 
 
 ### The photo page
 
-Every pin has exactly one photo page. Leave it out of the list and it comes right after the stamp with a general suggestion; list it as `{ "type": "photo", "prompt": … }` to choose its place and its prompt (100 characters). Photos end up side by side in a collage, so:
+Every pin has exactly one photo page. Leave it out of the list and it comes first with a general suggestion; list it as `{ "type": "photo", "prompt": … }` to choose its place and its prompt (100 characters). Photos end up side by side in a collage, so:
 
 - **Ask for a detail or a point of view,** not "a photo of the building": "the face above the door", "the tower framed by the arch", "your reflection in the canal".
 - **Vary them across the quest:** one close-up, one wide, one with the player in it, one at an odd angle. A collage of six façades is dull.

@@ -221,13 +221,13 @@ describe('chances', () => {
 const quiz = { type: 'quiz', question: 'q', options: ['a', 'b'], answer: 0 }
 
 describe('arrival pages', () => {
-  it('puts the photo page after the stamp when the pin does not place it', () => {
-    expect(arrivalPages({ arrival: [] }).map((p) => p.kind)).toEqual(['stamp', 'photo'])
-    expect(arrivalPages({ arrival: [{ type: 'fact', text: 'f' }, quiz] as never }).map((p) => p.kind)).toEqual(['stamp', 'photo', 'fact', 'quiz'])
+  it('puts the photo page first when the pin does not place it', () => {
+    expect(arrivalPages({ arrival: [] }).map((p) => p.kind)).toEqual(['photo'])
+    expect(arrivalPages({ arrival: [{ type: 'fact', text: 'f' }, quiz] as never }).map((p) => p.kind)).toEqual(['photo', 'fact', 'quiz'])
   })
   it('follows the order of the pin, skipping steps it does not know', () => {
     const pages = arrivalPages({ arrival: [quiz, { type: 'fact', text: 'f' }, { type: 'dance' }, { type: 'photo', prompt: 'p' }, quiz] as never })
-    expect(pages.map((p) => p.kind)).toEqual(['stamp', 'quiz', 'fact', 'photo', 'quiz'])
+    expect(pages.map((p) => p.kind)).toEqual(['quiz', 'fact', 'photo', 'quiz'])
     expect(pages.flatMap((p) => (p.kind === 'quiz' ? [p.index] : []))).toEqual([0, 4])
   })
 })

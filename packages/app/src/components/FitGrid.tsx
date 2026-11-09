@@ -110,6 +110,7 @@ export function FitGrid<T>({
   gap = 12,
   minWidth = 108,
   maxWidth = 420,
+  focusIndex,
 }: {
   items: T[]
   /** Width over height of a cell. */
@@ -118,6 +119,8 @@ export function FitGrid<T>({
   render: (item: T) => ReactNode
   /** Names the list for screen readers. */
   label: string
+  /** An item to show: the grid opens on its page until the player turns pages. */
+  focusIndex?: number
   gap?: number
   minWidth?: number
   maxWidth?: number
@@ -125,7 +128,7 @@ export function FitGrid<T>({
   const { t } = useI18n()
   const root = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ width: 0, height: 0 })
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState<number>()
 
   useLayoutEffect(() => {
     const el = root.current
@@ -139,7 +142,8 @@ export function FitGrid<T>({
 
   const fit = fitGrid({ ...size, count: items.length, aspect, gap, minWidth, maxWidth })
   const pages = Math.max(1, Math.ceil(items.length / fit.perPage))
-  const current = Math.min(page, pages - 1)
+  const focused = focusIndex !== undefined && focusIndex >= 0 ? Math.floor(focusIndex / fit.perPage) : 0
+  const current = Math.min(page ?? focused, pages - 1)
   const style = {
     '--cols': fit.cols,
     '--gap': `${gap}px`,

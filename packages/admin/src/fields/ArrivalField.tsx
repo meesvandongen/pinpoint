@@ -12,7 +12,7 @@ const LABELS: Record<KnownArrivalType, string> = {
 const HELP: Record<KnownArrivalType, string> = {
   fact: 'Something to tell the player now that they are here.',
   quiz: 'A question about the place. A wrong answer can cost a star.',
-  photo: 'Every pin has one photo page. Without this, it comes right after the stamp; with it, here, with your suggestion.',
+  photo: 'Every pin has one photo page. Without this, it comes first; with it, here, with your suggestion.',
 }
 
 const NEW_STEP: Record<KnownArrivalType, Record<string, unknown>> = {
@@ -44,7 +44,7 @@ export function ArrivalField({ id }: FieldProps) {
 
   return (
     <div className="pp-clues">
-      {steps.length === 0 && <p className="gcms-muted">Only the stamp and the photo page. Add facts or questions to tell the player more.</p>}
+      {steps.length === 0 && <p className="gcms-muted">Only the photo page. Add facts or questions to tell the player more.</p>}
       {steps.map((step, index) => {
         const known = isKnown(step.type)
         return (

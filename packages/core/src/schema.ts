@@ -173,7 +173,7 @@ export const Pin = z.object({
   /** Metres around the position that count as arrived. */
   radius: z.number().min(10).max(500).default(40),
   clues: z.array(Clue).min(1),
-  /** What happens after check-in, page by page. The photo page is added after the stamp when it is not listed. */
+  /** What happens after check-in, page by page. The photo page comes first when it is not listed. */
   arrival: z.array(ArrivalStep).max(8).refine(onePhoto, { message: 'a pin has one photo page' }).default([]),
   stamp: StampStyle.optional(),
 })

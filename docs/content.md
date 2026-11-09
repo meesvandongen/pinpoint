@@ -108,7 +108,7 @@ A clue type this version of the game does not know is kept in the file and skipp
 
 ### After arrival
 
-After check-in the player turns pages: first the stamp, then the pin's `arrival` steps in the order they are listed.
+After check-in the player turns pages: the pin's `arrival` steps in the order they are listed. Then the game goes back to the quest page, where the stamp is pressed onto the pin's page, its stars after it, and the photo is taped on last.
 
 ```json
 "arrival": [
@@ -130,7 +130,7 @@ After check-in the player turns pages: first the stamp, then the pin's `arrival`
 | `quiz` | `question` (120), `options` (two to four, 48 each), `answer` (counts from 0) | A question. Answering earns the quiz mark, right or wrong; a wrong answer can cost a star. |
 | `photo` | `prompt` (optional, 100) | The photo page, with a suggestion. |
 
-Every pin has exactly one photo page, because every pin has one place in the collage. List it to choose where it goes and what it suggests; leave it out and it comes right after the stamp, with a general suggestion. Listing it twice is an error. Facts and questions can be repeated as often as the pin needs.
+Every pin has exactly one photo page, because every pin has one place in the collage. List it to choose where it goes and what it suggests; leave it out and it comes first, with a general suggestion. Listing it twice is an error. Facts and questions can be repeated as often as the pin needs.
 
 A step type this version of the game does not know is kept and skipped, like clues.
 

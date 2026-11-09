@@ -115,9 +115,11 @@ export function stampPoints(stamp: Pick<Stamp, 'hints' | 'chances' | 'quiz'>): n
   return pointsLeft(stamp.chances, stamp.hints + wrongAnswers(stamp))
 }
 
-/** The pages after check-in: the stamp, then the pin's steps in order, with the photo page right after the stamp when the pin does not place it. */
+/**
+ * The pages after check-in: the pin's steps in order, with the photo page first when the pin does not place
+ * it. The stamp is not one of them: it is pressed on the quest page once these are done.
+ */
 export type ArrivalPage =
-  | { kind: 'stamp' }
   | { kind: 'photo'; step?: PhotoStep }
   | { kind: 'fact'; step: Fact }
   | { kind: 'quiz'; step: Quiz; index: number }
@@ -130,7 +132,7 @@ export function arrivalPages(pin: Pick<Pin, 'arrival'>): ArrivalPage[] {
     return []
   })
   const placed = steps.some((page) => page.kind === 'photo')
-  return [{ kind: 'stamp' }, ...(placed ? [] : [{ kind: 'photo' } as const]), ...steps]
+  return placed ? steps : [{ kind: 'photo' }, ...steps]
 }
 
 export type ClueContext = {

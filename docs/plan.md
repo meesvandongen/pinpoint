@@ -59,6 +59,8 @@ The stamp is the reward for arriving. It records what happened and does not grad
 - Five extra marks, for things anyone can choose to do: a question answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
 - A skipped pin can be stamped later. The book is never failed, only incomplete.
 - The quest has one page, a grid with a place for every pin, so nothing moves when a stamp is collected. A pin you can look for opens its clues. A pin that has to wait (the later pins of a quest played in order) is shown dimmed and cannot be tapped. A pin you found is a printed page (number, icon, name) with its stamp and stars pressed on it, and your photo taped over it as a polaroid. Tap the photo to lift it and see the stamps, tap the page to open the pin.
+- After the pages that follow check-in (photo, facts, questions), the game goes straight back to the quest page, and the stamp is made there rather than on a screen of its own: a rubber stamp comes down on the pin's page and leaves the ink, the stars are pressed one by one, and the photo is laid on and taped. Nothing jumps from one screen to another. With reduced motion, the page simply shows the result.
+- A photo shows the moment it is taken; shrinking it (to 1280 pixels, in a worker where the browser has one) and storing it happen behind the scenes.
 - Photos feed the collage. Photo matching is not part of the game.
 - All stamp drawing is escaped SVG built from strings, so a quest's text cannot inject markup, and the same drawing serves the screen and the collage.
 

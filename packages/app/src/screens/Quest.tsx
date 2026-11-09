@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
@@ -19,6 +19,7 @@ import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
 import { placeOf } from '../lib/place.ts'
 import { usePhotoUrls } from '../photos/usePhoto.ts'
+import { LANDING_TTL_MS, landed, useLanding } from '../state/landing.ts'
 import { findStamp, stampedPins, useStamps } from '../state/progress.ts'
 import { questStampPropsFor, stampPropsFor } from '../stamps/for-pin.ts'
 import { CategoryIcon, PointStamp, QuestStamp, Stamp } from '../stamps/Stamp.tsx'
@@ -43,6 +44,37 @@ export function QuestOverview() {
 
 type Cell = { kind: 'pin'; index: number } | { kind: 'quest' }
 
+/** How long the stamp, the stars and the photo take to land, in milliseconds. Matches the CSS below `.landing`. */
+const LANDING_MS = 3400
+/** When the rubber stamp touches the page. */
+const CONTACT_MS = 520
+
+const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/**
+ * The pin just finished, if it belongs to this quest: its page plays the stamp, the stars and the photo onto
+ * itself once, and then the landing is cleared, so coming back later shows the page as it is.
+ */
+function useLandingPin(questId: string): string | undefined {
+  const landing = useLanding()
+  const [fresh] = useState(() => landing !== undefined && Date.now() - landing.at < LANDING_TTL_MS)
+  const pinId = fresh && landing?.questId === questId ? landing.pinId : undefined
+  useEffect(() => {
+    if (!pinId) return
+    if (reducedMotion()) {
+      landed()
+      return
+    }
+    const buzz = setTimeout(() => navigator.vibrate?.(35), CONTACT_MS)
+    const done = setTimeout(landed, LANDING_MS)
+    return () => {
+      clearTimeout(buzz)
+      clearTimeout(done)
+    }
+  }, [pinId])
+  return pinId
+}
+
 function Overview({ quest }: { quest: Quest }) {
   const i18n = useI18n()
   const { t, contentLanguages } = i18n
@@ -50,6 +82,7 @@ function Overview({ quest }: { quest: Quest }) {
   const stamps = useStamps()
   const photoUrls = usePhotoUrls(quest.id)
   const [lifted, setLifted] = useState<string>()
+  const landingPin = useLandingPin(quest.id)
   const tr = (text: Parameters<typeof resolveText>[0]) =>
     resolveText(text, contentLanguages, quest.defaultLanguage)
 
@@ -85,9 +118,10 @@ function Overview({ quest }: { quest: Quest }) {
           items={cells}
           aspect={SLOT_ASPECT}
           label={tr(quest.title)}
+          focusIndex={landingPin ? quest.pins.findIndex((p) => p.id === landingPin) : undefined}
           keyOf={(c) => (c.kind === 'quest' ? 'quest' : quest.pins[c.index].id)}
           render={(cell) => {
-            if (cell.kind === 'quest') return <QuestSlot quest={quest} />
+            if (cell.kind === 'quest') return <QuestSlot quest={quest} late={landingPin !== undefined} />
             const pin = quest.pins[cell.index]
             const stamp = findStamp(stamps, quest.id, pin.id)
             const props = { quest, pin, number: cell.index + 1, title: tr(pin.title) }
@@ -97,6 +131,7 @@ function Overview({ quest }: { quest: Quest }) {
                   {...props}
                   stamp={stamp}
                   photo={stamp.photo ? photoUrls[pin.id] : undefined}
+                  landing={landingPin === pin.id}
                   lifted={lifted === pin.id}
                   onToggle={() => setLifted(lifted === pin.id ? undefined : pin.id)}
                 />
@@ -188,7 +223,11 @@ function LockedSlot({ pin, number, title }: PinProps) {
   )
 }
 
-/** A pin you found: the stamp and the points pressed on the page, with your photo taped over them. */
+/**
+ * A pin you found: the stamp and the stars pressed on the page, with your photo taped over them. Right after
+ * the pin is finished (`landing`), a rubber stamp comes down and inks the page, the stars are pressed one by
+ * one, and the photo is laid on and taped.
+ */
 function FoundSlot({
   quest,
   pin,
@@ -196,11 +235,13 @@ function FoundSlot({
   title,
   stamp,
   photo,
+  landing,
   lifted,
   onToggle,
 }: PinProps & {
   stamp: StampRecord
   photo: string | undefined
+  landing: boolean
   lifted: boolean
   onToggle: () => void
 }) {
@@ -213,11 +254,12 @@ function FoundSlot({
     '--dy': ((seed >> 4) % 11) - 5,
   } as CSSProperties
   const covered = photo !== undefined && !lifted
+  const props = stampPropsFor(quest, pin, stamp, i18n)
   return (
-    <div className={`slot found${photo ? ' photo' : ''}${lifted ? ' lifted' : ''}`}>
+    <div className={`slot found${photo ? ' photo' : ''}${lifted ? ' lifted' : ''}${landing ? ' landing' : ''}`}>
       <Paper number={number} title={title} category={pin.category}>
         <span className="ink paper-stamp" style={offset}>
-          <Stamp stamp={stampPropsFor(quest, pin, stamp, i18n)} />
+          <Stamp stamp={props} />
         </span>
         {points > 0 && (
           <span
@@ -226,11 +268,12 @@ function FoundSlot({
             aria-label={t('quest.points', { n: points, max: MAX_POINTS })}
           >
             {Array.from({ length: points }, (_, i) => (
-              <PointStamp key={i} seed={`${quest.id}/${pin.id}`} index={i} />
+              <PointStamp key={i} seed={`${quest.id}/${pin.id}`} index={i} className={`point-${i}`} />
             ))}
           </span>
         )}
       </Paper>
+      {landing && <Stamper ink={props.ink} offset={offset} />}
       <Link
         to="/book/$questId/$pinId"
         params={{ questId: quest.id, pinId: pin.id }}
@@ -264,8 +307,31 @@ function FoundSlot({
   )
 }
 
-/** The last page of a finished quest, with the quest stamp on it. It opens the collage. */
-function QuestSlot({ quest }: { quest: Quest }) {
+/** The rubber stamp that comes down on a page: a wooden handle and a block with the ink on its face. */
+function Stamper({ ink, offset }: { ink: string; offset: CSSProperties }) {
+  return (
+    <span className="stamper" style={offset} aria-hidden="true">
+      <svg viewBox="0 0 100 120">
+        <defs>
+          <linearGradient id="stamper-wood" x1="0" x2="1">
+            <stop offset="0" stopColor="#8a5a2b" />
+            <stop offset="0.45" stopColor="#c08a52" />
+            <stop offset="1" stopColor="#6e4521" />
+          </linearGradient>
+        </defs>
+        <ellipse cx="50" cy="20" rx="17" ry="15" fill="url(#stamper-wood)" />
+        <rect x="42" y="30" width="16" height="34" rx="4" fill="url(#stamper-wood)" />
+        <rect x="14" y="62" width="72" height="34" rx="5" fill="url(#stamper-wood)" />
+        <rect x="14" y="62" width="72" height="6" rx="3" fill="#000" opacity="0.15" />
+        <rect x="11" y="94" width="78" height="10" rx="2" fill={ink} />
+        <rect x="11" y="94" width="78" height="3" fill="#000" opacity="0.2" />
+      </svg>
+    </span>
+  )
+}
+
+/** The last page of a finished quest, with the quest stamp on it. It opens the collage. `late` waits for the last pin's stamp to land first. */
+function QuestSlot({ quest, late = false }: { quest: Quest; late?: boolean }) {
   const i18n = useI18n()
   const { t, contentLanguages } = i18n
   const stamps = useStamps()
@@ -274,7 +340,7 @@ function QuestSlot({ quest }: { quest: Quest }) {
     <Link
       to="/quest/$questId/done"
       params={{ questId: quest.id }}
-      className="slot quest-slot"
+      className={`slot quest-slot${late ? ' late' : ''}`}
       aria-label={t('book.openCollage')}
     >
       <div className="paper">

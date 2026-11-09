@@ -86,7 +86,6 @@ export const en = {
   'arrival.photo.saved': 'Saved to your album.',
   'arrival.photo.failed': 'That photo could not be saved.',
   'arrival.photo.skip': 'Skip',
-  'arrival.photo.saving': 'Saving…',
   'arrival.quiz.skip': 'Skip',
   'arrival.quiz.right': 'Right!',
   'arrival.quiz.wrong': 'Not quite. The right answer is in green.',

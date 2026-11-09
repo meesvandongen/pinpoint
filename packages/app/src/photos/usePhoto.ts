@@ -1,8 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getPhoto, listPhotos, usePhotosVersion } from './db.ts'
+import { pendingPhotos, usePendingPhoto, usePendingPhotos } from './save.ts'
 
 /** An object URL for the photo of a pin, or `undefined` while loading or when there is none. */
 export function usePhotoUrl(questId: string, pinId: string): string | undefined {
+  const pending = usePendingPhoto(questId, pinId)
+  const stored = useStoredPhotoUrl(questId, pinId)
+  return pending ?? stored
+}
+
+function useStoredPhotoUrl(questId: string, pinId: string): string | undefined {
   const version = usePhotosVersion()
   const [url, setUrl] = useState<string>()
   useEffect(() => {
@@ -25,6 +32,12 @@ export function usePhotoUrl(questId: string, pinId: string): string | undefined 
 
 /** Object URLs for every photo of a quest, keyed by pin id. */
 export function usePhotoUrls(questId: string): Record<string, string> {
+  const all = usePendingPhotos()
+  const stored = useStoredPhotoUrls(questId)
+  return useMemo(() => ({ ...stored, ...pendingPhotos(all, questId) }), [stored, all, questId])
+}
+
+function useStoredPhotoUrls(questId: string): Record<string, string> {
   const version = usePhotosVersion()
   const [urls, setUrls] = useState<Record<string, string>>({})
   useEffect(() => {

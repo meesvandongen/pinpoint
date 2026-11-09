@@ -22,12 +22,7 @@ for (const [name, viewport] of [
         await expectNoClipping(page, `play ${pin}`)
         await page.getByRole('button', { name: 'Check in' }).click()
 
-        // Page 1: the stamp
-        await expect(page.locator('.big-stamp')).toBeVisible()
-        await expectNoClipping(page, `stamp ${pin}`)
-        await page.getByRole('button', { name: 'Next' }).click()
-
-        // Page 2: the photo
+        // First the photo, which shows at once while it is saved behind the scenes
         await page.getByTestId('photo-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: await samplePhoto(page) })
         await expect(page.getByTestId('photo-preview')).toBeVisible()
         await expectNoClipping(page, `photo ${pin}`)
@@ -46,6 +41,15 @@ for (const [name, viewport] of [
           await expect(page.locator('.options .btn.right')).toHaveCount(1)
           await page.locator('.foot .btn.primary').click()
         }
+
+        // Back on the quest page, where the stamp is pressed onto the pin's page, then the stars, then the photo
+        await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+        const slot = page.locator('.slot.landing')
+        await expect(slot).toHaveCount(1)
+        await expect(slot.locator('.stamper')).toBeVisible()
+        await expect(slot.locator('.paper-stamp')).toBeVisible()
+        await expect(slot.locator('.flap img')).toBeVisible()
+        await expect(page.locator('.slot.landing')).toHaveCount(0, { timeout: 6000 })
       }
 
       // Home → the quest, with the position suggesting Tilburg
@@ -83,7 +87,9 @@ for (const [name, viewport] of [
       await arrive('market', { quiz: false })
       await arrive('harbour', { quiz: false })
 
-      // The finish: the quest stamp and the collage
+      // The finish: the quest stamp on the quest page, and the collage behind it
+      await expect(page.locator('.quest-slot')).toBeVisible()
+      await page.getByRole('link', { name: 'Open the collage' }).first().click()
       await page.waitForURL(/\/done$/)
       await expect(page.getByTestId('collage')).toBeVisible({ timeout: 30_000 })
       await expectNoClipping(page, 'done')
@@ -180,8 +186,7 @@ test.describe('moving around', () => {
     await expect(page.getByRole('link', { name: 'Start' })).toBeVisible()
     await page.getByRole('link', { name: 'Start' }).click()
     await page.getByRole('button', { name: 'Check in' }).click()
-    // Stamp, photo, fact, question.
-    await page.getByRole('button', { name: 'Next' }).click()
+    // Photo, fact, question.
     await page.getByRole('button', { name: 'Skip' }).click()
     await expect(page.locator('.fact-page')).toBeVisible()
     await page.getByRole('button', { name: 'Next' }).click()
