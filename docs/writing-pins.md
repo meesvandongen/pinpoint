@@ -126,7 +126,9 @@ The `photoPrompt` (100 characters) suggests one picture. Photos end up side by s
 ## 8. Make the quest more than its pins
 
 - **A theme.** "Wool city", "The vanished canals", "Where the walls were". A theme turns facts into a story, and makes the title and description easy to write.
-- **A route.** Three to eight pins, an hour's walk or less. With `"order": "linear"` you choose the route, so make each pin lead to the next and end somewhere pleasant: a square, a café-lined street, a view. Use `"free"` when the pins are spread out and any order works.
+- **A route, or not.** Three to eight pins is a good size, an hour's walk or less. Choose the order to fit the quest; neither is the default:
+  - `"order": "linear"` gives one pin at a time. It suits a short quest that tells a story in sequence, where each pin leads to the next and the walk ends somewhere pleasant (a square, a café-lined street, a view). The catch: a player stuck on one pin cannot go on, so it works best when the pins are few and none is very hard.
+  - `"order": "free"` lets the player pick. It suits a longer quest, pins that are spread out, or pins that are hard: a player who is stuck can try another and come back later. You can still suggest a route in the description.
 - **Vary the pins.** Mix big and small, a riddle-only pin for locals, a pin that needs a hint, one that is about looking up, one about looking down.
 - **Think about the extra marks.** A pin that is lit at night or faces the sunrise invites the after-dark and sunrise marks; a bridge or a harbour is a good place to be in the rain.
 - **The description (240 characters)** says what the walk is about, how long it is, and where it starts.

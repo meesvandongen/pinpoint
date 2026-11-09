@@ -21,7 +21,7 @@ Settle these with the user before researching. Ask only for what you cannot sens
 - **Theme:** a thread through the pins (industry, water, lost walls, street names…). If the user has none, propose two or three after a first look at the area.
 - **Length:** default 4–6 pins, under an hour's walk.
 - **Languages:** default `en` as `defaultLanguage`; add `nl` (or the local language) when the city is not English-speaking and the user wants it.
-- **Order:** `linear` (a route you design) unless the pins are far apart.
+- **Order:** decide with the user, no default. `linear` (one pin at a time) suits a short story-like route with no very hard pins; `free` suits longer quests, spread-out pins or hard pins, because a player stuck on one pin can try another. See section 8 of `docs/writing-pins.md`.
 
 Check `content/locations/`: if no location outline covers the area, the quest also needs one (a name and a rough polygon around the city).
 
@@ -50,7 +50,7 @@ nearby look-alikes:
 open questions to verify on site:
 ```
 
-Pick the pins that pass the three-sentence test in `docs/writing-pins.md` (*walks here because… / looks at… / leaves knowing…*). Prefer variety: big and small, up and down, one riddle-only pin. Then order them into a route and check the walking distance between pins.
+Pick the pins that pass the three-sentence test in `docs/writing-pins.md` (*walks here because… / looks at… / leaves knowing…*). Prefer variety: big and small, up and down, one riddle-only pin. Then decide between `linear` and `free`, and either way check the walking distance between pins (for `free`, the longest likely walk).
 
 ## 3. Write
 
