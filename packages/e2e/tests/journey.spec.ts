@@ -59,17 +59,21 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // Hints open one at a time, on request: a button says so, how many are left and when the next one opens by itself.
-      // Only the next one can be opened, and the player lands on the one that opened.
+      // Hints open one at a time, on request: a button says so, how many are left, and what the next one costs.
+      // Distance is on screen from the start, so one of the three points is already spent.
       const more = page.getByRole('button', { name: /Get another hint/ })
+      const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
+      await expect(points(2)).toBeVisible()
       await expect(more).toContainText('3 hints left')
-      await expect(more).toContainText(/opens by itself in \d+ s/)
+      await expect(more).toContainText('costs a point')
       await expect(page.getByRole('tab')).toHaveCount(0)
       await more.click()
       await expect(page.getByTestId('arrow')).toBeVisible()
       await expect(more).toContainText('2 hints left')
+      await expect(points(1)).toBeVisible()
       await more.click()
       await expect(page.getByRole('tab')).toHaveCount(2)
+      await expect(points(0)).toBeVisible()
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
 

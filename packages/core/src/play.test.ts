@@ -71,26 +71,29 @@ describe('clues', () => {
   const clues = [
     { type: 'text', text: 'riddle' },
     { type: 'distance' },
-    { type: 'direction', reveal: { afterSeconds: 60 } },
+    { type: 'direction', reveal: { onRequest: true } },
     { type: 'map', reveal: { onRequest: true } },
     { type: 'smell', note: 'unknown to this version' },
   ]
   const p = Quest.parse({ id: 'q', title: 'Q', pins: [pin('a', 51.56, 5.08, clues)] }).pins[0]
-  it('locks clues by time and by request, and skips unknown types', () => {
-    const states = resolveClues(p, { elapsedSeconds: 10, requested: new Set() })
-    expect(states.map((s) => [s.clue.type, s.visible, s.lockedBy])).toEqual([
-      ['text', true, undefined],
-      ['distance', true, undefined],
-      ['direction', false, 'time'],
-      ['map', false, 'request'],
+  it('holds back clues that are asked for, and skips unknown types', () => {
+    const states = resolveClues(p, { requested: new Set() })
+    expect(states.map((s) => [s.clue.type, s.visible])).toEqual([
+      ['text', true],
+      ['distance', true],
+      ['direction', false],
+      ['map', false],
     ])
   })
-  it('unlocks over time and on request', () => {
-    const states = resolveClues(p, { elapsedSeconds: 61, requested: new Set([3]) })
+  it('shows a clue once it was asked for', () => {
+    const states = resolveClues(p, { requested: new Set([2, 3]) })
     expect(states.every((s) => s.visible)).toBe(true)
   })
+  it('rejects the old time rule, so a quest never changes silently', () => {
+    expect(() => Quest.parse({ id: 'q', title: 'Q', pins: [pin('a', 51.56, 5.08, [{ type: 'distance', reveal: { afterSeconds: 30 } }])] })).toThrow()
+  })
   it('hides distance, direction and map for experts', () => {
-    const states = resolveClues(p, { elapsedSeconds: 999, requested: new Set([3]), expert: true })
+    const states = resolveClues(p, { requested: new Set([2, 3]), expert: true })
     expect(states.map((s) => s.clue.type)).toEqual(['text'])
   })
   it('shows the shape of a word', () => {

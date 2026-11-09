@@ -91,7 +91,7 @@ A pin gives its clues in order, and any clue can be left out. A pin with only a 
 | --- | --- | --- |
 | `text` | `text` (up to 140 characters) | A hint or a riddle. |
 | `distance` | | How far the player is. |
-| `direction` | `mode`: `arrow` (default) or `cardinal` | An arrow that follows the phone's compass, or a compass point. |
+| `direction` | | A compass: an arrow towards the pin that follows the phone's compass. |
 | `map` | `view`: `full` (default) or `area` | The pin and its arrival circle, or only a loose circle that contains it. |
 | `photo` | `src`, `alt` (optional) | A picture. `src` is a path under `content/`, never a web address. |
 | `audio` | `src`, `caption` (optional) | A sound. |
@@ -100,11 +100,11 @@ A pin gives its clues in order, and any clue can be left out. A pin with only a 
 Every clue can also have a `reveal`:
 
 ```json
-{ "type": "direction", "reveal": { "afterSeconds": 60 } }
+{ "type": "direction", "reveal": { "onRequest": true } }
 { "type": "map", "view": "area", "reveal": { "onRequest": true } }
 ```
 
-Without one, a clue shows from the start. `afterSeconds` unlocks it after a while; `onRequest` waits until the player asks. Players can also switch on **local expert** in the settings, which hides `distance`, `direction` and `map` everywhere. It only ever makes a quest harder, so a quest should still work with just its text.
+Without one, a clue shows from the start. With `onRequest` it is a **hint**: it waits until the player asks for it. Hints come one at a time, in the order of the list. `distance`, `direction` and `map` cost the player a point (a star on the stamp) when they are on screen at check-in, so a quest is most interesting when they are hints to ask for and not there from the start. A reveal that names anything else, such as the old `afterSeconds`, is rejected. Players can also switch on **local expert** in the settings, which hides `distance`, `direction` and `map` everywhere. It only ever makes a quest harder, so a quest should still work with just its text.
 
 A clue type this version of the game does not know is kept in the file and skipped when playing, so newer content does not break older apps.
 

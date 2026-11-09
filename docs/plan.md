@@ -45,9 +45,9 @@ A pin has a list of clues and any clue can be missing, so a pin can have only a 
 
 | Built | Idea, not built |
 | --- | --- |
-| text or riddle, distance, direction (arrow or compass point), map (exact or a rough area), photo, sound, word shape | shrinking circle, old map, detail crop, a chain where one pin's quiz answer is the next clue |
+| text or riddle, distance, compass, map (exact or a rough area), photo, sound, word shape | shrinking circle, old map, detail crop, a chain where one pin's quiz answer is the next clue |
 
-Each clue has an optional reveal rule: from the start, after some seconds, or on request. **Local expert** hides distance, direction and map everywhere; it only makes a quest harder. Clue types are an open set: a client skips types it does not know, and the schema keeps them.
+Each clue has an optional reveal rule: from the start, or on request, as a hint the player asks for. There is no timer: nobody could name a case where waiting is better than asking. **Local expert** hides distance, direction and map everywhere; it only makes a quest harder. Clue types are an open set: a client skips types it does not know, and the schema keeps them.
 
 ## Stamps
 

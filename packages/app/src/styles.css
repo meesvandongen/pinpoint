@@ -168,17 +168,33 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 
 .compass { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 2px dashed var(--paper-2); flex: none; }
 .dist { font-family: var(--font-type); font-weight: 700; font-size: clamp(40px, 15vw, 66px); letter-spacing: -0.04em; line-height: 1; }
-.dir { display: grid; justify-items: center; gap: 4px; color: var(--ink); max-width: 120px; }
-.card-dir { font-family: var(--font-type); font-weight: 700; font-size: 32px; }
+.reading { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.reading .dist { font-size: clamp(30px, 11.5vw, 60px); white-space: nowrap; }
+/* The compass is a button: on a phone that asks permission, a tap on it turns it on. Dashed until it follows the phone. */
+.dial { position: relative; flex: none; border: 0; background: none; padding: 0; color: var(--ink); cursor: pointer; display: grid; }
+.dial .hint-badge { position: absolute; right: -6px; bottom: -4px; }
+.dial-n { font-family: var(--font-type); font-weight: 700; font-size: 9px; fill: var(--muted); }
+.cover-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--gold-dim); font-size: 14px; min-height: 22px; }
+.points-meter { display: inline-flex; gap: 3px; color: var(--gold); }
+.points-meter svg { width: 18px; height: 18px; display: block; }
+.points-meter svg:not(.on) { color: var(--gold-dim); opacity: 0.7; }
+/* One picture per kind of hint, everywhere. Gold ring and a star: this one costs a point. */
+.hint-badge { position: relative; flex: none; display: inline-grid; place-items: center; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper-3); color: var(--ink); }
+.hint-badge.cost { border-color: #b8860b; color: #7a5a06; background: #fbf1d0; }
+.hint-star { position: absolute; right: -5px; top: -6px; width: 42%; height: 42%; color: #d4a017; stroke: var(--paper); stroke-width: 1.5; paint-order: stroke; }
+.hint-badge.spent { opacity: 0.45; }
 
 .clue-tabs { display: flex; gap: 6px; flex-wrap: wrap; flex: none; }
-.clue-tabs button { min-height: 36px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 18px; background: transparent; font-family: var(--font-type); font-weight: 700; font-size: 13px; cursor: pointer; }
+.clue-tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px 0 6px; border: 2px solid var(--ink); border-radius: 18px; background: transparent; font-family: var(--font-type); font-weight: 700; font-size: 13px; cursor: pointer; }
 .clue-tabs button.on { background: var(--ink); color: var(--paper); }
+.clue-tabs button.on .hint-badge { border-color: var(--paper); }
 /* The one way to ask for more: a real button with an icon, how many hints are left, and the wait if there is one. */
-.hint-btn { flex: none; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 6px 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper-3); color: var(--ink); text-align: left; cursor: pointer; }
-.hint-btn svg { flex: none; color: #b8860b; }
+.hint-btn { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 6px 10px; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper-3); color: var(--ink); text-align: left; cursor: pointer; }
+.hint-bulb { flex: none; color: #b8860b; display: grid; }
+.hint-btn .hint-badge { margin-left: auto; }
+.hint-btn:active { background: var(--paper-2); }
 .hint-text { display: grid; gap: 1px; }
-.hint-text strong { font-family: var(--font-type); font-size: 15px; }
+.hint-text strong { font-family: var(--font-type); font-size: 14px; white-space: nowrap; }
 .hint-text small { font-size: 12.5px; color: var(--muted); }
 .deck { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
 .deck-card { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 10px; }
@@ -220,7 +236,7 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 @media (prefers-reduced-motion: no-preference) {
   .pageturn { animation: pageturn 0.38s cubic-bezier(0.2, 0.7, 0.2, 1); transform-origin: left center; }
   @keyframes pageturn { from { opacity: 0; transform: perspective(900px) rotateY(-14deg) translateX(18px); } to { opacity: 1; transform: none; } }
-  .dir, .clue-tabs button.on { animation: pop 0.45s ease-out; }
+  .reading, .dial, .clue-tabs button.on { animation: pop 0.45s ease-out; }
   @keyframes pop { from { transform: scale(0.4) rotate(-20deg); opacity: 0; } to { transform: none; opacity: 1; } }
   .screen { animation: fade 0.2s ease-out; }
   /* The stamp lands on the page. */

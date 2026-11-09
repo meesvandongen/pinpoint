@@ -50,22 +50,18 @@ export const MediaPath = z
     message: 'use a path under content/, such as media/chimney.jpg, not a web address',
   })
 
-/** When a clue becomes visible. Without a rule it is visible from the start. */
-export const Reveal = z.object({
-  afterSeconds: z.number().int().positive().optional(),
-  onRequest: z.boolean().optional(),
-})
+/**
+ * When a clue becomes visible. Without a rule it is visible from the start; with `onRequest` it is a hint the
+ * player has to ask for. Strict, so an old `afterSeconds` is an error and not a silently different quest.
+ */
+export const Reveal = z.object({ onRequest: z.boolean().optional() }).strict()
 export type Reveal = z.infer<typeof Reveal>
 
 const reveal = { reveal: Reveal.optional() }
 
 const KnownClue = z.discriminatedUnion('type', [
   z.object({ type: z.literal('distance'), ...reveal }),
-  z.object({
-    type: z.literal('direction'),
-    mode: z.enum(['arrow', 'cardinal']).default('arrow'),
-    ...reveal,
-  }),
+  z.object({ type: z.literal('direction'), ...reveal }),
   z.object({
     type: z.literal('map'),
     view: z.enum(['full', 'area']).default('full'),

@@ -75,10 +75,11 @@ export function playablePins(quest: Quest, stamped: ReadonlySet<string>): Pin[] 
   return quest.order === 'linear' ? open.slice(0, 1) : open
 }
 
-export type ClueState = { clue: Clue; index: number; visible: boolean; lockedBy?: 'time' | 'request' }
+export type ClueState = { clue: Clue; index: number; visible: boolean; }
 
-/** Types that tell the player where to go. Expert mode hides them. */
-const ASSISTIVE = new Set(['distance', 'direction', 'map'])
+/** Types that tell the player where to go. Each costs a point, and expert mode hides them. */
+export const ASSISTIVE_TYPES = ['distance', 'direction', 'map'] as const
+const ASSISTIVE = new Set<string>(ASSISTIVE_TYPES)
 
 /** Most points a stamp can earn: one for each of the three assisting clue types (distance, direction, map) not used. */
 export const MAX_POINTS = ASSISTIVE.size
@@ -90,7 +91,6 @@ export function stampPoints(stamp: Pick<Stamp, 'clues'>): number {
 }
 
 export type ClueContext = {
-  elapsedSeconds: number
   /** Indexes of clues the player asked for. */
   requested: ReadonlySet<number>
   /** Hide distance, direction and map for players who know the city. */
@@ -102,10 +102,7 @@ export function resolveClues(pin: Pick<Pin, 'clues'>, ctx: ClueContext): ClueSta
     if (!isPlayable(clue)) return []
     if (ctx.expert && ASSISTIVE.has(clue.type)) return []
     const r = clue.reveal
-    if (r?.onRequest && !ctx.requested.has(index)) return [{ clue, index, visible: false, lockedBy: 'request' }]
-    if (r?.afterSeconds && ctx.elapsedSeconds < r.afterSeconds && !ctx.requested.has(index)) {
-      return [{ clue, index, visible: false, lockedBy: 'time' }]
-    }
+    if (r?.onRequest && !ctx.requested.has(index)) return [{ clue, index, visible: false }]
     return [{ clue, index, visible: true }]
   })
 }
