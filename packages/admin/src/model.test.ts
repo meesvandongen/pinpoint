@@ -3,7 +3,8 @@ import { join } from 'node:path'
 import { LocationFile, QuestFile } from 'pinpoint-core'
 import { locationSchema, questSchema } from './model.ts'
 
-const contentDir = join(import.meta.dirname, '../../../content')
+// The fixtures the browser tests play: real files in the same layout as content/.
+const contentDir = join(import.meta.dirname, '../../../fixtures/content')
 const read = (folder: string) =>
   readdirSync(join(contentDir, folder))
     .filter((f: string) => f.endsWith('.json'))
@@ -13,7 +14,7 @@ const quests = read('quests')
 const locations = read('locations')
 
 describe('the editor model and the game model agree', () => {
-  it('accept every file in content/', () => {
+  it('accept every fixture file', () => {
     for (const { name, data } of quests) {
       expect(questSchema.safeParse(data).success, name).toBe(true)
       expect(QuestFile.safeParse(data).success, name).toBe(true)

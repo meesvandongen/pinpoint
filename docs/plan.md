@@ -92,7 +92,7 @@ Open:
 
 - **Licence.** None chosen for the code, or for quests and photos people contribute. Decide before taking outside contributions.
 - **Production URL and editor sign-in.** The Worker for "Sign in with GitHub" exists but needs a GitHub App and its secret; until then the editor takes a token. Contributors without write access send files in a pull request.
-- **Real quests.** The sample quests have approximate coordinates.
+- **Real quests.** `content/` is empty. The made-up quests the tests play are in `fixtures/content/`. [writing-pins.md](writing-pins.md) is the guide for writing real ones.
 - **Clue marks on stamps:** always visible, or behind a tap? The first reads as honest, but some players may read them as a judgement.
 - **Contributed media.** There is no process yet for checking that photos and sounds in a pull request may be shared.
 - **Very large system text** is not tested.

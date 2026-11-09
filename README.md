@@ -5,14 +5,15 @@ A game for real cities. You get a **quest**: a list of **pins** (places). Each p
 It is a web app that installs like an app and keeps working offline. Quests are plain JSON files in this repository, so anyone can add one with a pull request. There is no score: a stamp records how you found a place, never how well.
 
 - **Play it:** open the site on your phone and tap *Use my location*.
-- **Add a quest:** read [docs/contributing.md](docs/contributing.md). The file format is in [docs/content.md](docs/content.md).
+- **Add a quest:** read [docs/writing-pins.md](docs/writing-pins.md) for how to find, research and write a pin worth walking to, and [docs/contributing.md](docs/contributing.md) for how to get it in. The file format is in [docs/content.md](docs/content.md). With Claude Code, the `write-quest` skill (`.claude/skills/write-quest/`) walks through the same steps.
 - **How it is put together and why:** [docs/plan.md](docs/plan.md).
 
 ## What is in the repository
 
 | Path | Contents |
 | --- | --- |
-| `content/` | Locations and quests as JSON, and the photos and sounds clues point at. |
+| `content/` | Locations and quests as JSON, and the photos and sounds clues point at. Empty until the first real quest is added. |
+| `fixtures/content/` | Made-up quests and locations in the same layout, played by the browser tests. Not real places. |
 | `packages/core` | The content schemas, geo maths, play rules, sun position, categories and their OpenStreetMap mapping, collage layout. No UI. Tested. |
 | `packages/app` | The game: React, TanStack Router and Query, MapLibre, Vite+. Its build output is what the Worker serves. |
 | `packages/admin` | The quest editor at `/admin`: [gitvfs-cms](https://github.com/meesvandongen/gitvfs) with Pinpoint's content model. Loaded only when opened. |
@@ -26,7 +27,7 @@ It is a web app that installs like an app and keeps working offline. Quests are 
 ```sh
 pnpm install
 pnpm --filter pinpoint-app dev        # the game at http://localhost:3000, with the test tools on
-pnpm run content                      # check everything under content/
+pnpm run content                      # check everything under content/ (pass fixtures/content to check the fixtures)
 pnpm test                             # unit tests of every package
 pnpm run typecheck
 pnpm run lint
@@ -48,6 +49,8 @@ The dev server and every **preview deployment** have test tools on, so a game th
 | **Query**, **Router** | The TanStack Query and Router panels. |
 
 A link such as `/?sim=51.5607,5.0768` opens the game with the player standing there (`lat,lng[,accuracy]`).
+
+`PINPOINT_CONTENT=fixtures/content pnpm --filter pinpoint-app dev` plays the test fixtures instead of `content/`; the browser tests do the same.
 
 [MSW](https://mswjs.io) answers the requests that depend on the outside world: the weather (Open-Meteo) and the GitHub API, backed by a copy of `content/` in the browser. That is what lets the editor at `/admin` work in a preview without an account: edit a quest, save, and play the change in the other tab at once.
 
@@ -76,4 +79,4 @@ Your position, photos, stamps and settings stay in your browser. The game sends 
 
 ## Credits
 
-Map data is © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), served by OpenFreeMap as OpenMapTiles. The sample quests in `content/` are examples and their coordinates are approximate. No licence has been chosen for the code or for contributed quests and photos yet; see the open questions in [docs/plan.md](docs/plan.md).
+Map data is © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), served by OpenFreeMap as OpenMapTiles. The quests in `fixtures/content/` exist for the tests; their coordinates and facts are approximate. No licence has been chosen for the code or for contributed quests and photos yet; see the open questions in [docs/plan.md](docs/plan.md).

@@ -1,14 +1,12 @@
 import { hashString } from 'pinpoint-core'
+import files from 'virtual:pinpoint-content-seed'
 
 /** The repository the preview pretends to be on GitHub. */
 export const MOCK_REPO = { owner: 'meesvandongen', repo: 'pinpoint', branch: 'main' } as const
 
-// Every JSON file of content/, as text, bundled into preview builds only.
-const files = import.meta.glob('../../../../content/**/*.json', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
-
-/** `content/quests/x.json` → file text. */
+/** `content/quests/x.json` → file text, for every JSON file of the content folder. Bundled into preview builds only. */
 export function seedFiles(): Record<string, string> {
-  return Object.fromEntries(Object.entries(files).map(([path, text]) => [path.replace(/^(\.\.\/)+/, ''), text]))
+  return { ...files }
 }
 
 /** Changes whenever the content does, so a redeployed preview starts from its own content instead of an old copy. */

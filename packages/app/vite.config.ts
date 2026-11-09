@@ -1,13 +1,19 @@
 import { createHash } from 'node:crypto'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { extname, join, relative } from 'node:path'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { msw } from 'msw/vite'
 import type { Plugin } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
-const contentDir = fileURLToPath(new URL('../../content', import.meta.url))
+const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
+
+/**
+ * The folder the game's content comes from: `content/` of this repository, or the folder named by
+ * `PINPOINT_CONTENT` (relative to the repository root). The browser tests point it at `fixtures/content`.
+ */
+const contentDir = resolve(repoRoot, process.env.PINPOINT_CONTENT ?? 'content')
 
 const MIME: Record<string, string> = {
   '.json': 'application/json',
@@ -23,15 +29,18 @@ const MIME: Record<string, string> = {
   '.wav': 'audio/wav',
 }
 
+/** Every file under a folder, skipping dotfiles such as `.gitkeep`. */
 function walk(dir: string): string[] {
+  if (!existsSync(dir)) return []
   return readdirSync(dir).flatMap((name) => {
+    if (name.startsWith('.')) return []
     const path = join(dir, name)
     return statSync(path).isDirectory() ? walk(path) : [path]
   })
 }
 
 const jsonIn = (folder: string) =>
-  readdirSync(join(contentDir, folder))
+  (existsSync(join(contentDir, folder)) ? readdirSync(join(contentDir, folder)) : [])
     .filter((name) => name.endsWith('.json'))
     .sort((a, b) => a.localeCompare(b))
     .map((name) => `${folder}/${name}`)
@@ -39,10 +48,28 @@ const jsonIn = (folder: string) =>
 /** The list of files to load, built from the folders so nobody has to keep an index up to date. */
 const contentIndex = () => JSON.stringify({ locations: jsonIn('locations'), quests: jsonIn('quests') }, null, 2)
 
-/** Serves the repository's `content/` folder at `/content` in dev and copies it into the build. */
+const SEED_MODULE = 'virtual:pinpoint-content-seed'
+
+/**
+ * Serves the content folder at `/content` in dev and copies it into the build. Also provides
+ * `virtual:pinpoint-content-seed`: every JSON file of it as text, keyed `content/<path>`, which the
+ * test tools copy into the mocked repository.
+ */
 function content(): Plugin {
   return {
     name: 'pinpoint-content',
+    resolveId(id) {
+      return id === SEED_MODULE ? `\0${SEED_MODULE}` : undefined
+    },
+    load(id) {
+      if (id !== `\0${SEED_MODULE}`) return undefined
+      const files = walk(contentDir).filter((file) => file.endsWith('.json'))
+      for (const file of files) this.addWatchFile(file)
+      const seed = Object.fromEntries(
+        files.map((file) => [`content/${relative(contentDir, file).split('\\').join('/')}`, readFileSync(file, 'utf8')]),
+      )
+      return `export default ${JSON.stringify(seed)}`
+    },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = decodeURIComponent((req.url ?? '').split('?')[0])

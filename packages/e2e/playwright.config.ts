@@ -2,6 +2,9 @@ import { defineConfig } from '@playwright/test'
 
 const CI = !!process.env.CI
 
+/** The quests the tests play: fixtures with known pins, not whatever is in `content/`. */
+const CONTENT = 'PINPOINT_CONTENT=fixtures/content'
+
 /**
  * Two servers: the dev server, which has the test tools on like a preview deployment, and a
  * production build, which has the service worker and none of the test tools.
@@ -21,14 +24,14 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'pnpm --filter pinpoint-app exec vp dev',
+      command: `${CONTENT} pnpm --filter pinpoint-app exec vp dev`,
       url: 'http://localhost:3000/content/index.json',
       reuseExistingServer: !CI,
       cwd: '../..',
       timeout: 180_000,
     },
     {
-      command: 'VITE_TEST_TOOLS=false pnpm --filter pinpoint-app run build && pnpm --filter pinpoint-app exec vp preview --port 4173 --strictPort',
+      command: `${CONTENT} VITE_TEST_TOOLS=false pnpm --filter pinpoint-app run build && pnpm --filter pinpoint-app exec vp preview --port 4173 --strictPort`,
       url: 'http://localhost:4173/sw.js',
       reuseExistingServer: !CI,
       cwd: '../..',

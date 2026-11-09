@@ -1,7 +1,8 @@
 // Validates everything under content/ with the shared schemas: shapes, length limits, the default
 // language in every text, pins inside the quest area, files referenced by clues.
 //
-//   pnpm run content
+//   pnpm run content                     checks content/
+//   pnpm run content fixtures/content    checks another folder laid out the same way
 //
 // The app builds its own index of these files, so there is nothing to regenerate.
 import { existsSync } from 'node:fs'
@@ -10,7 +11,7 @@ import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { idFromPath, Location, Quest, questProblems } from '../packages/core/src/index.ts'
 
-const root = join(fileURLToPath(new URL('..', import.meta.url)), 'content')
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)), process.argv[2] ?? 'content')
 
 let failed = false
 const fail = (path, message) => {
@@ -19,6 +20,7 @@ const fail = (path, message) => {
 }
 
 async function jsonFiles(dir) {
+  if (!existsSync(join(root, dir))) return []
   const entries = await readdir(join(root, dir), { withFileTypes: true })
   return entries
     .filter((entry) => entry.name.endsWith('.json'))
@@ -67,4 +69,4 @@ const locations = await check('locations', Location)
 const quests = await check('quests', Quest, (quest) => [...questProblems(quest), ...missingFiles(quest)])
 
 if (failed) process.exit(1)
-console.log(`✓ ${locations} locations, ${quests} quests`)
+console.log(`✓ ${relative(process.cwd(), root) || '.'}: ${locations} locations, ${quests} quests`)
