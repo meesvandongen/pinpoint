@@ -47,7 +47,6 @@ export type Stamp = {
   quiz?: 'correct' | 'wrong'
   /** A photo of the pin is in the album. */
   photo?: boolean
-  together?: boolean
   /** The sky at arrival, when it was dark or around sunrise. */
   sky?: 'night' | 'sunrise'
   /** Only recorded when the player allowed a weather lookup. */
@@ -55,7 +54,7 @@ export type Stamp = {
 }
 
 /** Small bonus marks beside a stamp. They reward things anyone can choose to do. */
-export const EXTRAS = ['quiz', 'photo', 'night', 'sunrise', 'rain', 'together'] as const
+export const EXTRAS = ['quiz', 'photo', 'night', 'sunrise', 'rain'] as const
 export type Extra = (typeof EXTRAS)[number]
 
 /** The extra marks a stamp has earned, in a fixed order. Getting a quiz wrong still counts as answering it. */
@@ -66,7 +65,6 @@ export function extrasOf(stamp: Stamp): Extra[] {
     night: stamp.sky === 'night',
     sunrise: stamp.sky === 'sunrise',
     rain: stamp.weather === 'rain',
-    together: stamp.together === true,
   }
   return EXTRAS.filter((e) => earned[e])
 }

@@ -66,7 +66,7 @@ describe('quest stamp and marks', () => {
     expect(doc.documentElement.innerHTML).toContain('3/3')
   })
   it('draws a mark for every extra', () => {
-    for (const extra of ['quiz', 'photo', 'night', 'sunrise', 'rain', 'together'] as const) {
+    for (const extra of ['quiz', 'photo', 'night', 'sunrise', 'rain'] as const) {
       parse(extraMarkSvg(extra, '#1b4a96', extra, 'seed'))
     }
   })

@@ -22,10 +22,9 @@ for (const [name, viewport] of [
         await expectNoClipping(page, `play ${pin}`)
         await page.getByRole('button', { name: 'Check in' }).click()
 
-        // Page 1: the stamp and "together"
+        // Page 1: the stamp
         await expect(page.locator('.big-stamp')).toBeVisible()
         await expectNoClipping(page, `stamp ${pin}`)
-        await page.getByRole('button', { name: 'I am here with someone' }).click()
         await page.getByRole('button', { name: 'Next' }).click()
 
         // Page 2: the photo
@@ -60,13 +59,16 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // Clues open one at a time: first the arrow (which also opens by itself after a minute), then, on request,
-      // the map (the real one, or the schematic one without tiles). Only the next clue can be opened.
-      await expect(page.getByRole('timer')).toHaveText(/Next clue in \d+ s/)
+      // Hints open one at a time, on request: a button says so, how many are left and when the next one opens by itself.
+      // Only the next one can be opened, and the player lands on the one that opened.
+      const more = page.getByRole('button', { name: /Get another hint/ })
+      await expect(more).toContainText('3 hints left')
+      await expect(more).toContainText(/opens by itself in \d+ s/)
       await expect(page.getByRole('tab')).toHaveCount(0)
-      await page.getByRole('button', { name: 'Show now' }).click()
+      await more.click()
       await expect(page.getByTestId('arrow')).toBeVisible()
-      await page.getByRole('button', { name: 'Show another clue' }).click()
+      await expect(more).toContainText('2 hints left')
+      await more.click()
       await expect(page.getByRole('tab')).toHaveCount(2)
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
@@ -105,9 +107,9 @@ for (const [name, viewport] of [
       await expect(page.locator('.slot.lifted')).toHaveCount(1)
       await page.locator('.slot.lifted .hit').click()
       await expect(page.locator('.detail-stamp')).toBeVisible()
-      // Quiz, photo and together, plus the dark or sunrise mark when the test runs at such an hour
-      await expect(page.locator('.extras-list li').nth(2)).toBeVisible()
-      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(3)
+      // Quiz and photo, plus the dark or sunrise mark when the test runs at such an hour
+      await expect(page.locator('.extras-list li').nth(1)).toBeVisible()
+      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(2)
       await expectNoClipping(page, 'book pin')
 
       // The progress survives a reload

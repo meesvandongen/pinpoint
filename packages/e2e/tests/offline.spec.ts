@@ -28,8 +28,8 @@ test('the production build has no test tools and works offline', async ({ page, 
   await page.locator('.row', { hasText: 'Tilburg' }).click()
   await page.locator('.quest', { hasText: 'Wool city' }).click()
   await lookForPin(page)
-  await page.getByRole('button', { name: 'Show now' }).click()
-  await page.getByRole('button', { name: 'Show another clue' }).click()
+  await page.getByRole('button', { name: /Get another hint/ }).click()
+  await page.getByRole('button', { name: /Get another hint/ }).click()
   await expect(page.locator('.mapview, .areamap').first()).toBeVisible({ timeout: 20_000 })
   await page.waitForTimeout(3000)
 
@@ -41,8 +41,8 @@ test('the production build has no test tools and works offline', async ({ page, 
   await page.locator('.quest', { hasText: 'Wool city' }).click()
   await lookForPin(page)
   await expect(page.getByTestId('distance')).toHaveText('240 m')
-  await page.getByRole('button', { name: 'Show now' }).click()
-  await page.getByRole('button', { name: 'Show another clue' }).click()
+  await page.getByRole('button', { name: /Get another hint/ }).click()
+  await page.getByRole('button', { name: /Get another hint/ }).click()
   await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
 
   // A deep link works offline too

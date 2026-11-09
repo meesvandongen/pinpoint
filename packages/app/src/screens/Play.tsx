@@ -88,6 +88,7 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
   // "next clue", with a countdown or a button.
   const held = states.filter((s) => s.visible && s.clue.type !== 'distance' && s.clue.type !== 'direction')
   const next = states.find((s) => !s.visible)
+  const hintsLeft = states.filter((s) => !s.visible).length
   const heldKey = held.map((s) => s.index).join()
   const [seen, setSeen] = useState<ReadonlySet<number>>(() => new Set(held.map((s) => s.index)))
   useEffect(() => {
@@ -188,7 +189,7 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
             )}
 
             {held.length > 1 && (
-              <div className="clue-tabs" role="tablist" aria-label={t('play.yourClues')}>
+              <div className="clue-tabs" role="tablist" aria-label={t('play.yourHints')}>
                 {held.map((c, i) => (
                   <button key={c.index} type="button" role="tab" aria-selected={c === card} className={c === card ? 'on' : ''} onClick={() => setPicked(c.index)}>
                     {i + 1} · {t(`play.clue.${c.clue.type}` as MessageKey)}
@@ -206,20 +207,18 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
             )}
 
             {next && (
-              <div className="next-clue">
-                {next.lockedBy === 'time' ? (
-                  <>
-                    <span role="timer">{t('play.next.wait', { seconds: Math.max(0, (next.clue.reveal?.afterSeconds ?? 0) - elapsed) })}</span>
-                    <button type="button" className="btn small" onClick={() => reveal(next.index)}>
-                      {t('play.next.now')}
-                    </button>
-                  </>
-                ) : (
-                  <button type="button" className="btn small" onClick={() => reveal(next.index)}>
-                    {t('play.next.ask')}
-                  </button>
-                )}
-              </div>
+              <button type="button" className="hint-btn" onClick={() => reveal(next.index)}>
+                <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+                  <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="hint-text">
+                  <strong>{t('play.hint.more')}</strong>
+                  <small>
+                    {hintsLeft > 1 ? t('play.hint.left', { n: hintsLeft }) : t('play.hint.last')}
+                    {next.lockedBy === 'time' && ` · ${t('play.hint.wait', { seconds: Math.max(0, (next.clue.reveal?.afterSeconds ?? 0) - elapsed) })}`}
+                  </small>
+                </span>
+              </button>
             )}
             {location.error && (
               <div className="notice">

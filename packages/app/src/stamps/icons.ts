@@ -81,5 +81,4 @@ export const EXTRA_SYMBOLS: Record<Extra, string> = {
   night: '<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5Z"/>',
   sunrise: '<path d="M4 17H20M7 17A5 5 0 0 1 17 17"/><path d="M12 5V8M4.5 9L6.5 11M19.5 9L17.5 11M2 13H5M19 13H22"/>',
   rain: '<path d="M12 3C12 3 6 10 6 14A6 6 0 0 0 18 14C18 10 12 3 12 3Z"/>',
-  together: '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20C2.5 14.5 13.5 14.5 13.5 20M10.5 20C10.5 14.5 21.5 14.5 21.5 20"/>',
 }

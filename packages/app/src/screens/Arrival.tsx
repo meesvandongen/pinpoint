@@ -88,15 +88,6 @@ function StampPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: Stamp
   return (
     <div className="page stamp-page">
       <Stamp className="big-stamp" stamp={stampPropsFor(quest, pin, stamp, i18n)} />
-      <button
-        type="button"
-        className={`toggle-chip ${stamp.together ? 'on' : ''}`}
-        aria-pressed={stamp.together === true}
-        onClick={() => patchStamp(quest.id, pin.id, { together: !stamp.together })}
-      >
-        <span className="box" aria-hidden="true">{stamp.together ? '✓' : ''}</span>
-        {i18n.t('arrival.together')}
-      </button>
     </div>
   )
 }

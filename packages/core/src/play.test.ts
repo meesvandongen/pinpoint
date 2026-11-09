@@ -142,8 +142,8 @@ describe('extra marks', () => {
     expect(extrasOf({ ...base, quiz: 'wrong' })).toEqual(['quiz'])
   })
   it('lists marks in a fixed order', () => {
-    const all: Stamp = { ...base, together: true, weather: 'rain', sky: 'night', photo: true, quiz: 'correct' }
-    expect(extrasOf(all)).toEqual(['quiz', 'photo', 'night', 'rain', 'together'])
+    const all: Stamp = { ...base, weather: 'rain', sky: 'night', photo: true, quiz: 'correct' }
+    expect(extrasOf(all)).toEqual(['quiz', 'photo', 'night', 'rain'])
     expect(extrasOf({ ...base, sky: 'sunrise' })).toEqual(['sunrise'])
   })
 })
