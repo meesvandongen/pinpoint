@@ -43,7 +43,7 @@ for (const [name, viewport] of [
         }
 
         // Back on the quest page, where the stamp is pressed onto the pin's page, then the stars, then the photo
-        await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+        await expect(page).toHaveURL(/\/quest\/tilburg-textile(\?|$)/)
         const slot = page.locator('.slot.landing')
         await expect(slot).toHaveCount(1)
         await expect(slot.locator('.stamper')).toBeVisible()
