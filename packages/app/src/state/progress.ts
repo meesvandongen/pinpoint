@@ -1,5 +1,6 @@
 import type { Stamp } from 'pinpoint-core'
 import { persistentStore, useStore } from '../lib/store.ts'
+import { resetHints } from './hints.ts'
 
 /** The player's stamps. Photos are kept separately in IndexedDB. */
 export const progressStore = persistentStore<Stamp[]>('pinpoint.stamps.v1', [], (stored) =>
@@ -28,4 +29,5 @@ export function stampedPins(stamps: Stamp[], questId: string): Set<string> {
 
 export function resetProgress() {
   progressStore.set([])
+  resetHints()
 }

@@ -16,7 +16,7 @@
       "clues": [
         { "type": "text", "text": { "en": "Look for the old chimney that still has a name on it.", "nl": "Zoek de oude schoorsteen waar nog een naam op staat." } },
         { "type": "distance" },
-        { "type": "direction", "mode": "arrow", "reveal": { "afterSeconds": 60 } },
+        { "type": "direction", "reveal": { "onRequest": true } },
         { "type": "map", "view": "area", "reveal": { "onRequest": true } },
         { "type": "wordShape", "word": { "en": "Chimney", "nl": "Schoorsteen" }, "reveal": { "onRequest": true } }
       ],
@@ -41,7 +41,7 @@
       "clues": [
         { "type": "text", "text": { "en": "Where the town has met to trade for centuries.", "nl": "Waar de stad al eeuwen samenkomt om te handelen." } },
         { "type": "distance" },
-        { "type": "direction", "mode": "cardinal" }
+        { "type": "direction" }
       ],
       "photoPrompt": { "en": "Photograph the busiest corner.", "nl": "Fotografeer de drukste hoek." }
     },

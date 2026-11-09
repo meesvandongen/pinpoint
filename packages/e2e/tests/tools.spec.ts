@@ -26,7 +26,7 @@ test('moves the player, changes the time and the weather, and earns the marks', 
 
   await page.getByRole('button', { name: '80 m' }).click()
   await expect(page.getByTestId('distance')).toHaveText('80 m')
-  await expect(page.getByTestId('status')).toHaveText('80 m to go.')
+  await expect(page.getByTestId('status')).toHaveText('Get within 50 m to check in.')
 
   await page.getByRole('button', { name: 'Vague fix' }).click()
   await expect(page.getByTestId('status')).toHaveText('Almost there. Hold still while GPS settles.')

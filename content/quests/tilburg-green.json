@@ -16,7 +16,7 @@
       "clues": [
         { "type": "text", "text": { "en": "Older than the street names around it.", "nl": "Ouder dan de straatnamen eromheen." } },
         { "type": "distance" },
-        { "type": "direction", "mode": "arrow" }
+        { "type": "direction" }
       ]
     },
     {
@@ -44,8 +44,8 @@
       "radius": 40,
       "clues": [
         { "type": "text", "text": { "en": "Music has no walls here.", "nl": "Muziek heeft hier geen muren." } },
-        { "type": "direction", "mode": "cardinal" },
-        { "type": "distance", "reveal": { "afterSeconds": 30 } }
+        { "type": "direction" },
+        { "type": "distance", "reveal": { "onRequest": true } }
       ],
       "stamp": { "ink": "#1c7a58" }
     }

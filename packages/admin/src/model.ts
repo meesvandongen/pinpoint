@@ -29,14 +29,14 @@ const pinId = Slug.check(
   }),
 )
 
-const reveal = z.object({ afterSeconds: z.number().int().positive().optional(), onRequest: z.boolean().optional() }).optional()
+const reveal = z.object({ onRequest: z.boolean().optional() }).strict().optional()
 
 const KNOWN_TYPES = ['distance', 'direction', 'map', 'text', 'photo', 'audio', 'wordShape']
 
 const Clue = z.union([
   z.discriminatedUnion('type', [
     z.object({ type: z.literal('distance'), reveal }),
-    z.object({ type: z.literal('direction'), mode: z.enum(['arrow', 'cardinal']).default('arrow'), reveal }),
+    z.object({ type: z.literal('direction'), reveal }),
     z.object({ type: z.literal('map'), view: z.enum(['full', 'area']).default('full'), reveal }),
     z.object({ type: z.literal('text'), text: localized(LIMITS.hint, { label: 'Text' }), reveal }),
     z.object({ type: z.literal('photo'), src: MediaPath, alt: localized(LIMITS.caption, { label: 'Description' }).optional(), reveal }),

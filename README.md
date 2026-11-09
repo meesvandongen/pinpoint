@@ -1,6 +1,6 @@
 # Pinpoint
 
-A game for real cities. You get a **quest**: a list of **pins** (places). Each pin gives you limited clues, such as a distance, a direction, a map or a riddle. When you are close enough you check in and collect a **stamp**. You can also take a photo, answer a question about the place, and earn small extra marks (found after dark, in the rain, together). At the end of a quest your photos become a collage you can save.
+A game for real cities. You get a **quest**: a list of **pins** (places). Each pin gives you limited clues, such as a distance, a direction, a map or a riddle. When you are close enough you check in and collect a **stamp**. You can also take a photo, answer a question about the place, and earn small extra marks (found after dark, at sunrise, in the rain). At the end of a quest your photos become a collage you can save.
 
 It is a web app that installs like an app and keeps working offline. Quests are plain JSON files in this repository, so anyone can add one with a pull request. There is no score: a stamp records how you found a place, never how well.
 

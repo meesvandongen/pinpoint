@@ -1,6 +1,7 @@
-import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { questsInLocation, resolveText } from 'pinpoint-core'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Screen } from '../components/layout.tsx'
 import { Pager } from '../components/Pager.tsx'
 import { contentQuery } from '../content.ts'
@@ -23,9 +24,7 @@ export function Quests() {
   return (
     <Screen>
       <Cover title={resolveText(location.name, contentLanguages)} subtitle={tp('quests.count', quests.length)}>
-        <Link to="/" className="back">
-          ‹ {t('quests.back')}
-        </Link>
+        <BackButton label={t('quests.back')} fallback={(go) => void go({ to: '/' })} />
       </Cover>
       <Body>
         {quests.length === 0 ? (
@@ -40,12 +39,16 @@ export function Quests() {
             label={t('home.places')}
             keyOf={(q) => q.id}
             render={(q) => {
-              const done = stampedPins(stamps, q.id).size
+              const done = Math.min(stampedPins(stamps, q.id).size, q.pins.length)
+              const complete = done >= q.pins.length
               return (
                 <button type="button" className="quest" onClick={() => navigate({ to: '/quest/$questId', params: { questId: q.id } })}>
-                  <strong>{resolveText(q.title, contentLanguages, q.defaultLanguage)}</strong>
+                  <strong>
+                    {resolveText(q.title, contentLanguages, q.defaultLanguage)}
+                    {(complete || done > 0) && <em className={complete ? 'badge done' : 'badge'}>{complete ? `✓ ${t('quests.complete')}` : t('quests.started')}</em>}
+                  </strong>
                   <span>
-                    {t('quests.progress', { done: Math.min(done, q.pins.length), total: q.pins.length })} ·{' '}
+                    {t('quests.progress', { done, total: q.pins.length })} ·{' '}
                     {q.order === 'linear' ? t('quests.order.linear') : t('quests.order.free')}
                   </span>
                   {q.description && <small>{resolveText(q.description, contentLanguages, q.defaultLanguage)}</small>}

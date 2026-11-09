@@ -22,10 +22,9 @@ for (const [name, viewport] of [
         await expectNoClipping(page, `play ${pin}`)
         await page.getByRole('button', { name: 'Check in' }).click()
 
-        // Page 1: the stamp and "together"
+        // Page 1: the stamp
         await expect(page.locator('.big-stamp')).toBeVisible()
         await expectNoClipping(page, `stamp ${pin}`)
-        await page.getByRole('button', { name: 'I am here with someone' }).click()
         await page.getByRole('button', { name: 'Next' }).click()
 
         // Page 2: the photo
@@ -60,10 +59,21 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // A locked clue opens on request, and shows the map (the real one, or the schematic one without tiles)
-      await page.getByRole('button', { name: 'Next clue' }).click()
-      await expect(page.getByText('A clue is waiting for you.')).toBeVisible()
-      await page.getByRole('button', { name: 'Show it now' }).click()
+      // Hints open one at a time, on request: a button says so, how many are left, and what the next one costs.
+      // Distance is on screen from the start, so one of the three points is already spent.
+      const more = page.getByRole('button', { name: /Get another hint/ })
+      const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
+      await expect(points(2)).toBeVisible()
+      await expect(more).toContainText('3 hints left')
+      await expect(more).toContainText('costs a point')
+      await expect(page.getByRole('tab')).toHaveCount(0)
+      await more.click()
+      await expect(page.getByTestId('arrow')).toBeVisible()
+      await expect(more).toContainText('2 hints left')
+      await expect(points(1)).toBeVisible()
+      await more.click()
+      await expect(page.getByRole('tab')).toHaveCount(2)
+      await expect(points(0)).toBeVisible()
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
 
@@ -101,9 +111,9 @@ for (const [name, viewport] of [
       await expect(page.locator('.slot.lifted')).toHaveCount(1)
       await page.locator('.slot.lifted .hit').click()
       await expect(page.locator('.detail-stamp')).toBeVisible()
-      // Quiz, photo and together, plus the dark or sunrise mark when the test runs at such an hour
-      await expect(page.locator('.extras-list li').nth(2)).toBeVisible()
-      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(3)
+      // Quiz and photo, plus the dark or sunrise mark when the test runs at such an hour
+      await expect(page.locator('.extras-list li').nth(1)).toBeVisible()
+      expect(await page.locator('.extras-list li').count()).toBeGreaterThanOrEqual(2)
       await expectNoClipping(page, 'book pin')
 
       // The progress survives a reload
@@ -149,5 +159,61 @@ test.describe('the clue deck', () => {
     // Asking for a later pin by its address leads back to the page of the quest.
     await page.goto('/quest/tilburg-textile/find/harbour')
     await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+  })
+})
+
+test.describe('moving around', () => {
+  test.use({ viewport: { width: 390, height: 780 }, reducedMotion: 'reduce' })
+
+  test('Back never walks in circles, Home is always close, and a started quest can be resumed', async ({ page }) => {
+    await page.goto('/place/tilburg?sim=51.5607,5.0768,10')
+    await page.getByRole('button', { name: /Wool city/ }).click()
+    await expect(page.getByRole('link', { name: 'Start' })).toBeVisible()
+    await page.getByRole('link', { name: 'Start' }).click()
+    await page.getByRole('button', { name: 'Check in' }).click()
+    await page.getByRole('button', { name: 'Next' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+    await page.getByRole('button', { name: 'Skip' }).click()
+
+    // Back on the quest page, which now offers to go on, and Back leads to the list it was chosen from.
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+    await expect(page.getByRole('link', { name: 'Continue' })).toBeVisible()
+    await page.getByRole('button', { name: 'Back' }).click()
+    await expect(page).toHaveURL(/\/place\/tilburg(\?|$)/)
+
+    // Forward again, then the home shortcut, which offers the started quest.
+    await page.getByRole('button', { name: /Wool city/ }).click()
+    await page.getByRole('link', { name: 'Home' }).click()
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
+    const resume = page.locator('.row.resume')
+    await expect(resume).toContainText('Wool city')
+    await expect(resume).toContainText('1/3')
+    await expectNoClipping(page, 'home with a started quest')
+    await resume.click()
+    await expect(page).toHaveURL(/\/quest\/tilburg-textile$/)
+    // Back from a quest entered from Home returns to Home.
+    await page.getByRole('button', { name: 'Back' }).click()
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
+  })
+
+  test('hints asked for stay used when the player leaves the pin and comes back', async ({ page }) => {
+    await page.goto('/quest/tilburg-textile/find/chimney?sim=51.5629,5.0768,10')
+    const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
+    await expect(points(2)).toBeVisible()
+    await page.getByRole('button', { name: /Get another hint/ }).click()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
+
+    // Leave through the quest page and come back: the compass is still open, the point still spent.
+    await page.getByRole('button', { name: /All pins/ }).click()
+    await page.locator('.slot.open').click()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Get another hint/ })).toContainText('2 hints left')
+
+    // And it survives closing the app.
+    await page.reload()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
   })
 })

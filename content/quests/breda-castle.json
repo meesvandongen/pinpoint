@@ -16,7 +16,7 @@
       "clues": [
         { "type": "text", "text": { "en": "Its tower is the tallest thing for miles.", "nl": "De toren is kilometers ver te zien." } },
         { "type": "distance" },
-        { "type": "direction", "mode": "arrow" }
+        { "type": "direction" }
       ]
     },
     {

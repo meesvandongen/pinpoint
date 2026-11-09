@@ -45,9 +45,9 @@ A pin has a list of clues and any clue can be missing, so a pin can have only a 
 
 | Built | Idea, not built |
 | --- | --- |
-| text or riddle, distance, direction (arrow or compass point), map (exact or a rough area), photo, sound, word shape | shrinking circle, old map, detail crop, a chain where one pin's quiz answer is the next clue |
+| text or riddle, distance, compass, map (exact or a rough area), photo, sound, word shape | shrinking circle, old map, detail crop, a chain where one pin's quiz answer is the next clue |
 
-Each clue has an optional reveal rule: from the start, after some seconds, or on request. **Local expert** hides distance, direction and map everywhere; it only makes a quest harder. Clue types are an open set: a client skips types it does not know, and the schema keeps them.
+Each clue has an optional reveal rule: from the start, or on request, as a hint the player asks for. There is no timer: nobody could name a case where waiting is better than asking. **Local expert** hides distance, direction and map everywhere; it only makes a quest harder. Clue types are an open set: a client skips types it does not know, and the schema keeps them.
 
 ## Stamps
 
@@ -56,7 +56,7 @@ The stamp is the reward for arriving. It records what happened and does not grad
 - Every stamp is a full stamp. There are no tiers and no total score. The one thing counted is help: up to three small star stamps beside it, one for each assisting clue type (distance, direction, map) that was not on screen at check-in. Local expert mode hides those clues, so it earns all three. Points never unlock or block anything.
 - Small clue marks show which clue types were used. Two players get two different stamps and neither is better.
 - Five shapes (round seal, postage stamp, hexagon, ticket, oval postmark) plus a starburst for finishing a quest. A pin can choose its shape, icon and ink; otherwise they follow from its category and id, so a pin always looks the same.
-- Six extra marks, for things anyone can choose to do: quiz answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain, found together. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
+- Five extra marks, for things anyone can choose to do: quiz answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
 - A skipped pin can be stamped later. The book is never failed, only incomplete.
 - The quest has one page, a grid with a place for every pin, so nothing moves when a stamp is collected. A pin you can look for opens its clues. A pin that has to wait (the later pins of a quest played in order) is shown dimmed and cannot be tapped. A pin you found is a printed page (number, icon, name) with its stamp and points pressed on it, and your photo taped over it as a polaroid. Tap the photo to lift it and see the stamps, tap the page to open the pin.
 - Photos feed the collage. Photo matching is not part of the game.

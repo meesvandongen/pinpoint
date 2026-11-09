@@ -60,7 +60,7 @@ export async function startTestTools({ queryClient }: { queryClient: QueryClient
 
 const SESSION_KEY = 'pinpoint.test-tools.v1'
 
-type Saved = { fix?: { lat: number; lng: number; accuracy: number }; heading?: number; time?: number; skip?: number; weather?: MockWeather }
+type Saved = { fix?: { lat: number; lng: number; accuracy: number }; heading?: number; time?: number; weather?: MockWeather }
 
 /**
  * Keeps the simulated position, compass, clock and weather for the tab, so a reload does not send the
@@ -82,7 +82,7 @@ export function restoreSimulation() {
   if (saved.fix) setSimulatedFix(saved.fix)
   if (saved.heading !== undefined) headingStore.set((h) => ({ ...h, simulated: saved.heading }))
   if (saved.weather) testState.set((t) => ({ ...t, weather: saved.weather! }))
-  if (saved.time !== undefined || saved.skip) clockStore.set((c) => ({ ...c, fixed: saved.time, skipSeconds: saved.skip ?? 0 }))
+  if (saved.time !== undefined) clockStore.set((c) => ({ ...c, fixed: saved.time }))
 
   const persist = () => {
     try {
@@ -92,7 +92,6 @@ export function restoreSimulation() {
           fix: locationStore.get().simulated,
           heading: headingStore.get().simulated,
           time: clockStore.get().fixed,
-          skip: clockStore.get().skipSeconds,
           weather: testState.get().weather,
         } satisfies Saved),
       )

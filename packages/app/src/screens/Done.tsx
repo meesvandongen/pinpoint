@@ -6,6 +6,7 @@ import { renderCollage } from '../collage/render.ts'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { contentQuery } from '../content.ts'
 import { useI18n } from '../i18n/index.ts'
+import { placeOf } from '../lib/place.ts'
 import { usePhotoRecords } from '../photos/usePhoto.ts'
 import { useStamps } from '../state/progress.ts'
 import { questStampPropsFor, stampPropsFor } from '../stamps/for-pin.ts'
@@ -60,6 +61,7 @@ export function Done() {
   }, [quest?.id, photos, mine.length, language])
 
   if (!quest) return <NotFound />
+  const place = placeOf(content.locations, content.quests, quest)
 
   const share = async () => {
     if (!collage) return
@@ -70,7 +72,7 @@ export function Done() {
 
   return (
     <Screen className="done">
-      <Cover title={resolveText(quest.title, contentLanguages, quest.defaultLanguage)} subtitle={t('done.title')} />
+      <Cover title={resolveText(quest.title, contentLanguages, quest.defaultLanguage)} subtitle={t('done.title')} home />
       <Body className="done-body">
         <QuestStamp className="quest-stamp" stamp={questStampPropsFor(quest, stamps, i18n)} />
         <div className="collage-slot">
@@ -93,9 +95,20 @@ export function Done() {
             )}
           </div>
         )}
-        <Link to="/" className="btn">
-          {t('done.back')}
-        </Link>
+        <div className="foot-nav">
+          <Link to="/quest/$questId" params={{ questId: quest.id }} className="btn">
+            {t('done.stamps')}
+          </Link>
+          {place ? (
+            <Link to="/place/$locationId" params={{ locationId: place.id }} className="btn">
+              {t('done.more')}
+            </Link>
+          ) : (
+            <Link to="/" className="btn">
+              {t('done.more')}
+            </Link>
+          )}
+        </div>
       </Foot>
     </Screen>
   )

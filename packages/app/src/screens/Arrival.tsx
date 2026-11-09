@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams } from '@tanstack/react-router'
+import { Navigate, useCanGoBack, useLocation, useNavigate, useParams, useRouter } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { extrasOf, resolveText, type Pin, type Quest, type Stamp as StampRecord } from 'pinpoint-core'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
@@ -31,6 +31,9 @@ export function Arrival() {
 function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampRecord }) {
   const { t, contentLanguages } = useI18n()
   const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+  const fromPin = useLocation({ select: (l) => (l.state as { fromPin?: boolean }).fromPin === true })
   const stamps = useStamps()
   const [index, setIndex] = useState(0)
   const steps: Step[] = pin.quiz ? ['stamp', 'photo', 'quiz'] : ['stamp', 'photo']
@@ -39,14 +42,17 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
   const extras = extrasOf(stamp)
   const last = index === steps.length - 1
   const photoPending = step === 'photo' && !stamp.photo
+  const quizPending = step === 'quiz' && stamp.quiz === undefined
 
   const next = () => {
     if (last) {
       // The last pin of a quest leads on to the collage, the others back to the overview.
       const complete = stampedPins(stamps, quest.id).size >= quest.pins.length
-      void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
-    }
-    else setIndex(index + 1)
+      // Back to the overview by going back in history when this page came from the pin, so the history does not
+      // fill up with copies of the overview that Back would then walk through one by one.
+      if (!complete && fromPin && canGoBack) router.history.back()
+      else void navigate({ to: complete ? '/quest/$questId/done' : '/quest/$questId', params: { questId: quest.id }, replace: true })
+    } else setIndex(index + 1)
   }
 
   return (
@@ -69,8 +75,8 @@ function ArrivalPages({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: St
       </Body>
       <Foot>
         <Dots index={index} total={steps.length} />
-        <button type="button" className="btn primary" disabled={step === 'quiz' && stamp.quiz === undefined} onClick={next}>
-          {last ? t('common.continue') : photoPending ? t('arrival.photo.skip') : t('common.next')}
+        <button type="button" className="btn primary" onClick={next}>
+          {quizPending ? t('arrival.quiz.skip') : last ? t('common.continue') : photoPending ? t('arrival.photo.skip') : t('common.next')}
         </button>
       </Foot>
     </Screen>
@@ -82,15 +88,6 @@ function StampPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: Stamp
   return (
     <div className="page stamp-page">
       <Stamp className="big-stamp" stamp={stampPropsFor(quest, pin, stamp, i18n)} />
-      <button
-        type="button"
-        className={`toggle-chip ${stamp.together ? 'on' : ''}`}
-        aria-pressed={stamp.together === true}
-        onClick={() => patchStamp(quest.id, pin.id, { together: !stamp.together })}
-      >
-        <span className="box" aria-hidden="true">{stamp.together ? '✓' : ''}</span>
-        {i18n.t('arrival.together')}
-      </button>
     </div>
   )
 }
@@ -137,7 +134,7 @@ function PhotoPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: Stamp
         }}
       />
       <button type="button" className="btn" disabled={busy} onClick={() => input.current?.click()}>
-        {stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
+        {busy ? t('arrival.photo.saving') : stamp.photo ? t('arrival.photo.again') : t('arrival.photo.take')}
       </button>
       {stamp.photo && !failed && <p className="status" role="status">{t('arrival.photo.saved')}</p>}
       {failed && <p className="status warn" role="alert">{t('arrival.photo.failed')}</p>}
@@ -174,6 +171,11 @@ function QuizPage({ quest, pin, stamp }: { quest: Quest; pin: Pin; stamp: StampR
           )
         })}
       </div>
+      {answered && (
+        <p className={`status ${stamp.quiz === 'correct' ? 'good' : ''}`} role="status">
+          {stamp.quiz === 'correct' ? t('arrival.quiz.right') : t('arrival.quiz.wrong')}
+        </p>
+      )}
     </div>
   )
 }

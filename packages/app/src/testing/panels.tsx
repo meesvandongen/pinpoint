@@ -208,16 +208,6 @@ export function TimePanel() {
       </div>
 
       <div>
-        <h3>Clue timers</h3>
-        <div className="pp-row">
-          <button onClick={() => clockStore.set((c) => ({ ...c, skipSeconds: c.skipSeconds + 30 }))}>+30 s</button>
-          <button onClick={() => clockStore.set((c) => ({ ...c, skipSeconds: c.skipSeconds + 60 }))}>+60 s</button>
-          <button onClick={() => clockStore.set((c) => ({ ...c, skipSeconds: 0 }))}>Reset</button>
-          <span className="pp-muted">skipped {clock.skipSeconds} s</span>
-        </div>
-      </div>
-
-      <div>
         <h3>Weather</h3>
         <div className="pp-row">
           {(['real', 'dry', 'rain'] as MockWeather[]).map((w) => (

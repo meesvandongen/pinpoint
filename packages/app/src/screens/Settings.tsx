@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { BackButton } from '../components/BackButton.tsx'
 import { Body, Cover, Screen } from '../components/layout.tsx'
 import { LANGUAGES, useI18n } from '../i18n/index.ts'
 import { clearPhotos } from '../photos/db.ts'
@@ -37,12 +37,10 @@ export function Settings() {
   return (
     <Screen className="settings">
       <Cover title={t('settings.title')}>
-        <Link to="/" className="back">
-          ‹ {t('common.back')}
-        </Link>
+        <BackButton label={t('common.back')} fallback={(go) => void go({ to: '/' })} />
       </Cover>
       <Body className="settings-body">
-        <div className="setting">
+        <div className="setting stacked">
           <strong id="lang-label">{t('settings.language')}</strong>
           <div className="segmented" role="radiogroup" aria-labelledby="lang-label">
             {(['auto', ...LANGUAGES] as const).map((value) => (
@@ -67,7 +65,7 @@ export function Settings() {
           </div>
           {!compassOn && (
             <button type="button" className="btn small" onClick={() => void enableCompass().then((ok) => setCompassFailed(!ok))}>
-              {t('common.on')}
+              {t('settings.compass.turnOn')}
             </button>
           )}
         </div>

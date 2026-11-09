@@ -23,7 +23,6 @@ export const EXTRA_INK: Record<Extra, string> = {
   night: '#1b4a96',
   sunrise: '#a8302a',
   rain: '#17707a',
-  together: '#2b2a26',
 }
 
 export function ExtraMark({ extra, label, seed, className }: { extra: Extra; label: string; seed: string; className?: string }) {
