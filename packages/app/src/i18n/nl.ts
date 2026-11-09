@@ -67,8 +67,6 @@ export const nl: Record<MessageKey, string> = {
   'play.mapTarget': 'doel {distance}',
   'play.audio': 'Speel geluid af',
   'play.getClose': 'Kom binnen {distance} om in te checken.',
-  'play.hint.costs': 'kost een ster',
-  'play.pointsLeft': 'nog {n} van {max} sterren',
   'play.hint.more': 'Toon nog een hint',
   'play.hint.left': '{n} hints over',
   'play.hint.last': 'Laatste hint',

@@ -64,23 +64,18 @@ for (const [name, viewport] of [
       await expect(page.getByTestId('distance')).toHaveText('240 m')
       await expectNoClipping(page, 'play')
 
-      // Hints open one at a time, on request: a button says so, how many are left, and whether the next one costs.
-      // The pin starts with three stars. It has four chances to slip (three hints and a question), so the
-      // first hint is free and the second costs a star. Distance, shown from the start, costs nothing.
+      // Hints open one at a time, on request: a button says so and how many are left. Nothing about stars
+      // shows while looking.
       const more = page.getByRole('button', { name: /Get another hint/ })
-      const stars = (n: number) => page.getByRole('img', { name: `${n} of 3 stars left` })
-      await expect(stars(3)).toBeVisible()
       await expect(more).toContainText('3 hints left')
-      await expect(more).not.toContainText('costs a star')
+      await expect(page.getByText(/star/i)).toHaveCount(0)
       await expect(page.getByRole('tab')).toHaveCount(0)
       await more.click()
       await expect(page.getByTestId('arrow')).toBeVisible()
       await expect(more).toContainText('2 hints left')
-      await expect(more).toContainText('costs a star')
-      await expect(stars(3)).toBeVisible()
       await more.click()
       await expect(page.getByRole('tab')).toHaveCount(2)
-      await expect(stars(2)).toBeVisible()
+      await expect(page.getByText(/star/i)).toHaveCount(0)
       await expect(page.locator('.mapview, .areamap').first()).toBeVisible()
       await expectNoClipping(page, 'play with the map')
 
@@ -106,10 +101,17 @@ for (const [name, viewport] of [
       await expect(page.locator('.slot').first()).toBeVisible()
       expect(await countAcrossPages(page, '.slot')).toBe(4) // three pins and the quest stamp, over as many pages as fit
       await expectNoClipping(page, 'quest page with stamps')
-      await expect(page.locator('.points').first()).toBeVisible()
-      // Back to the first page, if there are several
+      // The stars show once a pin is done. The chimney had four chances (three hints and a question) and two
+      // hints were asked: one is forgiven, one costs a star. The other pins had no hints and keep all three.
       const previous = page.getByRole('button', { name: 'Previous page' })
-      while ((await previous.count()) > 0 && (await previous.isEnabled())) await previous.click()
+      const toFirstPage = async () => {
+        while ((await previous.count()) > 0 && (await previous.isEnabled())) await previous.click()
+      }
+      await toFirstPage()
+      expect(await countAcrossPages(page, '.points[aria-label="2 of 3 stars"]')).toBe(1)
+      await toFirstPage()
+      expect(await countAcrossPages(page, '.points[aria-label="3 of 3 stars"]')).toBe(2)
+      await toFirstPage()
       // Lift a photo to show the stamps under it, then open the pin
       const flap = page.locator('.flap').first()
       await expect(flap).toHaveAttribute('aria-expanded', 'false')
@@ -208,24 +210,21 @@ test.describe('moving around', () => {
 
   test('hints asked for stay used when the player leaves the pin and comes back', async ({ page }) => {
     await page.goto('/quest/tilburg-textile/find/chimney?sim=51.5629,5.0768,10')
-    const stars = (n: number) => page.getByRole('img', { name: `${n} of 3 stars left` })
     const more = page.getByRole('button', { name: /Get another hint/ })
-    await expect(stars(3)).toBeVisible()
     await more.click()
     await more.click()
     await expect(page.getByRole('tab')).toHaveCount(2)
-    await expect(stars(2)).toBeVisible()
 
-    // Leave through the quest page and come back: the hints are still open, the star still spent.
+    // Leave through the quest page and come back: the hints are still open and still count as asked.
     await page.getByRole('button', { name: /All pins/ }).click()
     await page.locator('.slot.open').click()
     await expect(page.getByTestId('arrow')).toBeVisible()
-    await expect(stars(2)).toBeVisible()
+    await expect(page.getByRole('tab')).toHaveCount(2)
     await expect(more).toContainText('Last hint')
 
     // And it survives closing the app.
     await page.reload()
     await expect(page.getByTestId('arrow')).toBeVisible()
-    await expect(stars(2)).toBeVisible()
+    await expect(more).toContainText('Last hint')
   })
 })

@@ -67,8 +67,6 @@ export const en = {
   'play.mapTarget': 'target {distance}',
   'play.audio': 'Play sound',
   'play.getClose': 'Get within {distance} to check in.',
-  'play.hint.costs': 'costs a star',
-  'play.pointsLeft': '{n} of {max} stars left',
   'play.hint.more': 'Get another hint',
   'play.hint.left': '{n} hints left',
   'play.hint.last': 'Last hint',

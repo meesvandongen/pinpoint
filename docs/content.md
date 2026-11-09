@@ -138,9 +138,9 @@ A step type this version of the game does not know is kept and skipped, like clu
 
 Every pin starts with three stars. Two things can cost one: **asking for a hint** and **answering a question wrong**. A pin's chances are its hints (clues with `onRequest`) plus its questions; clues that show from the start are free.
 
-The stars stay at three as long as at least three chances are untouched. So a pin with five chances forgives two slips: the third costs a star, and if everything goes wrong, none are left. A pin with three chances or fewer counts as having three, so there every slip costs a star. Skipping a question is not a slip.
+The stars stay at three as long as at least three chances are untouched. So a pin with five chances forgives two slips: the third costs a star, and if everything goes wrong, none are left. A pin with fewer than three chances still starts with three stars, and there every slip costs one. Skipping a question is not a slip.
 
-Stars never unlock or block anything. **Local expert** hides `distance`, `direction` and `map`, so those hints cannot be asked for, and a quest should still work with just its text.
+Stars only show once a pin is done, on the quest page; nothing about them is shown while the player is looking or answering, so they do not pull anyone out of the walk. They never unlock or block anything. **Local expert** hides `distance`, `direction` and `map`, so those hints cannot be asked for, and a quest should still work with just its text.
 
 ## Languages
 
