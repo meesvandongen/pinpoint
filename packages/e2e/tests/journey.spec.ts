@@ -178,8 +178,11 @@ test.describe('moving around', () => {
     await expect(page.getByRole('link', { name: 'Start' })).toBeVisible()
     await page.getByRole('link', { name: 'Start' }).click()
     await page.getByRole('button', { name: 'Check in' }).click()
+    // Stamp, photo, fact, question.
     await page.getByRole('button', { name: 'Next' }).click()
     await page.getByRole('button', { name: 'Skip' }).click()
+    await expect(page.locator('.fact-page')).toBeVisible()
+    await page.getByRole('button', { name: 'Next' }).click()
     await page.getByRole('button', { name: 'Skip' }).click()
 
     // Back on the quest page, which now offers to go on, and Back leads to the list it was chosen from.
