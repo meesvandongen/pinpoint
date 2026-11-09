@@ -63,15 +63,15 @@ Facts in a quest are checked by people standing in front of them. Get them right
 
 Clues are shown in the order they are listed. The first ones show from the start; the ones with `"reveal": { "onRequest": true }` are **hints** the player asks for, one at a time. Distance, direction and map that are on screen at check-in cost a star on the stamp, so they belong at the end of the list, as hints.
 
-**Build a ladder.** Each step should make the pin a little easier than the one before:
+**Think of the clues as a ladder.** Each hint should usually make the pin a little easier than the one before, so a player who asks for one more gets one step closer, not the answer. Which clues you use, and in what order, is up to you and the place. Some ingredients:
 
-1. **A text clue that shows from the start.** It must be enough on its own for someone who knows the city, because **local expert** mode hides distance, direction and map.
-2. **A second text clue or a `wordShape`, as a hint.** A narrower riddle, or the shape of the name on the plaque.
-3. **A `photo` hint** of a detail (a crop, not the whole façade), if you took one.
-4. **`map` with `"view": "area"`, as a hint.** It says roughly where without saying exactly.
-5. **`direction` and `distance`, as hints.** The last resort.
+- **A clue that shows from the start.** Usually a text clue or a photo. It should be enough on its own for someone who knows the city, because **local expert** mode hides distance, direction and map.
+- **A narrower riddle or a `wordShape`.** A second angle on the place, or the shape of the name on the plaque.
+- **A `photo`.** A detail, a viewpoint or an old picture of the place. Depending on what it shows it can be the opening clue, a mid-way hint or nearly the answer.
+- **`map` with `"view": "area"`.** Says roughly where without saying exactly.
+- **`direction` and `distance`.** The most direct help. They cost a star when on screen at check-in, so they usually work best as hints near the end, but a pin that is meant to be an easy walk can show them from the start.
 
-A pin with only steps 1 and 5 is fine. A pin whose first clue is a full map is a walk, not a game.
+A pin with one riddle and a distance hint is fine. A pin with a photo and nothing else can be great. A pin whose first clue is a full map is a walk, not a game, unless that is what you want for that stop.
 
 **Writing the text clue (140 characters)**
 
@@ -90,7 +90,13 @@ A pin with only steps 1 and 5 is fine. A pin whose first clue is a full map is a
 
 **A `wordShape`** turns a name you can read on site into a hint: the name on a plaque, a word in a gable stone, a carved motto. It is most fun when the word is visible once you are there.
 
-**A `photo` clue** should be a detail you took yourself, from a spot the player can find: a door knocker, a carved face, a date on a wall. Crop it so it is recognizable from close by and puzzling from afar.
+**A `photo` clue** is often the most fun clue of all: the player has to match a picture to the street. It can be:
+
+- **A detail** from a spot the player can find: a door knocker, a carved face, a date on a wall. Crop it so it is recognizable from close by and puzzling from afar.
+- **A viewpoint:** the place seen from where the player should stand, or a view from the pin of something further away.
+- **An old picture** of the place from an archive, so the player has to find what is still the same.
+
+Use a photo you took, or one whose licence allows it (many archives and Wikimedia Commons have openly licensed images); put the file under `content/media/`, give it an `alt` text, and say in the pull request where it comes from and under which licence. Keep it under 1200 pixels wide.
 
 **An `audio` clue** fits a place with a sound: a carillon, a mill, a ferry horn, a market crier. Record it yourself.
 
@@ -133,7 +139,7 @@ Before you open the pull request, every pin should pass these:
 - [ ] `position` is where the player stands; `radius` suits the GPS there.
 - [ ] The first clue alone finds it for someone who knows the city (try **local expert** in the settings).
 - [ ] No clue fits another place nearby.
-- [ ] Distance, direction and map are hints (`onRequest`), at the end of the list.
+- [ ] The hints go from less to more help, and distance, direction and map are only on screen from the start if the pin is meant to be easy.
 - [ ] The quiz can be answered by looking, or teaches the surprise; the wrong answers are plausible.
 - [ ] The photo prompt asks for a detail or a point of view, and differs from the other pins.
 - [ ] Every fact has a source, listed in the pull request description.
@@ -167,4 +173,4 @@ An illustration with an invented place, so the parts can be seen together:
 }
 ```
 
-Why it works: the first clue gives a hook (a name, a height, a change of use) that only fits one chimney; the hints narrow it step by step and the assisting ones come last; the photo prompt gives the collage an unusual angle; the quiz has three plausible answers and teaches what the place was.
+Why it works: the first clue gives a hook (a name, a height, a change of use) that only fits one chimney; the hints narrow it step by step and the most direct help comes last; the photo prompt gives the collage an unusual angle; the quiz has three plausible answers and teaches what the place was.

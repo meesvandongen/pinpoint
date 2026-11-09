@@ -57,12 +57,12 @@ Pick the pins that pass the three-sentence test in `docs/writing-pins.md` (*walk
 Follow `docs/writing-pins.md` sections 4–8. In short:
 
 - The first text clue shows from the start and must find the pin on its own (local expert mode hides distance, direction and map).
-- Then hints with `"reveal": { "onRequest": true }`, easier each time: a second riddle or `wordShape`, then `map` with `"view": "area"`, then `direction` and `distance` last.
+- Then hints with `"reveal": { "onRequest": true }` that generally give a little more help each time. Choose the clues and their order to suit the place: a second riddle, a `wordShape`, a photo, a `map` with `"view": "area"`, `direction`, `distance`. Distance, direction and map cost a star when on screen at check-in, so they usually come late, but that is a judgement, not a rule.
 - The quiz is answerable by looking, or teaches the surprise; wrong answers are plausible.
 - Photo prompts ask for a detail or a viewpoint and differ between pins.
 - Every text within its limit in every language: titles 40, clues 140, photo prompts 100, questions 120, answers 48, description 240.
 - **Every fact must come from a source you found.** Never fill a gap with something plausible. If you cannot source it, leave it out or ask.
-- Do not add photo or audio clues unless the user supplies the files and says they may be shared. Never hot-link: `src` is a path under `content/`.
+- Consider a `photo` clue (a detail, a viewpoint, or an old archive picture of the place). Use a file the user supplies, or one you found with a licence that allows reuse (for example an openly licensed archive or Wikimedia Commons image). Download it into `content/media/`, at most 1200 px wide, give it an `alt`, and record the source and licence for the pull request. Never hot-link: `src` is a path under `content/`. Audio only from files the user supplies.
 - Translations: write each language natively, not word for word, and keep the riddle working in each.
 
 Save to `content/quests/<id>.json` (the file name is the id; no `id` field at the top).
