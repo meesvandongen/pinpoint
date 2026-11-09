@@ -29,6 +29,7 @@ import { now } from '../lib/clock.ts'
 import { MapClue } from '../map/MapClue.tsx'
 import { enableCompass, useCompassEnabled, useHeading } from '../state/heading.ts'
 import { retryLocation, startWatching, useFix, useLocationState } from '../state/location.ts'
+import { askForHint, useAskedHints } from '../state/hints.ts'
 import { playContext } from '../state/play-context.ts'
 import { addStamp, patchStamp, stampedPins, useStamps } from '../state/progress.ts'
 import { useSettings } from '../state/settings.ts'
@@ -58,7 +59,7 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
   const fix = useFix()
   const heading = useHeading()
   const compassOn = useCompassEnabled()
-  const [requested, setRequested] = useState<ReadonlySet<number>>(new Set())
+  const requested = useAskedHints(quest.id, pin.id)
   const [picked, setPicked] = useState<number>()
   const tr = (text: Parameters<typeof resolveText>[0]) => resolveText(text, contentLanguages, quest.defaultLanguage)
 
@@ -84,7 +85,7 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
   const spent = new Set<string>(visible.map((c) => c.type))
   const pointsLeft = MAX_POINTS - ASSISTIVE_TYPES.filter((type) => spent.has(type)).length
   const reveal = (state: (typeof states)[number]) => {
-    setRequested((r) => new Set([...r, state.index]))
+    askForHint(quest.id, pin.id, state.index)
     // The tap that asks for the compass is also what lets a phone that wants permission turn it on.
     if (state.clue.type === 'direction') void enableCompass()
     // The new hint is the one on show.

@@ -195,4 +195,25 @@ test.describe('moving around', () => {
     await page.getByRole('button', { name: 'Back' }).click()
     await expect(page).toHaveURL(/\/(\?.*)?$/)
   })
+
+  test('hints asked for stay used when the player leaves the pin and comes back', async ({ page }) => {
+    await page.goto('/quest/tilburg-textile/find/chimney?sim=51.5629,5.0768,10')
+    const points = (n: number) => page.getByRole('img', { name: `${n} of 3 points still to earn` })
+    await expect(points(2)).toBeVisible()
+    await page.getByRole('button', { name: /Get another hint/ }).click()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
+
+    // Leave through the quest page and come back: the compass is still open, the point still spent.
+    await page.getByRole('button', { name: /All pins/ }).click()
+    await page.locator('.slot.open').click()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Get another hint/ })).toContainText('2 hints left')
+
+    // And it survives closing the app.
+    await page.reload()
+    await expect(page.getByTestId('arrow')).toBeVisible()
+    await expect(points(1)).toBeVisible()
+  })
 })
