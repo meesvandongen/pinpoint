@@ -96,7 +96,9 @@ A pin with one riddle and a distance hint is fine. A pin with a photo and nothin
 - **A viewpoint:** the place seen from where the player should stand, or a view from the pin of something further away.
 - **An old picture** of the place from an archive, so the player has to find what is still the same.
 
-Use a photo you took, or one whose licence allows it (many archives and Wikimedia Commons have openly licensed images); put the file under `content/media/`, give it an `alt` text, and say in the pull request where it comes from and under which licence. Keep it under 1200 pixels wide.
+Use a photo you took, or one whose licence allows it (many archives and Wikimedia Commons have openly licensed images); put the file under `content/media/`, give it an `alt` text, and say in the pull request where it comes from and under which licence. Keep it under 1200 pixels wide, and crop away printed captions that would give the answer.
+
+A picture of something that is **gone** (a demolished house, a tower that fell) cannot help anyone find the spot. It still makes a fine pin: show it from the start, next to a text clue that leads there, so the player walks to the empty spot knowing what stood there.
 
 **An `audio` clue** fits a place with a sound: a carillon, a mill, a ferry horn, a market crier. Record it yourself.
 
@@ -138,7 +140,7 @@ Every pin has exactly one photo page. Leave it out of the list and it comes firs
 ## 7. Make the quest more than its pins
 
 - **A theme.** "Wool city", "The vanished canals", "Where the walls were". A theme turns facts into a story, and makes the title and description easy to write.
-- **A route, or not.** Three to eight pins is a good size, an hour's walk or less. Choose the order to fit the quest; neither is the default:
+- **A route, or not.** Three to eight pins is a good size; a narrow theme with three strong places beats five pins stretched to fit, an hour's walk or less. Choose the order to fit the quest; neither is the default:
   - `"order": "linear"` gives one pin at a time. It suits a short quest that tells a story in sequence, where each pin leads to the next and the walk ends somewhere pleasant (a square, a café-lined street, a view). The catch: a player stuck on one pin cannot go on, so it works best when the pins are few and none is very hard.
   - `"order": "free"` lets the player pick. It suits a longer quest, pins that are spread out, or pins that are hard: a player who is stuck can try another and come back later. You can still suggest a route in the description.
 - **Vary the pins.** Mix big and small, a riddle-only pin for locals, a pin that needs a hint, one that is about looking up, one about looking down.

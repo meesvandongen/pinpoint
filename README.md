@@ -12,7 +12,7 @@ It is a web app that installs like an app and keeps working offline. Quests are 
 
 | Path | Contents |
 | --- | --- |
-| `content/` | Locations and quests as JSON, and the photos and sounds clues point at. Empty until the first real quest is added. |
+| `content/` | Locations and quests as JSON, and the photos and sounds clues point at. |
 | `fixtures/content/` | Made-up quests and locations in the same layout, played by the browser tests. Not real places. |
 | `packages/core` | The content schemas, geo maths, play rules, sun position, categories and their OpenStreetMap mapping, collage layout. No UI. Tested. |
 | `packages/app` | The game: React, TanStack Router and Query, MapLibre, Vite+. Its build output is what the Worker serves. |
@@ -79,4 +79,4 @@ Your position, photos, stamps and settings stay in your browser. The game sends 
 
 ## Credits
 
-Map data is © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), served by OpenFreeMap as OpenMapTiles. The quests in `fixtures/content/` exist for the tests; their coordinates and facts are approximate. No licence has been chosen for the code or for contributed quests and photos yet; see the open questions in [docs/plan.md](docs/plan.md).
+Map data is © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), served by OpenFreeMap as OpenMapTiles. The quests in `fixtures/content/` exist for the tests; their coordinates and facts are approximate. The photo of King Willem II's house in `content/media/tilburg-willem-ii/` is by A. van Beurden, around 1870, from the [Rijksmuseum](http://hdl.handle.net/10934/RM0001.COLLECT.64092) (CC0). No licence has been chosen for the code or for contributed quests and photos yet; see the open questions in [docs/plan.md](docs/plan.md).

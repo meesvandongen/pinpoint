@@ -1,0 +1,88 @@
+{
+  "title": { "en": "The king who loved Tilburg", "nl": "De koning die van Tilburg hield" },
+  "description": {
+    "en": "King Willem II felt at home in Tilburg. Follow him from his statue on the Heuvel to the palace he never lived in and the spot where he died. Three stops, under a kilometre.",
+    "nl": "Koning Willem II voelde zich thuis in Tilburg. Volg hem van zijn standbeeld op de Heuvel naar het paleis waar hij nooit woonde en de plek waar hij stierf. Drie plekken, nog geen kilometer."
+  },
+  "defaultLanguage": "en",
+  "order": "linear",
+  "pins": [
+    {
+      "id": "statue",
+      "title": { "en": "The king on the Heuvel", "nl": "De koning op de Heuvel" },
+      "category": "monument",
+      "position": { "lat": 51.5577, "lng": 5.0904 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "For seventy years this bronze king stood in The Hague. In 1924 Tilburg bought him for 1,000 guilders. Find him.", "nl": "Zeventig jaar stond deze bronzen koning in Den Haag. In 1924 kocht Tilburg hem voor 1000 gulden. Zoek hem." } },
+        { "type": "text", "text": { "en": "He stands on the square where the main shopping street ends.", "nl": "Hij staat op het plein waar de grote winkelstraat uitkomt." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Heuvel", "nl": "Heuvel" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "The four women on the corners of the plinth stand for kingship, law or history, prosperity, and art or victory. Since a restoration in 1996 the king faces north.", "nl": "De vier vrouwen op de hoeken van de sokkel staan voor koningschap, wetgeving of geschiedenis, welvaart, en kunst of overwinning. Sinds een restauratie in 1996 kijkt de koning naar het noorden." } },
+        {
+          "type": "quiz",
+          "question": { "en": "Battles are named on one side of the plinth. Which one is not?", "nl": "Op een zijkant van de sokkel staan veldslagen. Welke staat er niet bij?" },
+          "options": [
+            { "en": "Waterloo", "nl": "Waterloo" },
+            { "en": "Austerlitz", "nl": "Austerlitz" },
+            { "en": "Salamanca", "nl": "Salamanca" },
+            { "en": "Quatre-Bras", "nl": "Quatre-Bras" }
+          ],
+          "answer": 1
+        },
+        { "type": "fact", "text": { "en": "In 1924 a lead box with a document and two books was walled into the plinth. In 1996 it was swapped for a laptop and a CD-ROM.", "nl": "In 1924 werd een loden doos met een oorkonde en twee boeken in de sokkel ingemetseld. In 1996 werd die vervangen door een laptop en een cd-rom." } },
+        { "type": "photo", "prompt": { "en": "Photograph the king from below, with the sky behind him.", "nl": "Fotografeer de koning van onderaf, met de lucht achter hem." } }
+      ]
+    },
+    {
+      "id": "palace",
+      "title": { "en": "The palace he never lived in", "nl": "Het paleis waar hij nooit woonde" },
+      "category": "castle",
+      "position": { "lat": 51.5545, "lng": 5.0862 },
+      "radius": 35,
+      "clues": [
+        { "type": "text", "text": { "en": "He laid its first stone in 1847 but never slept in it. Today it is the town hall: a small castle with a tower on each corner.", "nl": "Hij legde in 1847 de eerste steen, maar sliep er nooit. Nu is het het raadhuis: een kasteeltje met op elke hoek een toren." } },
+        { "type": "text", "text": { "en": "Look for battlements and pointed windows, a short walk south-west of the Heuvel.", "nl": "Zoek kantelen en spitsboogramen, een kort stukje ten zuidwesten van de Heuvel." }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "direction", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "The king died in March 1849, a few weeks before the palace was finished. He came inside only once: his body was laid out in the hall so people could say goodbye.", "nl": "De koning stierf in maart 1849, een paar weken voordat het paleis af was. Hij kwam er maar één keer binnen: opgebaard in de hal, zodat Tilburgers afscheid konden nemen." } },
+        {
+          "type": "quiz",
+          "question": { "en": "Which painter went to school in this palace as a boy?", "nl": "Welke schilder ging als jongen in dit paleis naar school?" },
+          "options": [
+            { "en": "Rembrandt", "nl": "Rembrandt" },
+            { "en": "Piet Mondriaan", "nl": "Piet Mondriaan" },
+            { "en": "Vincent van Gogh", "nl": "Vincent van Gogh" },
+            { "en": "Johannes Vermeer", "nl": "Johannes Vermeer" }
+          ],
+          "answer": 2
+        },
+        { "type": "fact", "text": { "en": "After his death the palace became a secondary school, named after the king. From 1866 to 1868 one of its pupils was a 13-year-old Vincent van Gogh.", "nl": "Na zijn dood werd het paleis een middelbare school, genoemd naar de koning. Van 1866 tot 1868 zat daar een dertienjarige Vincent van Gogh in de klas." } },
+        { "type": "photo", "prompt": { "en": "Photograph a corner tower, looking up past the battlements.", "nl": "Fotografeer een hoektoren, omhoog langs de kantelen." } }
+      ]
+    },
+    {
+      "id": "needle",
+      "title": { "en": "Where the king died", "nl": "Waar de koning stierf" },
+      "category": "memorial",
+      "position": { "lat": 51.5544, "lng": 5.0849 },
+      "radius": 30,
+      "clues": [
+        { "type": "text", "text": { "en": "In March 1849 he died in a house near his unfinished palace. The house is gone. A needle of stone, by the church, marks the spot.", "nl": "In maart 1849 stierf hij in een huis vlak bij zijn onaffe paleis. Het huis is weg. Een stenen naald bij de kerk markeert de plek." } },
+        { "type": "photo", "src": "media/tilburg-willem-ii/death-house-1870.jpg", "alt": { "en": "The house where the king died, around 1870: two floors, shutters, ivy.", "nl": "Het sterfhuis van de koning, rond 1870: twee verdiepingen, luiken, klimop." } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "The first needle was unveiled here on 17 March 1874, 25 years after his death. In 1968 it had to make way for a wider road. Only the medallion with his face was saved.", "nl": "De eerste naald werd hier op 17 maart 1874 onthuld, 25 jaar na zijn dood. In 1968 moest hij wijken voor een bredere weg. Alleen het medaillon met zijn gezicht bleef bewaard." } },
+        { "type": "photo", "prompt": { "en": "Photograph the king's face on the needle.", "nl": "Fotografeer het gezicht van de koning op de naald." } },
+        { "type": "fact", "text": { "en": "In 1833 he bought a country house just outside town. Of Tilburg he reportedly said: \"Here I breathe freely and feel happy.\"", "nl": "In 1833 kocht hij een buitenhuis net buiten de stad. Over Tilburg zou hij gezegd hebben: \"Hier adem ik vrij en voel ik mij gelukkig.\"" } }
+      ]
+    }
+  ]
+}
