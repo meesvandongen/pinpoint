@@ -1,6 +1,6 @@
 import { destinationPoint, distanceMeters, pointInRing, questArea, ringArea, ringsOverlap } from './geo.ts'
 import { hashString } from './stamp-style.ts'
-import { KNOWN_CLUE_TYPES, type Clue, type KnownClue, type Location, type Pin, type Position, type Quest } from './schema.ts'
+import { KNOWN_CLUE_TYPES, type Clue, type Fact, type KnownClue, type Location, type PhotoStep, type Pin, type Position, type Quest, type Quiz } from './schema.ts'
 
 export type Fix = Position & {
   /** Reported accuracy radius in metres. */
@@ -44,7 +44,12 @@ export type Stamp = {
   at: string
   /** Clue types the player looked at, in no particular order. */
   clues: string[]
-  quiz?: 'correct' | 'wrong'
+  /** How many hints the player asked for before checking in. */
+  hints: number
+  /** How many things could have cost a star at this pin: its hints and its questions. See `stampPoints`. */
+  chances: number
+  /** Answers to the pin's questions, by the question's index in `pin.arrival`. */
+  quiz?: Record<string, 'correct' | 'wrong'>
   /** A photo of the pin is in the album. */
   photo?: boolean
   /** The sky at arrival, when it was dark or around sunrise. */
@@ -57,10 +62,10 @@ export type Stamp = {
 export const EXTRAS = ['quiz', 'photo', 'night', 'sunrise', 'rain'] as const
 export type Extra = (typeof EXTRAS)[number]
 
-/** The extra marks a stamp has earned, in a fixed order. Getting a quiz wrong still counts as answering it. */
+/** The extra marks a stamp has earned, in a fixed order. Answering any question earns the quiz mark, right or wrong. */
 export function extrasOf(stamp: Stamp): Extra[] {
   const earned: Record<Extra, boolean> = {
-    quiz: stamp.quiz !== undefined,
+    quiz: Object.keys(stamp.quiz ?? {}).length > 0,
     photo: stamp.photo === true,
     night: stamp.sky === 'night',
     sunrise: stamp.sky === 'sunrise',
@@ -77,17 +82,57 @@ export function playablePins(quest: Quest, stamped: ReadonlySet<string>): Pin[] 
 
 export type ClueState = { clue: Clue; index: number; visible: boolean; }
 
-/** Types that tell the player where to go. Each costs a point, and expert mode hides them. */
+/** Types that tell the player where to go. Expert mode hides them. */
 export const ASSISTIVE_TYPES = ['distance', 'direction', 'map'] as const
 const ASSISTIVE = new Set<string>(ASSISTIVE_TYPES)
 
-/** Most points a stamp can earn: one for each of the three assisting clue types (distance, direction, map) not used. */
-export const MAX_POINTS = ASSISTIVE.size
+/** Every pin starts with three stars. */
+export const MAX_POINTS = 3
 
-/** Points for finding a pin with less help: one for every assisting clue type that was not on screen at check-in. */
-export function stampPoints(stamp: Pick<Stamp, 'clues'>): number {
-  const used = new Set(stamp.clues.filter((type) => ASSISTIVE.has(type)))
-  return MAX_POINTS - used.size
+/**
+ * Stars left after `slips` (hints asked, questions answered wrong) out of `chances` things that could go
+ * wrong. The pin keeps all three stars until fewer than three chances are left untouched: with five chances,
+ * the first two slips are free; when everything goes wrong, no star is left. A pin with fewer than three
+ * chances counts as having three, so each slip there costs a star.
+ */
+export function pointsLeft(chances: number, slips: number): number {
+  return Math.max(0, Math.min(MAX_POINTS, Math.max(chances, MAX_POINTS) - slips))
+}
+
+/** How many things can cost a star at a pin: each hint to ask for, and each question. */
+export function pinChances(pin: Pick<Pin, 'clues' | 'arrival'>): number {
+  const hints = pin.clues.filter((clue) => isPlayable(clue) && clue.reveal?.onRequest).length
+  return hints + arrivalPages(pin).filter((page) => page.kind === 'quiz').length
+}
+
+/** Questions of a stamp answered wrong. */
+export function wrongAnswers(stamp: Pick<Stamp, 'quiz'>): number {
+  return Object.values(stamp.quiz ?? {}).filter((answer) => answer === 'wrong').length
+}
+
+/** The stars a stamp has: three, less the slips that went beyond the pin's spare chances. */
+export function stampPoints(stamp: Pick<Stamp, 'hints' | 'chances' | 'quiz'>): number {
+  return pointsLeft(stamp.chances, stamp.hints + wrongAnswers(stamp))
+}
+
+/**
+ * The pages after check-in: the pin's steps in order, with the photo page first when the pin does not place
+ * it. The stamp is not one of them: it is pressed on the quest page once these are done.
+ */
+export type ArrivalPage =
+  | { kind: 'photo'; step?: PhotoStep }
+  | { kind: 'fact'; step: Fact }
+  | { kind: 'quiz'; step: Quiz; index: number }
+
+export function arrivalPages(pin: Pick<Pin, 'arrival'>): ArrivalPage[] {
+  const steps = pin.arrival.flatMap((step, index): ArrivalPage[] => {
+    if (step.type === 'fact') return [{ kind: 'fact', step: step as Fact }]
+    if (step.type === 'quiz') return [{ kind: 'quiz', step: step as Quiz, index }]
+    if (step.type === 'photo') return [{ kind: 'photo', step: step as PhotoStep }]
+    return []
+  })
+  const placed = steps.some((page) => page.kind === 'photo')
+  return placed ? steps : [{ kind: 'photo' }, ...steps]
 }
 
 export type ClueContext = {

@@ -29,6 +29,7 @@ jobs:
       - run: pnpm run lint
       # Validates every quest and location: schemas, length limits, languages, pins inside the area, files that exist.
       - run: pnpm run content
+      - run: pnpm run content fixtures/content
       - run: pnpm --filter pinpoint-core run typecheck
       - run: pnpm --filter pinpoint-core run test
       - run: pnpm --filter pinpoint-e2e run typecheck

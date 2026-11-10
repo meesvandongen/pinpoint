@@ -52,6 +52,7 @@ const Clue = z.union([
 
 const Quiz = z
   .object({
+    type: z.literal('quiz'),
     question: localized(LIMITS.question, { label: 'Question' }),
     options: z
       .array(localized(LIMITS.option, { label: 'Answer' }))
@@ -61,6 +62,21 @@ const Quiz = z
     answer: z.number().int().min(0).check(field({ label: 'Right answer', description: 'Which answer is right, counting from 0.' })),
   })
   .refine((quiz) => quiz.answer < quiz.options.length, { message: 'The right answer has to point at one of the answers', path: ['answer'] })
+
+const KNOWN_STEPS = ['fact', 'quiz', 'photo']
+
+const ArrivalStep = z.union([
+  z.discriminatedUnion('type', [
+    z.object({ type: z.literal('fact'), text: localized(LIMITS.fact, { label: 'Fact', multiline: true }) }),
+    Quiz,
+    z.object({ type: z.literal('photo'), prompt: localized(LIMITS.prompt, { label: 'Photo suggestion' }).optional() }),
+  ]),
+  // A step type this version does not know is kept, but a known type with wrong fields is an error.
+  z
+    .object({ type: z.string().min(1) })
+    .loose()
+    .refine((step) => !KNOWN_STEPS.includes(step.type), { message: 'invalid fields for a known arrival step type' }),
+])
 
 const Pin = z.object({
   id: pinId,
@@ -72,8 +88,12 @@ const Pin = z.object({
     .array(Clue)
     .min(1)
     .check(field({ label: 'Clues', fieldType: 'clues', description: 'What the player gets to find the place.' })),
-  photoPrompt: localized(LIMITS.prompt, { label: 'Photo suggestion' }).optional(),
-  quiz: Quiz.optional().check(field({ label: 'Question about the place', fieldType: 'quiz' })),
+  arrival: z
+    .array(ArrivalStep)
+    .max(8)
+    .refine((steps) => steps.filter((s) => s.type === 'photo').length <= 1, { message: 'A pin has one photo page' })
+    .default([])
+    .check(field({ label: 'After arrival', fieldType: 'arrival', description: 'The pages after the stamp: facts, questions and where the photo page goes.' })),
   stamp: z
     .object({
       shape: z.enum(STAMP_SHAPES).optional().check(field({ label: 'Shape' })),

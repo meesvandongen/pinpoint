@@ -3,11 +3,10 @@ import { Navigate, useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   arrowRotation,
-  ASSISTIVE_TYPES,
   bearingDegrees,
   cardinal,
   formatDistance,
-  MAX_POINTS,
+  pinChances,
   playablePins,
   proximity,
   resolveClues,
@@ -21,7 +20,7 @@ import {
   type Stamp,
 } from 'pinpoint-core'
 import { BackButton } from '../components/BackButton.tsx'
-import { costsPoint, HintBadge, Points } from '../components/HintIcon.tsx'
+import { HintBadge } from '../components/HintIcon.tsx'
 import { Body, Cover, Foot, Screen } from '../components/layout.tsx'
 import { contentQuery, mediaUrl } from '../content.ts'
 import { useI18n, type MessageKey } from '../i18n/index.ts'
@@ -82,8 +81,10 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
   const next = states.find((s) => !s.visible)
   const hintsLeft = states.filter((s) => !s.visible).length
   const card = held.find((s) => s.index === picked) ?? held[0]
-  const spent = new Set<string>(visible.map((c) => c.type))
-  const pointsLeft = MAX_POINTS - ASSISTIVE_TYPES.filter((type) => spent.has(type)).length
+  // Recorded on the stamp, which turns them into stars once the pin is done. Nothing about stars shows while
+  // looking: it would pull the player out of the street.
+  const chances = useMemo(() => pinChances(pin), [pin])
+  const asked = states.filter((s) => s.visible && s.clue.reveal?.onRequest).length
   const reveal = (state: (typeof states)[number]) => {
     askForHint(quest.id, pin.id, state.index)
     // The tap that asks for the compass is also what lets a phone that wants permission turn it on.
@@ -118,6 +119,8 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
       pinId: pin.id,
       at: at.toISOString(),
       clues: [...new Set(visible.map((c) => c.type))],
+      hints: asked,
+      chances,
     }
     const sky = skyAt(at, fix)
     if (sky !== 'day') stamp.sky = sky
@@ -151,7 +154,6 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
         after={
           <div className="cover-meta">
             <span>{t('play.pinOf', { n: index + 1, total: quest.pins.length })}</span>
-            <Points left={pointsLeft} max={MAX_POINTS} label={t('play.pointsLeft', { n: pointsLeft, max: MAX_POINTS })} />
           </div>
         }
       >
@@ -227,7 +229,6 @@ function PinScreen({ quest, pin }: { quest: Quest; pin: Pin }) {
                   <strong>{t('play.hint.more')}</strong>
                   <small>
                     {hintsLeft > 1 ? t('play.hint.left', { n: hintsLeft }) : t('play.hint.last')}
-                    {costsPoint(next.clue.type) && ` · ${t('play.hint.costs')}`}
                   </small>
                 </span>
                 <HintBadge type={next.clue.type} size={34} />

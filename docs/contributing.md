@@ -1,13 +1,14 @@
 # Adding a quest
 
-A quest is one JSON file. You do not need to run the game to write one, but it is much easier to get right when you do. The format is in [content.md](content.md).
+A quest is one JSON file. You do not need to run the game to write one, but it is much easier to get right when you do. The format is in [content.md](content.md); how to choose places, research them and write clues people enjoy is in [writing-pins.md](writing-pins.md). Read that first: most of the work is there.
 
 ## 1. Write it
 
 Either way, the file ends up in `content/quests/<id>.json`:
 
 - **In the editor.** Open `/admin` on the game's site, sign in with GitHub (or paste a token) and use the forms: maps for the pins and the area, a list for the clues, a preview that runs the game's own checks. Every save is a commit on a branch of its own; **Review & publish** opens a pull request. You need write access to the repository.
-- **As a file.** Fork the repository, copy `content/quests/tilburg-textile.json`, and change it. This works for everyone.
+- **As a file.** Fork the repository, copy the example at the end of [writing-pins.md](writing-pins.md) or a test fixture from `fixtures/content/quests/`, and change it. This works for everyone.
+- **With Claude Code.** Ask it to write a quest; the `write-quest` skill researches candidates, drafts the file, checks it and lists what still has to be verified on site.
 
 Locations are the same, under `content/locations/`. Only add one when the place has no outline yet: a quest shows up under every location whose outline overlaps its area.
 
@@ -40,7 +41,7 @@ CI runs `pnpm run content`, the unit tests and a browser run of the game.
 
 - **Public places only.** Pins must be somewhere anyone can stand, in daylight, without trespassing. No private gardens, no railway tracks, no roadsides without a pavement.
 - **Short.** Three to eight pins, within a walk of an hour or so. Say in the description how far it is.
-- **One thing to find at a time.** The clue says where; the quiz and the photo prompt say what to look at once you are there.
+- **One thing to find at a time.** The clues say where; the facts, questions and photo prompt say what to look at once you are there.
 - **Clues that survive a bad day.** Do not make a pin depend on a shop being open, a sign that may be taken down, or a view that is only there in winter.
 - **Writing for a screen that does not scroll.** Hints are 140 characters or fewer. If it needs more, it is two clues.
 - **Languages are optional.** One language is fine. If you add more, add them everywhere, and always include the default.

@@ -24,7 +24,7 @@ Content lives in this repository as JSON. [gitvfs](https://github.com/meesvandon
 
 - **location**: a name and a polygon. No parent: Tilburg, Noord-Brabant and the Netherlands are three independent entries, and nesting is computed from the geometry. The app lists every location whose polygon contains the player, smallest first.
 - **quest**: title, description, `order` (`linear` or `free`), an optional `area` polygon, and pins. A quest shows under every location whose outline overlaps its area; without an `area`, a box around the pins stands in. Quests name no location.
-- **pin**: a point and a radius, clues, an optional photo prompt, an optional quiz question, an optional stamp style.
+- **pin**: a point and a radius, clues, the pages after arrival (facts, questions, and where the photo page goes), an optional stamp style.
 - **The file name is the id.** The editor would otherwise show two fields, the slug and an id, that have to match.
 - **Coordinates are `{ lat, lng }`**, like the editor's map fields: nobody mixes up the order.
 - **Languages:** any text is a plain string or a map of language to text. A map has to include the quest's default language; the game falls back to it.
@@ -53,12 +53,14 @@ Each clue has an optional reveal rule: from the start, or on request, as a hint 
 
 The stamp is the reward for arriving. It records what happened and does not grade the player; the one count, help used, never gates anything.
 
-- Every stamp is a full stamp. There are no tiers and no total score. The one thing counted is help: up to three small star stamps beside it, one for each assisting clue type (distance, direction, map) that was not on screen at check-in. Local expert mode hides those clues, so it earns all three. Points never unlock or block anything.
+- Every stamp is a full stamp. There are no tiers and no total score. The one thing counted is slips: every pin starts with three small star stamps beside it, and asking for a hint or answering a question wrong can cost one. A pin's chances are its hints and its questions; it keeps all three stars while at least three chances are untouched, so a pin with many hints forgives the first few, and when everything goes wrong no star is left. A pin with fewer than three chances counts as having three. Clues shown from the start are free. Stars only appear once a pin is done, pressed beside its stamp on the quest page; the play and arrival screens never mention them, so they do not break the immersion. They never unlock or block anything.
 - Small clue marks show which clue types were used. Two players get two different stamps and neither is better.
 - Five shapes (round seal, postage stamp, hexagon, ticket, oval postmark) plus a starburst for finishing a quest. A pin can choose its shape, icon and ink; otherwise they follow from its category and id, so a pin always looks the same.
-- Five extra marks, for things anyone can choose to do: quiz answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
+- Five extra marks, for things anyone can choose to do: a question answered (right or wrong), photo taken, found after dark, found at sunrise, found in rain. Dark and sunrise come from the sun's position at the player's place and time, so nothing is sent anywhere. Rain asks Open-Meteo, and only when the player switched weather marks on.
 - A skipped pin can be stamped later. The book is never failed, only incomplete.
-- The quest has one page, a grid with a place for every pin, so nothing moves when a stamp is collected. A pin you can look for opens its clues. A pin that has to wait (the later pins of a quest played in order) is shown dimmed and cannot be tapped. A pin you found is a printed page (number, icon, name) with its stamp and points pressed on it, and your photo taped over it as a polaroid. Tap the photo to lift it and see the stamps, tap the page to open the pin.
+- The quest has one page, a grid with a place for every pin, so nothing moves when a stamp is collected. A pin you can look for opens its clues. A pin that has to wait (the later pins of a quest played in order) is shown dimmed and cannot be tapped. A pin you found is a printed page (number, icon, name) with its stamp and stars pressed on it, and your photo taped over it as a polaroid. Tap the photo to lift it and see the stamps, tap the page to open the pin.
+- After the pages that follow check-in (photo, facts, questions), the game goes straight back to the quest page, and the stamp is made there rather than on a screen of its own: a rubber stamp comes down on the pin's page and leaves the ink, the stars are pressed one by one, and the photo is laid on and taped. Nothing jumps from one screen to another. With reduced motion, the page simply shows the result.
+- A photo shows the moment it is taken; shrinking it (to 1280 pixels, in a worker where the browser has one) and storing it happen behind the scenes.
 - Photos feed the collage. Photo matching is not part of the game.
 - All stamp drawing is escaped SVG built from strings, so a quest's text cannot inject markup, and the same drawing serves the screen and the collage.
 
@@ -92,7 +94,7 @@ Open:
 
 - **Licence.** None chosen for the code, or for quests and photos people contribute. Decide before taking outside contributions.
 - **Production URL and editor sign-in.** The Worker for "Sign in with GitHub" exists but needs a GitHub App and its secret; until then the editor takes a token. Contributors without write access send files in a pull request.
-- **Real quests.** The sample quests have approximate coordinates.
+- **Real quests.** The first, *The king who loved Tilburg*, is written from sources but has not been walked yet. The made-up quests the tests play are in `fixtures/content/`. [writing-pins.md](writing-pins.md) is the guide for writing real ones.
 - **Clue marks on stamps:** always visible, or behind a tap? The first reads as honest, but some players may read them as a judgement.
 - **Contributed media.** There is no process yet for checking that photos and sounds in a pull request may be shared.
 - **Very large system text** is not tested.

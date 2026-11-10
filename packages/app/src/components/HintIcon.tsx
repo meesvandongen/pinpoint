@@ -1,5 +1,3 @@
-import { ASSISTIVE_TYPES } from 'pinpoint-core'
-
 /** Every kind of hint has one picture, used wherever the hint shows up: its tab, its reading, the button that asks for it. */
 const PATHS: Record<string, string> = {
   text: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
@@ -10,9 +8,6 @@ const PATHS: Record<string, string> = {
   direction: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
   distance: '<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v4M10 8v3M14 8v4M18 8v3"/>',
 }
-
-/** Hints that point the way cost a point, which a gold ring and a small star make visible everywhere. */
-export const costsPoint = (type: string) => (ASSISTIVE_TYPES as readonly string[]).includes(type)
 
 export function HintIcon({ type, size = 20 }: { type: string; size?: number }) {
   return (
@@ -31,34 +26,11 @@ export function HintIcon({ type, size = 20 }: { type: string; size?: number }) {
   )
 }
 
-/** The picture in a round badge; gold with a star when this kind of hint costs a point. */
+/** The picture in a round badge. */
 export function HintBadge({ type, size = 30, spent = false }: { type: string; size?: number; spent?: boolean }) {
-  const cost = costsPoint(type)
   return (
-    <span className={`hint-badge ${cost ? 'cost' : ''} ${spent ? 'spent' : ''}`} style={{ width: size, height: size }}>
+    <span className={`hint-badge ${spent ? 'spent' : ''}`} style={{ width: size, height: size }}>
       <HintIcon type={type} size={Math.round(size * 0.62)} />
-      {cost && <Star className="hint-star" />}
-    </span>
-  )
-}
-
-export function Star({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill="currentColor" />
-    </svg>
-  )
-}
-
-/** One star per point still to earn, hollow for each one a hint has used. */
-export function Points({ left, max, label }: { left: number; max: number; label: string }) {
-  return (
-    <span className="points-meter" role="img" aria-label={label}>
-      {Array.from({ length: max }, (_, i) => (
-        <svg key={i} viewBox="0 0 24 24" className={i < left ? 'on' : ''} aria-hidden="true">
-          <path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill={i < left ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        </svg>
-      ))}
     </span>
   )
 }

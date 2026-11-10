@@ -54,7 +54,11 @@ export function QuestPreview({ contentType, values }: PreviewProps) {
             <strong>{resolveText(pin.title, [quest.defaultLanguage], quest.defaultLanguage)}</strong>
             <span className="gcms-muted">
               {category(pin.category)} · {pin.clues.length} clue{pin.clues.length === 1 ? '' : 's'} · {pin.position.lat.toFixed(4)}, {pin.position.lng.toFixed(4)}
-              {pin.quiz ? ' · quiz' : ''}
+              {(() => {
+                const facts = pin.arrival.filter((s) => s.type === 'fact').length
+                const quizzes = pin.arrival.filter((s) => s.type === 'quiz').length
+                return `${facts ? ` · ${facts} fact${facts === 1 ? '' : 's'}` : ''}${quizzes ? ` · ${quizzes} question${quizzes === 1 ? '' : 's'}` : ''}`
+              })()}
             </span>
           </li>
         ))}

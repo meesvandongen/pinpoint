@@ -175,13 +175,8 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .dial .hint-badge { position: absolute; right: -6px; bottom: -4px; }
 .dial-n { font-family: var(--font-type); font-weight: 700; font-size: 9px; fill: var(--muted); }
 .cover-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--gold-dim); font-size: 14px; min-height: 22px; }
-.points-meter { display: inline-flex; gap: 3px; color: var(--gold); }
-.points-meter svg { width: 18px; height: 18px; display: block; }
-.points-meter svg:not(.on) { color: var(--gold-dim); opacity: 0.7; }
-/* One picture per kind of hint, everywhere. Gold ring and a star: this one costs a point. */
+/* One picture per kind of hint, everywhere. */
 .hint-badge { position: relative; flex: none; display: inline-grid; place-items: center; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper-3); color: var(--ink); }
-.hint-badge.cost { border-color: #b8860b; color: #7a5a06; background: #fbf1d0; }
-.hint-star { position: absolute; right: -5px; top: -6px; width: 42%; height: 42%; color: #d4a017; stroke: var(--paper); stroke-width: 1.5; paint-order: stroke; }
 .hint-badge.spent { opacity: 0.45; }
 
 .clue-tabs { display: flex; gap: 6px; flex-wrap: wrap; flex: none; }
@@ -228,6 +223,8 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .polaroid-photo { aspect-ratio: 1; background: var(--paper-2); display: grid; place-items: center; overflow: hidden; color: var(--muted); font-family: var(--font-type); font-size: 13px; border: 2px dashed #b9ad8c; }
 .polaroid-photo:has(img) { border: 0; }
 .polaroid-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fact-page { justify-content: center; }
+.fact { margin: 0; font-family: var(--font-serif); font-size: clamp(18px, 5.2vw, 22px); line-height: 1.3; max-width: 34ch; }
 .quiz-page { align-items: stretch; justify-content: flex-start; text-align: left; }
 .question { margin: 0; font-family: var(--font-serif); font-size: clamp(18px, 5.2vw, 22px); line-height: 1.25; }
 .options { display: grid; gap: 8px; }
@@ -296,6 +293,69 @@ h2.sub { font-family: var(--font-type); font-style: normal; font-weight: 700; fo
 .polaroid-back { background: #f7f2e6; transform: rotateX(180deg); display: grid; place-items: center; }
 .polaroid-back span { font: 600 max(16px, calc(22 * var(--u)))/1 var(--font-hand); color: #4a4538; transform: rotate(-3deg); }
 @media (prefers-reduced-motion: reduce) { .flap { transition: none; } }
+
+/*
+ * A pin just finished: a rubber stamp comes down and inks the page (0.1–1.2 s), the stars are pressed one by
+ * one (1.25–2.2 s), and the photo is laid on and taped (2.2–3.3 s). LANDING_MS in Quest.tsx matches the end.
+ */
+.stamper { position: absolute; left: 50%; top: 50%; width: 78%; aspect-ratio: 100 / 120; z-index: 9; pointer-events: none; transform: translate(calc(-50% + var(--dx, 0) * var(--u)), calc(-60% + var(--dy, 0) * var(--u))); }
+.stamper svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 calc(6 * var(--u)) calc(6 * var(--u)) rgba(43, 42, 38, 0.35)); }
+@media (prefers-reduced-motion: no-preference) {
+  .landing .stamper svg { animation: stamper 1.15s cubic-bezier(0.4, 0, 0.3, 1) 0.1s both; transform-origin: 50% 100%; }
+  @keyframes stamper {
+    0% { transform: translateY(-115%) scale(1.25); opacity: 0; }
+    28% { transform: translateY(-30%) scale(1.08); opacity: 1; }
+    40% { transform: translateY(0) scale(1); }
+    48% { transform: translateY(0) scale(1.03, 0.92); }
+    58% { transform: translateY(0) scale(1); }
+    75% { transform: translateY(-45%) scale(1.06); opacity: 1; }
+    100% { transform: translateY(-130%) scale(1.2); opacity: 0; }
+  }
+  /* The ink appears where the rubber touched, a little heavy at first, then dries into the page. */
+  .landing .paper-stamp .stamp { animation: ink-in 1.15s linear 0.1s both; }
+  @keyframes ink-in {
+    0%, 40% { opacity: 0; transform: scale(0.97); filter: blur(1px); }
+    43% { opacity: 1; transform: scale(1.02); filter: blur(0.6px) saturate(1.4); }
+    70% { transform: scale(1); filter: none; }
+    100% { opacity: 1; transform: none; filter: none; }
+  }
+  /* The page gives a little under the press. */
+  .landing .paper { animation: give 1.15s ease-out 0.1s both; }
+  @keyframes give {
+    0%, 40% { transform: none; }
+    46% { transform: translateY(calc(1.5 * var(--u))) scale(0.992); }
+    60%, 100% { transform: none; }
+  }
+  .landing .point-stamp { animation: press 0.32s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+  .landing .point-0 { animation-delay: 1.3s; }
+  .landing .point-1 { animation-delay: 1.6s; }
+  .landing .point-2 { animation-delay: 1.9s; }
+  @keyframes press {
+    from { opacity: 0; transform: scale(1.8) rotate(-12deg); }
+    to { opacity: 1; transform: none; }
+  }
+  /* The photo is held above the page, laid on, and then taped down. */
+  .landing .flap { animation: lay 0.75s cubic-bezier(0.25, 0.9, 0.3, 1.05) 2.25s both; }
+  @keyframes lay {
+    from { opacity: 0; transform: translate(calc(10 * var(--u)), calc(-30 * var(--u))) rotate(calc(var(--tilt, -1deg) - 9deg)) scale(1.12); }
+    70% { opacity: 1; }
+    to { opacity: 1; transform: rotate(var(--tilt, -1deg)); }
+  }
+  .landing .polaroid-card { animation: lift-shadow 0.75s ease-out 2.25s both; }
+  @keyframes lift-shadow {
+    from { box-shadow: 0 calc(18 * var(--u)) calc(22 * var(--u)) rgba(43, 42, 38, 0.35); }
+    to { box-shadow: 0 3px 8px rgba(43, 42, 38, 0.3); }
+  }
+  .landing .tape { animation: tape 0.3s ease-out 3s both; transform-origin: 0 50%; }
+  @keyframes tape {
+    from { opacity: 0; transform: rotate(-4deg) scaleX(0); }
+    to { opacity: 1; transform: rotate(-4deg) scaleX(1); }
+  }
+  /* The quest stamp of a quest just completed waits for the last pin's stamp. */
+  .quest-slot.late { animation: fade 0.3s ease-out 3.2s both; }
+  .quest-slot.late .paper-stamp .stamp { animation: press 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) 3.3s both; }
+}
+@media (prefers-reduced-motion: reduce) { .stamper { display: none; } }
 
 /* ---------- Book ---------- */
 .book-pin-body { align-items: center; justify-content: center; }

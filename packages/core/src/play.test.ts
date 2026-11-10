@@ -1,8 +1,11 @@
 import {
+  arrivalPages,
   arrowRotation,
   extrasOf,
   formatDistance,
   locationsContaining,
+  pinChances,
+  pointsLeft,
   playablePins,
   proximity,
   questsInLocation,
@@ -137,15 +140,16 @@ describe('text', () => {
 })
 
 describe('extra marks', () => {
-  const base: Stamp = { questId: 'q', pinId: 'a', at: '2026-11-08T10:00:00Z', clues: [] }
+  const base: Stamp = { questId: 'q', pinId: 'a', at: '2026-11-08T10:00:00Z', clues: [], hints: 0, chances: 0 }
   it('earns none by default', () => {
     expect(extrasOf(base)).toEqual([])
+    expect(extrasOf({ ...base, quiz: {} })).toEqual([])
   })
   it('counts a wrong quiz answer as answering', () => {
-    expect(extrasOf({ ...base, quiz: 'wrong' })).toEqual(['quiz'])
+    expect(extrasOf({ ...base, quiz: { 0: 'wrong' } })).toEqual(['quiz'])
   })
   it('lists marks in a fixed order', () => {
-    const all: Stamp = { ...base, weather: 'rain', sky: 'night', photo: true, quiz: 'correct' }
+    const all: Stamp = { ...base, weather: 'rain', sky: 'night', photo: true, quiz: { 1: 'correct' } }
     expect(extrasOf(all)).toEqual(['quiz', 'photo', 'night', 'rain'])
     expect(extrasOf({ ...base, sky: 'sunrise' })).toEqual(['sunrise'])
   })
@@ -170,16 +174,60 @@ describe('rough area', () => {
 })
 
 describe('stamp points', () => {
-  it('gives three points for finding a pin without any assisting clue', () => {
-    expect(stampPoints({ clues: [] })).toBe(3)
-    expect(stampPoints({ clues: ['text', 'photo', 'wordShape'] })).toBe(3)
+  it('starts every pin with three stars', () => {
+    expect(stampPoints({ hints: 0, chances: 0 })).toBe(3)
+    expect(stampPoints({ hints: 0, chances: 7 })).toBe(3)
   })
-  it('takes one point for each assisting clue type that was on screen', () => {
-    expect(stampPoints({ clues: ['text', 'distance'] })).toBe(2)
-    expect(stampPoints({ clues: ['direction', 'map'] })).toBe(1)
-    expect(stampPoints({ clues: ['distance', 'direction', 'map', 'text'] })).toBe(0)
+  it('keeps three stars while at least three chances are untouched', () => {
+    // Five chances: two slips are free, then each one costs a star.
+    expect(pointsLeft(5, 2)).toBe(3)
+    expect(pointsLeft(5, 3)).toBe(2)
+    expect(pointsLeft(5, 4)).toBe(1)
+    expect(pointsLeft(5, 5)).toBe(0)
   })
-  it('counts a type once, and ignores types it does not know', () => {
-    expect(stampPoints({ clues: ['distance', 'distance', 'smell'] })).toBe(2)
+  it('takes a star for every slip at a pin with three chances or fewer', () => {
+    expect(pointsLeft(3, 1)).toBe(2)
+    expect(pointsLeft(2, 1)).toBe(2)
+    expect(pointsLeft(2, 2)).toBe(1)
+    expect(pointsLeft(0, 0)).toBe(3)
+  })
+  it('counts hints asked and wrong answers as slips', () => {
+    expect(stampPoints({ hints: 1, chances: 4, quiz: { 3: 'wrong', 5: 'correct' } })).toBe(2)
+    expect(stampPoints({ hints: 4, chances: 5, quiz: { 3: 'wrong' } })).toBe(0)
+  })
+})
+
+describe('chances', () => {
+  it('counts hints to ask for and questions, not clues shown from the start', () => {
+    const parsed = Quest.parse({
+      id: 'q',
+      title: 'Q',
+      pins: [
+        pin('a', 51.56, 5.08, [
+          { type: 'text', text: 'x' },
+          { type: 'distance' },
+          { type: 'map', reveal: { onRequest: true } },
+          { type: 'smell', reveal: { onRequest: true } },
+        ]),
+      ],
+    })
+    const a = parsed.pins[0]
+    expect(pinChances(a)).toBe(1)
+    const withQuestions = { ...a, arrival: [quiz, { type: 'fact', text: 'f' }, quiz] } as typeof a
+    expect(pinChances(withQuestions)).toBe(3)
+  })
+})
+
+const quiz = { type: 'quiz', question: 'q', options: ['a', 'b'], answer: 0 }
+
+describe('arrival pages', () => {
+  it('puts the photo page first when the pin does not place it', () => {
+    expect(arrivalPages({ arrival: [] }).map((p) => p.kind)).toEqual(['photo'])
+    expect(arrivalPages({ arrival: [{ type: 'fact', text: 'f' }, quiz] as never }).map((p) => p.kind)).toEqual(['photo', 'fact', 'quiz'])
+  })
+  it('follows the order of the pin, skipping steps it does not know', () => {
+    const pages = arrivalPages({ arrival: [quiz, { type: 'fact', text: 'f' }, { type: 'dance' }, { type: 'photo', prompt: 'p' }, quiz] as never })
+    expect(pages.map((p) => p.kind)).toEqual(['quiz', 'fact', 'photo', 'quiz'])
+    expect(pages.flatMap((p) => (p.kind === 'quiz' ? [p.index] : []))).toEqual([0, 4])
   })
 })

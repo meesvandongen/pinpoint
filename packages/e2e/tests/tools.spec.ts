@@ -40,7 +40,7 @@ test('moves the player, changes the time and the weather, and earns the marks', 
   await page.getByLabel('Close TanStack Devtools').click()
   await page.getByRole('button', { name: 'Check in' }).click()
 
-  await expect(page.locator('.big-stamp')).toBeVisible()
+  await expect(page.locator('.photo-page')).toBeVisible()
   await expect(page.locator('.extras-row [role=img]')).toHaveCount(2)
   const marks = await page.locator('.extras-row [role=img]').evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))
   expect(marks).toEqual(['Found after dark', 'Found in rain'])

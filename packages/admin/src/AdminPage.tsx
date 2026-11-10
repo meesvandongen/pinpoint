@@ -8,7 +8,7 @@ import 'gitvfs-cms/styles.css'
 import './admin.css'
 import { CluesField } from './fields/CluesField.tsx'
 import { LocalizedField } from './fields/LocalizedField.tsx'
-import { QuizField } from './fields/QuizField.tsx'
+import { ArrivalField } from './fields/ArrivalField.tsx'
 import { collections } from './model.ts'
 import { LocationPreview, QuestPreview } from './previews.tsx'
 
@@ -20,7 +20,7 @@ const BRANCH_KEY = 'pinpoint-admin:branch'
 
 type Session = { method: 'github' | 'token' | 'mock'; token: TokenProvider; branch: string }
 
-const formComponents = { localized: LocalizedField, clues: CluesField, quiz: QuizField }
+const formComponents = { localized: LocalizedField, clues: CluesField, arrival: ArrivalField }
 const previews = { quests: QuestPreview, locations: LocationPreview }
 const mapDefaults = { geocoder: nominatimGeocoder({ language: 'en' }) }
 
