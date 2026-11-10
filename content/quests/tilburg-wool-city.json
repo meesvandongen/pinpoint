@@ -1,0 +1,251 @@
+{
+  "title": { "en": "The wool city", "nl": "De wolstad" },
+  "description": {
+    "en": "From weavers' cottages to blanket mills: eight stops through Tilburg, once the wool city of the Netherlands. About 7 km. Play them in any order, or start at the Hasselt chapel and end on the terraces of the Piushaven.",
+    "nl": "Van wevershuisjes tot dekenfabriek: acht plekken door Tilburg, ooit de wolstad van Nederland. Zo'n 7 km. Speel ze in elke volgorde, of begin bij de Hasseltse kapel en eindig op de terrassen aan de Piushaven."
+  },
+  "defaultLanguage": "en",
+  "order": "free",
+  "pins": [
+    {
+      "id": "hasselt",
+      "title": { "en": "The Hasselt chapel", "nl": "De Hasseltse kapel" },
+      "category": "church",
+      "position": { "lat": 51.5763, "lng": 5.0641 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Tilburg's oldest chapel has rung the same bell since 1536. Low weavers' cottages still face it across a triangle of grass.", "nl": "De oudste kapel van Tilburg luidt al sinds 1536 dezelfde klok. Lage wevershuisjes kijken er nog op uit, over een driehoek gras." } },
+        { "type": "text", "text": { "en": "North-west of the centre, a stone's throw from the big hospital.", "nl": "Ten noordwesten van het centrum, een steenworp van het grote ziekenhuis." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Hasseltplein", "nl": "Hasseltplein" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "The bell says who it is: \"Maria is mijnen naem\", Mary is my name. Jasper Moer cast it in 1536, and the chapel is older still.", "nl": "De klok zegt zelf wie ze is: \"Maria is mijnen naem\". Jasper Moer goot haar in 1536, en de kapel is nog ouder." } },
+        {
+          "type": "quiz",
+          "question": { "en": "After 1629 no Mass was allowed here. What was built inside the chapel in those years?", "nl": "Na 1629 mocht hier geen mis meer worden opgedragen. Wat werd er in die jaren in de kapel gebouwd?" },
+          "options": [
+            { "en": "A house", "nl": "Een woning" },
+            { "en": "A weaving workshop", "nl": "Een weverij" },
+            { "en": "A stable", "nl": "Een paardenstal" },
+            { "en": "A school", "nl": "Een school" }
+          ],
+          "answer": 0
+        },
+        { "type": "fact", "text": { "en": "In 1743 a house was built inside the chapel, which kept the building in repair. The family left in 1794, and two years later Mass was said here again.", "nl": "In 1743 werd er een woning in de kapel gebouwd, zodat het gebouw onderhouden bleef. In 1794 vertrokken de bewoners, en twee jaar later werd hier weer de mis opgedragen." } },
+        { "type": "fact", "text": { "en": "The low cottages on the square are weavers' houses from the early 1800s. Before the steam factories came, Tilburg wove its wool at home, on looms in rooms like these.", "nl": "De lage huisjes aan het plein zijn wevershuisjes uit de eerste helft van de 19e eeuw. Voordat de stoomfabrieken kwamen, weefde Tilburg zijn wol thuis, aan getouwen in kamers zoals deze." } },
+        { "type": "photo", "prompt": { "en": "Photograph the chapel's little tower from the grass triangle.", "nl": "Fotografeer het torentje van de kapel vanaf de driehoek gras." } }
+      ]
+    },
+    {
+      "id": "weavers",
+      "title": { "en": "The weavers' row", "nl": "De wevershuisjes" },
+      "category": "house",
+      "position": { "lat": 51.5679, "lng": 5.0626 },
+      "radius": 50,
+      "clues": [
+        { "type": "text", "text": { "en": "One side of this street is a row of one-storey weavers' cottages. One still has a little door up in its front, for the wool.", "nl": "Aan één kant van deze straat staat een rij wevershuisjes zonder verdieping. Eén heeft boven in de gevel nog een deurtje, voor de wol." } },
+        { "type": "text", "text": { "en": "A short walk south of the Hasselt chapel. Flats face the cottages across the street.", "nl": "Een kort stukje ten zuiden van de Hasseltse kapel. Tegenover de huisjes staan flats." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Reitse Hoevenstraat", "nl": "Reitse Hoevenstraat" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "direction", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        {
+          "type": "quiz",
+          "question": { "en": "Find number 60. Which year is on its front?", "nl": "Zoek nummer 60. Welk jaartal staat op de gevel?" },
+          "options": [
+            { "en": "1822", "nl": "1822" },
+            { "en": "1852", "nl": "1852" },
+            { "en": "1882", "nl": "1882" },
+            { "en": "1912", "nl": "1912" }
+          ],
+          "answer": 2
+        },
+        { "type": "fact", "text": { "en": "Above the windows of number 60 is a loading door for the wool. Light for the loom came in through sash windows of twenty small panes.", "nl": "Boven de ramen van nummer 60 zit een laaddeur voor de wol. Licht voor het weefgetouw kwam binnen door schuiframen van twintig ruitjes." } },
+        { "type": "fact", "text": { "en": "Cottages like these once set the look of Tilburg. Then the factories took over the weaving, and most of them were demolished. This row is one of the few left.", "nl": "Huisjes zoals deze bepaalden ooit het beeld van Tilburg. Toen namen de fabrieken het weven over, en de meeste werden gesloopt. Deze rij is een van de weinige die er nog staan." } },
+        { "type": "photo", "prompt": { "en": "Photograph the wool door above the windows of number 60.", "nl": "Fotografeer het luik voor de wol boven de ramen van nummer 60." } }
+      ]
+    },
+    {
+      "id": "de-pont",
+      "title": { "en": "The mill that became a museum", "nl": "De spinnerij die museum werd" },
+      "category": "culture",
+      "position": { "lat": 51.5673, "lng": 5.0748 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Wool was spun here until the mill could no longer compete. Now a great steel dish in front of it holds the sky.", "nl": "Hier werd wol gesponnen tot de spinnerij niet meer kon concurreren. Nu houdt een grote stalen schaal ervoor de lucht vast." } },
+        { "type": "text", "text": { "en": "The museum carries the name of a Tilburg lawyer who once helped the mill through a bankruptcy.", "nl": "Het museum draagt de naam van een Tilburgse jurist die de spinnerij ooit door een faillissement hielp." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "De Pont", "nl": "De Pont" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "This was the Thomas de Beer wool spinning mill. In the 1960s Jan de Pont helped it back on its feet; about twenty years later it closed for good.", "nl": "Dit was de wolspinnerij Thomas de Beer. In de jaren zestig hielp Jan de Pont haar weer op de been; zo'n twintig jaar later ging ze toch dicht." } },
+        {
+          "type": "quiz",
+          "question": { "en": "The foundation bought the mill for a symbolic sum. What else did it take on?", "nl": "De stichting kocht de spinnerij voor een symbolisch bedrag. Wat nam ze er nog meer bij over?" },
+          "options": [
+            { "en": "Four of its last six workers", "nl": "Vier van de laatste zes werknemers" },
+            { "en": "The last bale of wool", "nl": "De laatste baal wol" },
+            { "en": "The steam engine", "nl": "De stoommachine" },
+            { "en": "The owner's villa", "nl": "De villa van de eigenaar" }
+          ],
+          "answer": 0
+        },
+        { "type": "fact", "text": { "en": "The museum opened in 1992. The mirror is Anish Kapoor's Sky Mirror (for Hendrik), a gift for its 25th birthday in 2017, named after Hendrik Driessen, its first director.", "nl": "Het museum ging in 1992 open. De spiegel is Sky Mirror (for Hendrik) van Anish Kapoor, een cadeau voor het 25-jarig bestaan in 2017, genoemd naar Hendrik Driessen, de eerste directeur." } },
+        { "type": "photo", "prompt": { "en": "Find yourself upside down in the mirror, and photograph that.", "nl": "Zoek jezelf ondersteboven in de spiegel, en fotografeer dat." } }
+      ]
+    },
+    {
+      "id": "textielmuseum",
+      "title": { "en": "The factory that still weaves", "nl": "De fabriek die nog weeft" },
+      "category": "industrial",
+      "position": { "lat": 51.5709, "lng": 5.0797 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Two chimneys rise from an old wool factory on the Goirkestraat. The tall one still signs a manufacturer's initials in white brick.", "nl": "Twee schoorstenen rijzen op uit een oude wolfabriek aan de Goirkestraat. De hoge zet nog de initialen van een fabrikant in witte steen." } },
+        { "type": "text", "text": { "en": "The looms here work again, for designers and artists. The whole factory is now a museum of cloth.", "nl": "De weefgetouwen draaien hier weer, voor ontwerpers en kunstenaars. De hele fabriek is nu een museum van stof." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "TextielMuseum", "nl": "TextielMuseum" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "direction", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        {
+          "type": "quiz",
+          "question": { "en": "Look up at the tall chimney. Which two letters are bricked in white near the top?", "nl": "Kijk omhoog naar de hoge schoorsteen. Welke twee letters zijn in witte steen bovenin gemetseld?" },
+          "options": [
+            { "en": "C M", "nl": "C M" },
+            { "en": "G D", "nl": "G D" },
+            { "en": "T B", "nl": "T B" },
+            { "en": "W M", "nl": "W M" }
+          ],
+          "answer": 1
+        },
+        { "type": "fact", "text": { "en": "G D is George Droge, whose wool firm later took over this factory. It was built for the Mommers family: two stones in the west gable read \"W. Mommers, 15 juni 1885\".", "nl": "G D is George Droge, wiens wolfabriek deze fabriek later overnam. Gebouwd werd ze voor de familie Mommers: twee stenen in de westgevel melden \"W. Mommers, 15 juni 1885\"." } },
+        { "type": "fact", "text": { "en": "When Tilburg's factories closed, alderman Miet van Puijenbroek fought to keep this one. Since 2009 her statue has stood at the entrance.", "nl": "Toen de Tilburgse fabrieken sloten, vocht wethouder Miet van Puijenbroek voor het behoud van deze. Sinds 2009 staat haar beeld bij de ingang." } },
+        { "type": "photo", "prompt": { "en": "Frame the top of the chimney with its white letters.", "nl": "Fotografeer de top van de schoorsteen met de witte letters." } }
+      ]
+    },
+    {
+      "id": "umbrellas",
+      "title": { "en": "The umbrella factory", "nl": "De paraplufabriek" },
+      "category": "industrial",
+      "position": { "lat": 51.559, "lng": 5.0819 },
+      "radius": 35,
+      "clues": [
+        { "type": "text", "text": { "en": "Not all Tilburg cloth was worn. On Factory Street, near the station, a red-brick factory of 1886 made it into something for the rain.", "nl": "Niet alle Tilburgse stof werd gedragen. In de Fabriekstraat bij het station maakte een rode fabriek uit 1886 er iets voor de regen van." } },
+        { "type": "text", "text": { "en": "Nine arched windows wide, and the owner lived next door, on the corner of the Stationsstraat.", "nl": "Negen boogramen breed, en de eigenaar woonde ernaast, op de hoek met de Stationsstraat." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Gimbrère", "nl": "Gimbrère" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "Guillaume Gimbrère's firm began in 1853 with a shop on the Heuvelstraat. This umbrella factory followed in 1886. It closed in 1956, and is now a home and a warehouse.", "nl": "De firma van Guillaume Gimbrère begon in 1853 met een winkel in de Heuvelstraat. Deze paraplufabriek volgde in 1886. Ze sloot in 1956 en is nu een woning en een opslag." } },
+        {
+          "type": "quiz",
+          "question": { "en": "The windows are cast iron. How many small panes does each one have?", "nl": "De ramen zijn van gietijzer. Hoeveel ruitjes heeft elk raam?" },
+          "options": [
+            { "en": "12", "nl": "12" },
+            { "en": "24", "nl": "24" },
+            { "en": "36", "nl": "36" },
+            { "en": "48", "nl": "48" }
+          ],
+          "answer": 2
+        },
+        { "type": "photo", "prompt": { "en": "Photograph one cast-iron window close up, pane by pane.", "nl": "Fotografeer één gietijzeren raam van dichtbij, ruitje voor ruitje." } }
+      ]
+    },
+    {
+      "id": "duvelhok",
+      "title": { "en": "The devils' den", "nl": "Het Duvelhok" },
+      "category": "industrial",
+      "position": { "lat": 51.5566, "lng": 5.0954 },
+      "radius": 35,
+      "clues": [
+        { "type": "text", "text": { "en": "The men who cleaned raw wool here came out so filthy that Tilburg called them devils. Their old factory still carries the name.", "nl": "De mannen die hier ruwe wol schoonmaakten, zagen er zo smerig uit dat Tilburg ze duvels noemde. Hun oude fabriek draagt die naam nog." } },
+        { "type": "text", "text": { "en": "On the Sint Josephstraat, a little past the old lancers' barracks.", "nl": "Aan de Sint Josephstraat, een stukje voorbij de oude Lancierskazerne." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Duvelhok", "nl": "Duvelhok" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "direction", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "It was built in 1862 as a cotton spinning mill for the Deen family. In 1911 the wool firm BeKa bought it as its duvelhok: the place where raw wool was \"duveled\".", "nl": "Het werd in 1862 gebouwd als katoenspinnerij voor de familie Deen. In 1911 kocht wolfabriek BeKa het als duvelhok: de plek waar ruwe wol werd geduveld." } },
+        {
+          "type": "quiz",
+          "question": { "en": "What did duveling do to the raw wool?", "nl": "Wat gebeurde er bij het duvelen met de ruwe wol?" },
+          "options": [
+            { "en": "Untangled, cleaned and greased it", "nl": "Ontward, gereinigd en ingevet" },
+            { "en": "Dyed it black", "nl": "Zwart geverfd" },
+            { "en": "Spun it into yarn", "nl": "Tot garen gesponnen" },
+            { "en": "Singed off the loose hairs", "nl": "De losse haren afgeschroeid" }
+          ],
+          "answer": 0
+        },
+        { "type": "fact", "text": { "en": "Of BeKa's own factory, only its chimney of 1904 survives, a block away. The Duvelhok has been a place for artists since the late 1960s.", "nl": "Van de BeKa-fabriek zelf staat alleen de schoorsteen uit 1904 nog, een blok verderop. Het Duvelhok is sinds eind jaren zestig een plek voor kunstenaars." } },
+        { "type": "photo", "prompt": { "en": "Photograph the old factory front through the iron fence.", "nl": "Fotografeer de oude fabrieksgevel door het smeedijzeren hek." } }
+      ]
+    },
+    {
+      "id": "aabe",
+      "title": { "en": "The blanket chimney", "nl": "De dekenschoorsteen" },
+      "category": "chimney",
+      "position": { "lat": 51.551, "lng": 5.1031 },
+      "radius": 40,
+      "clues": [
+        { "type": "text", "text": { "en": "Tilburg slept under the wool blankets made here. The mill is full of shops now, but its round chimney still stands on an eight-sided foot.", "nl": "Tilburg sliep onder de wollen dekens van deze fabriek. Nu zitten er winkels, maar de ronde schoorsteen staat nog op zijn achtkantige voet." } },
+        { "type": "text", "text": { "en": "South-east of the Piushaven, just north of the Ringbaan-Zuid.", "nl": "Ten zuidoosten van de Piushaven, net ten noorden van de Ringbaan-Zuid." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "AaBe", "nl": "AaBe" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "direction", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        {
+          "type": "quiz",
+          "question": { "en": "Which year is written on the chimney?", "nl": "Welk jaartal staat er op de schoorsteen?" },
+          "options": [
+            { "en": "1910", "nl": "1910" },
+            { "en": "1930", "nl": "1930" },
+            { "en": "1950", "nl": "1950" },
+            { "en": "1961", "nl": "1961" }
+          ],
+          "answer": 1
+        },
+        { "type": "fact", "text": { "en": "AaBe was founded in 1929 by a director of BeKa, the firm behind the Duvelhok. It made wool blankets. The halls were designed by G. Forest from Tourcoing, a French textile town.", "nl": "AaBe werd in 1929 opgericht door een directeur van BeKa, de firma van het Duvelhok. Het maakte wollen dekens. De hallen zijn ontworpen door G. Forest uit het Franse textielstadje Tourcoing." } },
+        { "type": "fact", "text": { "en": "Look at the roofs: a zigzag of sheds, glazed on the north side for even daylight. Since 2014 shops have filled the halls.", "nl": "Kijk naar de daken: een zigzag van sheddaken, aan de noordkant van glas, voor gelijkmatig daglicht. Sinds 2014 zitten er winkels in de hallen." } },
+        { "type": "photo", "prompt": { "en": "Photograph the chimney's eight-sided foot.", "nl": "Fotografeer de achtkantige voet van de schoorsteen." } }
+      ]
+    },
+    {
+      "id": "piushaven",
+      "title": { "en": "The harbour they saved", "nl": "De haven die bleef" },
+      "category": "harbour",
+      "position": { "lat": 51.5527, "lng": 5.098 },
+      "radius": 45,
+      "clues": [
+        { "type": "text", "text": { "en": "Tilburg dug itself a harbour in 1923. When the textile trade died, there were plans to fill it in. Find the water that stayed.", "nl": "Tilburg groef in 1923 een eigen haven. Toen de textiel verdween, waren er plannen om hem te dempen. Zoek het water dat bleef." } },
+        { "type": "text", "text": { "en": "On its north quay stands a yellow-brick grain office from 1935, with a square corner tower.", "nl": "Aan de noordkade staat een geelstenen graankantoor uit 1935, met een vierkante hoektoren." }, "reveal": { "onRequest": true } },
+        { "type": "wordShape", "word": { "en": "Piushaven", "nl": "Piushaven" }, "reveal": { "onRequest": true } },
+        { "type": "map", "view": "area", "reveal": { "onRequest": true } },
+        { "type": "distance", "reveal": { "onRequest": true } }
+      ],
+      "arrival": [
+        { "type": "fact", "text": { "en": "The harbour opened in 1923 on a branch of the new Wilhelmina Canal. Farms were pulled down to dig it, and even the Willem II football ground had to move.", "nl": "De haven ging in 1923 open, aan een zijtak van het nieuwe Wilhelminakanaal. Er werden boerderijen voor gesloopt, en zelfs het voetbalveld van Willem II moest verhuizen." } },
+        {
+          "type": "quiz",
+          "question": { "en": "The building with the corner tower was built in 1935. For which trade?", "nl": "Het gebouw met de hoektoren is uit 1935. Voor welke handel?" },
+          "options": [
+            { "en": "Grain and flour", "nl": "Graan en meel" },
+            { "en": "Wool", "nl": "Wol" },
+            { "en": "Coal", "nl": "Kolen" },
+            { "en": "Beer", "nl": "Bier" }
+          ],
+          "answer": 0
+        },
+        { "type": "fact", "text": { "en": "When Tilburg's textile industry collapsed in the 1970s, the harbour fell quiet, and plans came to fill it in for a road. Residents fought them off. Today the quays are full of terraces.", "nl": "Toen de Tilburgse textiel in de jaren zeventig instortte, werd het stil aan de haven, en kwamen er plannen om hem te dempen voor een weg. Bewoners hielden dat tegen. Nu staan de kades vol terrassen." } },
+        { "type": "photo", "prompt": { "en": "Photograph the harbour with a boat in the frame.", "nl": "Fotografeer de haven met een boot in beeld." } }
+      ]
+    }
+  ]
+}
